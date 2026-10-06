@@ -507,6 +507,8 @@
   <script src="data/data.js"></script>
   <script src="js/geo.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/telemetry.js"></script>
+  <script src="js/dev.js"></script>
   <script src="js/main.js"></script>
   <script>
     let currentTab = 'pending';
@@ -1299,7 +1301,17 @@
       `;
 
       setTimeout(() => {
-        initItineraryMap(points, booking.return_with_vehicle);
+        let deadheadOpt = null;
+        if (!booking.return_with_vehicle && booking.assignment && booking.assignment.vehicle_id) {
+          const sites = FleetStore.getSites() || [];
+          const vehicles = FleetStore.getVehicles() || [];
+          const v = vehicles.find(item => item.code === booking.assignment.vehicle_id);
+          const s = v ? sites.find(site => site.id === v.home_site_id) : null;
+          if (s && typeof s.lat === 'number' && typeof s.lng === 'number') {
+            deadheadOpt = { to_coords: { lat: s.lat, lng: s.lng } };
+          }
+        }
+        initItineraryMap(points, booking.return_with_vehicle, deadheadOpt);
       }, 50);
     }
 
@@ -1310,21 +1322,19 @@
       return true;
     }
 
-    function initItineraryMap(points, returnWithVehicle) {
+    function initItineraryMap(points, returnWithVehicle, deadheadOpt) {
       const container = document.getElementById('dispatch-itinerary-map');
       if (!container) return;
 
-      if (typeof drawItineraryMap === 'function') {
-        currentItineraryMapInstance = drawItineraryMap('dispatch-itinerary-map', points, {
-          returnWithVehicle: Boolean(returnWithVehicle),
-          height: '290px'
-        });
-      } else if (window.GeoService && typeof window.GeoService.drawItineraryMap === 'function') {
-        currentItineraryMapInstance = window.GeoService.drawItineraryMap('dispatch-itinerary-map', points, {
-          returnWithVehicle: Boolean(returnWithVehicle),
-          height: '290px'
-        });
+      const opts = {
+        returnWithVehicle: Boolean(returnWithVehicle),
+        height: '290px'
+      };
+      if (deadheadOpt) {
+        opts.deadhead = deadheadOpt;
       }
+
+      currentItineraryMapInstance = GeoMap.create('dispatch-itinerary-map').drawItinerary(points, opts);
     }
 
     function focusDispatchWaypoint(idx) {

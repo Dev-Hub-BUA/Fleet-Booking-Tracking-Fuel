@@ -6,6 +6,7 @@
   <title>Stop-by-Stop Waypoints — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="js/auth.js"></script>
 </head>
 <body>
@@ -63,7 +64,7 @@
         <div class="page-title-group">
           <span class="page-pretitle" id="trip-header-pretitle">BK-2047 · Active Manifest</span>
           <h1 class="page-title">Stop-by-Stop Waypoints</h1>
-          <span class="page-subtitle" id="trip-header-subtitle">V-122 (Hyundai H-1) · Lead: Dr. Sarah Mansour (+20 10 2233 4455)</span>
+          <span class="page-subtitle" id="trip-header-subtitle">V-122 (Hyundai H-1) · Lead: Demo Requester 1 (+20 000 000 0000)</span>
         </div>
         <a href="driver-run.html" class="btn btn-gold" id="btn-start-run" style="display:inline-flex; align-items:center; gap:6px;">
           <span>Open Live Navigation &amp; Run</span>
@@ -110,6 +111,8 @@
           </div>
         </div>
 
+        <div id="driver-trip-map" style="width: 100%; height: 320px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 16px; background: #E2E8F0;"></div>
+
         <div id="driver-stops-list" style="display: flex; flex-direction: column; gap: 16px;">
           <!-- Dynamically populated from booking.itinerary -->
         </div>
@@ -145,9 +148,9 @@
         <div class="footer-col">
           <h4>Fleet Operations Center</h4>
           <span>CIRA Education HQ · Central Logistics Operations</span>
-          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
-          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
-          <span>Email: fleet.operations@cira.com.eg</span>
+          <span>Operations Desk: <strong>Ext. 0000</strong></span>
+          <span>Emergency Line: <strong>+20 000 000 0000</strong></span>
+          <span>Email: operations@example.com</span>
           <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
         </div>
       </div>
@@ -164,6 +167,10 @@
 
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/geo.js"></script>
+  <script src="js/telemetry.js"></script>
+  <script src="js/dev.js"></script>
   <script src="js/main.js"></script>
   <script>
     let currentTripId = 'BK-2047';
@@ -190,6 +197,19 @@
       const days = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
 
       document.getElementById('trip-summary-pill').textContent = `${points.length} Stops · ${days} Days (${sDate} → ${eDate})`;
+
+      const driverMapInstance = GeoMap.create('driver-trip-map');
+      if (driverMapInstance) {
+        driverMapInstance.drawItinerary(points, { returnWithVehicle: trip.return_with_vehicle }).then(() => {
+          if (trip.status === 'Active' || trip.status === 'Dispatched') {
+            const vId = trip.assignment ? trip.assignment.vehicle_id : null;
+            const ping = Telemetry.latestForBooking(trip.id) || (vId ? Telemetry.latest(vId) : null);
+            if (ping && vId) {
+              driverMapInstance.setVehicle(vId, ping);
+            }
+          }
+        });
+      }
 
       points.forEach((point, idx) => {
         const isDep = point.type === 'departure';
@@ -243,7 +263,7 @@
               ` : ''}
               <div style="font-size: 12px; color: var(--navy-600); margin-top: 4px; display:flex; align-items:center; gap:4px;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                <span>Lead: ${escapeHtml(trip.requesterName || 'Dr. Sarah Mansour')} (${escapeHtml(trip.dept || 'Pharmacy')})</span>
+                <span>Lead: ${escapeHtml((trip.requester && trip.requester.name) || trip.requesterName || 'Demo Requester 1')} (${escapeHtml((trip.requester && trip.requester.department) || trip.dept || 'Pharmacy')})</span>
               </div>
             </div>
           </div>
@@ -324,7 +344,7 @@
       if (myTrip) {
         currentTripId = myTrip.id;
         document.getElementById('trip-header-pretitle').textContent = `${myTrip.id} · Active Manifest (${myTrip.status})`;
-        document.getElementById('trip-header-subtitle').textContent = `${myTrip.vehicleCode || 'V-122'} (${myTrip.vehicle || 'Hyundai H-1'}) · Lead: ${myTrip.requesterName || 'Dr. Sarah Mansour'} (${myTrip.dept || 'Pharmacy'})`;
+        document.getElementById('trip-header-subtitle').textContent = `${myTrip.vehicleCode || 'V-122'} (${myTrip.vehicle || 'Toyota HiAce'}) · Lead: ${(myTrip.requester && myTrip.requester.name) || myTrip.requesterName || 'Demo Requester 1'} (${(myTrip.requester && myTrip.requester.department) || myTrip.dept || 'Pharmacy'})`;
 
         const paxCount = myTrip.passengers || 4;
         const paxEl = document.getElementById('driver-passengers-text');

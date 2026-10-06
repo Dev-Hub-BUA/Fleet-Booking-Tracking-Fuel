@@ -314,9 +314,9 @@
         <div class="footer-col" id="footer-contact-col">
           <h4>Fleet Operations Center</h4>
           <span id="footer-contact-loc">CIRA Education HQ · Central Logistics Operations</span>
-          <span>Operations Desk: <strong id="footer-contact-desk">Ext. 4108 / 4109</strong></span>
-          <span>Emergency Line: <strong id="footer-contact-emer">+20 10 2233 4455</strong></span>
-          <span>Email: <a href="mailto:fleet.operations@cira.com.eg" id="footer-contact-email" style="color:inherit; text-decoration:underline;">fleet.operations@cira.com.eg</a></span>
+          <span>Operations Desk: <strong id="footer-contact-desk">Ext. 0000</strong></span>
+          <span>Emergency Line: <strong id="footer-contact-emer">+20 000 000 0000</strong></span>
+          <span>Email: <a href="mailto:operations@example.com" id="footer-contact-email" style="color:inherit; text-decoration:underline;">operations@example.com</a></span>
           <span id="footer-contact-hours" style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
         </div>
       </div>
@@ -335,6 +335,8 @@
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
   <script src="js/geo.js"></script>
+  <script src="js/telemetry.js"></script>
+  <script src="js/dev.js"></script>
   <script src="js/main.js"></script>
   <script>
     let currentBooking = null;
@@ -812,6 +814,21 @@
         returnWithVehicle: booking.return_with_vehicle
       });
 
+      if ((booking.status === 'Active' || booking.status === 'Dispatched') && booking.assignment && booking.assignment.vehicle_id) {
+        const vId = booking.assignment.vehicle_id;
+        const mapObj = GeoMap.create('detail-leaflet-map');
+        const initialPing = Telemetry.latestForBooking(booking.id) || Telemetry.latest(vId);
+        if (initialPing) {
+          mapObj.setVehicle(vId, initialPing);
+        }
+        Telemetry.subscribe(() => {
+          const ping = Telemetry.latestForBooking(booking.id) || Telemetry.latest(vId);
+          if (ping) {
+            mapObj.setVehicle(vId, ping);
+          }
+        });
+      }
+
       const timelineContainer = document.getElementById('detail-timeline-container');
       timelineContainer.innerHTML = '';
 
@@ -1024,7 +1041,7 @@
       const user = Auth.getUser() || { name: 'You' };
       FleetStore.addBookingMessage(currentBooking.id, {
         sender: 'requester',
-        senderName: user.name || 'Dr. Sarah Mansour',
+        senderName: user.name || 'Demo Requester 1',
         text: text
       });
 

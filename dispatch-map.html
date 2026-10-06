@@ -6,6 +6,7 @@
   <title>Live Map Telemetry Hub — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="js/auth.js"></script>
 </head>
 <body>
@@ -23,16 +24,9 @@
 
       <!-- Authenticated Controls -->
       <div class="header-actions">
-        <div class="search-wrapper">
-          <span class="search-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          </span>
-          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
-        </div>
-
         <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
-          <span class="badge-counter">3</span>
+          <span class="badge-counter">0</span>
         </a>
 
         <!-- User Dropdown Menu -->
@@ -62,79 +56,113 @@
 
     <main class="main-content" role="main">
       <div class="page-header">
-  <div class="page-title-group">
-    <span class="page-pretitle">Fleet Radar</span>
-    <h1 class="page-title">Live Telemetry Map Hub</h1>
-    <span class="page-subtitle">Real-time GPS telemetry, speed, engine health and active paths</span>
-  </div>
-</div>
-
-<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: start;">
-  <div class="map-canvas-container" style="flex: 999 1 600px; min-height: 600px;">
-    <div class="map-toolbar">
-      <span style="font-size: 13px; font-weight: 700; color: var(--navy-800);">Filter Fleet:</span>
-      <button type="button" class="btn btn-sm btn-primary">All</button>
-      <button type="button" class="btn btn-sm btn-secondary">Moving</button>
-      <button type="button" class="btn btn-sm btn-secondary">Idle</button>
-      <button type="button" class="btn btn-sm btn-secondary">Incident</button>
-    </div>
-
-    <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" preserveAspectRatio="none">
-      <line x1="100" y1="520" x2="780" y2="180" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
-      <line x1="200" y1="150" x2="600" y2="480" stroke="#CBD5E1" stroke-width="4" stroke-dasharray="6,6"/>
-      <line x1="50" y1="400" x2="850" y2="400" stroke="#CBD5E1" stroke-width="4"/>
-    </svg>
-
-    <div class="map-vehicle-pin" style="left: 42%; top: 50%;" onclick="inspectVehicle('V-122', 'Hyundai H-1', 'Driver A', 'BK-2047', 'Obour → 10th of Ramadan', 72, 82, 22, 'Moving');">
-      <div class="pin-bubble">V-122 · 72 km/h</div>
-      <div class="pin-marker moving"></div>
-    </div><div class="map-vehicle-pin" style="left: 78%; top: 65%;" onclick="inspectVehicle('V-130', 'Toyota HiAce', 'Driver B', 'Standby', 'Campus Depot', 0, 94, 21, 'Idle');">
-      <div class="pin-bubble">V-130 · 0 km/h</div>
-      <div class="pin-marker idle"></div>
-    </div><div class="map-vehicle-pin" style="left: 25%; top: 35%;" onclick="inspectVehicle('V-114', 'Toyota HiAce', 'Driver C', 'BK-2041', 'Cairo Airport Corridor', 58, 68, 23, 'Moving');">
-      <div class="pin-bubble">V-114 · 58 km/h</div>
-      <div class="pin-marker moving"></div>
-    </div><div class="map-vehicle-pin" style="left: 55%; top: 40%;" onclick="inspectVehicle('B-03', 'MCV Coach 45', 'Driver K', 'BK-2039', 'Cairo-Ismailia Desert Rd Km 42', 0, 45, 38, 'Incident');">
-      <div class="pin-bubble">B-03 · 0 km/h</div>
-      <div class="pin-marker incident"></div>
-    </div><div class="map-vehicle-pin" style="left: 72%; top: 22%;" onclick="inspectVehicle('T-02', 'Isuzu Box Truck', 'Driver I', 'BK-2044', '10th of Ramadan Zone 3', 64, 75, 24, 'Moving');">
-      <div class="pin-bubble">T-02 · 64 km/h</div>
-      <div class="pin-marker moving"></div>
-    </div><div class="map-vehicle-pin" style="left: 75%; top: 72%;" onclick="inspectVehicle('S-11', 'Hyundai Elantra', 'Driver E', 'Standby', 'Badr University Gate 1', 0, 88, 22, 'Idle');">
-      <div class="pin-bubble">S-11 · 0 km/h</div>
-      <div class="pin-marker idle"></div>
-    </div><div class="map-vehicle-pin" style="left: 15%; top: 80%;" onclick="inspectVehicle('V-205', 'Toyota Corolla', 'Driver F', 'BK-2049', 'Terminal 3 VIP Road', 68, 62, 23, 'Moving');">
-      <div class="pin-bubble">V-205 · 68 km/h</div>
-      <div class="pin-marker moving"></div>
-    </div>
-  </div>
-
-  <div style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 16px;">
-    <div class="card" id="map-inspector-card">
-      <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <h2 style="margin: 0; font-size: 24px; color: var(--navy-800);" id="mi-model">Hyundai H-1</h2>
-        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--navy-600);" id="mi-code">V-122</span>
-      </div>
-      <span class="badge badge-info" id="mi-badge">Moving</span>
-
-      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px; margin-top: 8px;">
-        <div style="display: flex; justify-content: space-between;"><span>Driver:</span><strong id="mi-driver">Ahmed Hassan (Driver A)</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Active Mission:</span><strong id="mi-trip">BK-2047</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Current Route:</span><strong id="mi-route">Obour → 10th of Ramadan</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Current Speed:</span><strong style="font-family:var(--font-mono);" id="mi-speed">72 km/h</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Fuel Remaining:</span><strong style="font-family:var(--font-mono);" id="mi-fuel">82%</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Engine Temp:</span><strong style="font-family:var(--font-mono);" id="mi-temp">22 °C</strong></div>
+        <div class="page-title-group">
+          <span class="page-pretitle">Fleet Radar</span>
+          <h1 class="page-title">Live Telemetry Map Hub</h1>
+          <span class="page-subtitle">Real-time GPS telemetry, speed, vehicle health, and active mission corridors</span>
+        </div>
       </div>
 
-      <div id="mi-incident-cta" style="margin-top: 14px; display: none;">
-        <a href="incident.html" class="btn btn-danger" style="width: 100%; box-sizing:border-box; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
-          <span>Open Emergency Incident Triage</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
+      <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: start;">
+        <!-- Left Column: Map and Filter Controls -->
+        <div style="flex: 999 1 620px; display: flex; flex-direction: column; gap: 12px;">
+          <!-- Filter Controls Bar -->
+          <div class="card" style="padding: 10px 16px;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span style="font-size: 12.5px; font-weight: 700; color: var(--navy-800); margin-right: 4px;">Status:</span>
+                <button type="button" class="btn btn-sm btn-primary filter-status-btn active" data-status="ALL" onclick="setStatusFilter('ALL')">All</button>
+                <button type="button" class="btn btn-sm btn-secondary filter-status-btn" data-status="Moving" onclick="setStatusFilter('Moving')">Moving</button>
+                <button type="button" class="btn btn-sm btn-secondary filter-status-btn" data-status="Idle" onclick="setStatusFilter('Idle')">Idle</button>
+                <button type="button" class="btn btn-sm btn-secondary filter-status-btn" data-status="Incident" onclick="setStatusFilter('Incident')">Incident</button>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <label for="filter-site" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Site:</label>
+                  <select id="filter-site" onchange="applyFilters()" style="padding: 5px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; background: #FFF;">
+                    <option value="ALL">All CIRA Sites</option>
+                  </select>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <label for="filter-type" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Type:</label>
+                  <select id="filter-type" onchange="applyFilters()" style="padding: 5px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; background: #FFF;">
+                    <option value="ALL">All Categories</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leaflet Fleet Map Container -->
+          <div class="card" style="padding: 0; overflow: hidden; position: relative;">
+            <div id="dispatch-fleet-map" style="width: 100%; height: 580px; background: #E2E8F0;"></div>
+          </div>
+        </div>
+
+        <!-- Right Column: Vehicle Inspector Card -->
+        <div style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 16px;">
+          <div class="card" id="map-inspector-card">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
+              <h2 style="margin: 0; font-size: 22px; color: var(--navy-800);" id="mi-model">Select a Vehicle</h2>
+              <span style="font-family: var(--font-mono); font-weight: 700; color: var(--navy-600);" id="mi-code">—</span>
+            </div>
+            <div style="margin-bottom: 12px;">
+              <span class="badge badge-neutral" id="mi-badge">Click marker to inspect</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13.5px;">
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                <span style="color:var(--text-muted);">Driver:</span>
+                <strong id="mi-driver">—</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                <span style="color:var(--text-muted);">Active Mission:</span>
+                <strong id="mi-trip" style="font-family:var(--font-mono);">Standby</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                <span style="color:var(--text-muted);">Route / Site:</span>
+                <strong id="mi-route">—</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                <span style="color:var(--text-muted);">Current Speed:</span>
+                <strong style="font-family:var(--font-mono);" id="mi-speed">0 km/h</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                <span style="color:var(--text-muted);">ETA Remaining:</span>
+                <strong style="font-family:var(--font-mono);" id="mi-eta">—</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color:var(--text-muted);">Last Telemetry Ping:</span>
+                <strong style="font-family:var(--font-mono); font-size:12px; color:var(--text-muted);" id="mi-ping">—</strong>
+              </div>
+            </div>
+
+            <div id="mi-mission-cta" style="margin-top: 14px; display: none;">
+              <a id="mi-mission-link" href="#" class="btn btn-secondary btn-sm" style="width: 100%; box-sizing:border-box; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Open Booking Details</span>
+              </a>
+            </div>
+
+            <div id="mi-incident-cta" style="margin-top: 10px; display: none;">
+              <a href="incident.html" class="btn btn-danger btn-sm" style="width: 100%; box-sizing:border-box; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>Open Emergency Incident Triage</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Fleet List -->
+          <div class="card" style="padding: 14px;">
+            <h3 class="card-title" style="margin-bottom: 10px;">Tracked Fleet Units</h3>
+            <div id="fleet-list-container" style="max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
     </main>
   </div>
 
@@ -166,9 +194,9 @@
         <div class="footer-col">
           <h4>Fleet Operations Center</h4>
           <span>CIRA Education HQ · Central Logistics Operations</span>
-          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
-          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
-          <span>Email: fleet.operations@cira.com.eg</span>
+          <span>Operations Desk: <strong>Ext. 0000</strong></span>
+          <span>Emergency Line: <strong>+20 000 000 0000</strong></span>
+          <span>Email: operations@example.com</span>
           <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
         </div>
       </div>
@@ -184,33 +212,225 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/geo.js"></script>
+  <script src="js/telemetry.js"></script>
+  <script src="js/dev.js"></script>
   <script src="js/main.js"></script>
   <script>
+    let fleetMapInstance = null;
+    let selectedVehicleId = null;
+    let activeStatusFilter = 'ALL';
+    let unsubscribeTelemetry = null;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function (m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[m];
+      });
+    }
+
+    function setStatusFilter(status) {
+      activeStatusFilter = status;
+      document.querySelectorAll('.filter-status-btn').forEach(btn => {
+        const matches = btn.getAttribute('data-status') === status;
+        btn.classList.toggle('btn-primary', matches);
+        btn.classList.toggle('btn-secondary', !matches);
+        btn.classList.toggle('active', matches);
+      });
+      applyFilters();
+    }
+
+    function populateFilterDropdowns() {
+      const sites = FleetStore.getSites() || [];
+      const siteSelect = document.getElementById('filter-site');
+      if (siteSelect) {
+        sites.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = s.name;
+          siteSelect.appendChild(opt);
+        });
+      }
+
+      const vehicles = FleetStore.getVehicles() || [];
+      const types = Array.from(new Set(vehicles.map(v => v.type).filter(Boolean)));
+      const typeSelect = document.getElementById('filter-type');
+      if (typeSelect) {
+        types.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          typeSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function applyFilters() {
+      const allLive = Telemetry.getAllLiveVehicles();
+      const siteVal = document.getElementById('filter-site').value;
+      const typeVal = document.getElementById('filter-type').value;
+
+      const filtered = allLive.filter(v => {
+        if (activeStatusFilter !== 'ALL' && v.status !== activeStatusFilter) return false;
+        if (typeVal !== 'ALL' && v.type !== typeVal) return false;
+        if (siteVal !== 'ALL') {
+          const rawV = (FleetStore.getVehicles() || []).find(item => item.code === v.code);
+          if (rawV && rawV.home_site_id !== siteVal) return false;
+        }
+        return true;
+      });
+
+      fleetMapInstance.setVehicles(filtered);
+      renderFleetList(filtered);
+
+      if (selectedVehicleId) {
+        const currentSelected = filtered.find(v => v.code === selectedVehicleId);
+        if (currentSelected) {
+          inspectVehicle(currentSelected);
+        }
+      }
+    }
+
+    function renderFleetList(vehicles) {
+      const listEl = document.getElementById('fleet-list-container');
+      if (!listEl) return;
+
+      if (vehicles.length === 0) {
+        listEl.innerHTML = '<div style="font-size:12px; color:var(--text-muted); padding:8px 0;">No units match filter criteria.</div>';
+        return;
+      }
+
+      listEl.innerHTML = vehicles.map(v => {
+        const badgeClass = v.status === 'Moving' ? 'badge-success' : (v.status === 'Incident' ? 'badge-danger' : 'badge-neutral');
+        const isSel = v.code === selectedVehicleId;
+        const bg = isSel ? 'var(--navy-50)' : 'transparent';
+        const border = isSel ? '1px solid var(--navy-800)' : '1px solid var(--border-light)';
+
+        return `
+          <div onclick="selectVehicleByCode('${escapeHtml(v.code)}')" style="padding:6px 10px; border-radius:4px; background:${bg}; border:${border}; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="font-size:12.5px; color:var(--navy-900);">${escapeHtml(v.code)}</strong>
+              <span style="font-size:11px; color:var(--text-muted); margin-left:4px;">${escapeHtml(v.model)}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-family:var(--font-mono); font-size:11.5px; color:var(--navy-700);">${v.speed_kmh} km/h</span>
+              <span class="badge ${badgeClass}" style="font-size:10.5px; padding:1px 6px;">${escapeHtml(v.status)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function inspectVehicle(v) {
+      selectedVehicleId = v.code;
+      document.getElementById('mi-model').textContent = `${v.make} ${v.model}`;
+      document.getElementById('mi-code').textContent = v.code;
+
+      const badge = document.getElementById('mi-badge');
+      badge.textContent = v.status;
+      badge.className = v.status === 'Moving' ? 'badge badge-success' : (v.status === 'Incident' ? 'badge badge-danger' : 'badge badge-neutral');
+
+      document.getElementById('mi-driver').textContent = v.driver_name || 'Standby Depot';
+      document.getElementById('mi-speed').textContent = `${v.speed_kmh} km/h`;
+
+      const pingDate = new Date(v.at);
+      const pingTimeStr = !isNaN(pingDate.getTime()) ? pingDate.toLocaleTimeString('en-GB') : 'Just now';
+      document.getElementById('mi-ping').textContent = `${pingTimeStr} (${v.is_stale ? 'Signal lost' : 'Active'})`;
+
+      const tripEl = document.getElementById('mi-trip');
+      const routeEl = document.getElementById('mi-route');
+      const etaEl = document.getElementById('mi-eta');
+      const missionCta = document.getElementById('mi-mission-cta');
+      const missionLink = document.getElementById('mi-mission-link');
+      const incidentCta = document.getElementById('mi-incident-cta');
+
+      if (v.status === 'Incident') {
+        incidentCta.style.display = 'block';
+      } else {
+        incidentCta.style.display = 'none';
+      }
+
+      if (v.booking_id) {
+        tripEl.textContent = v.booking_id;
+        missionCta.style.display = 'block';
+        missionLink.href = `booking-detail.html?id=${v.booking_id}`;
+
+        const b = FleetStore.getBooking(v.booking_id);
+        if (b && b.itinerary && b.itinerary.length > 0) {
+          const rText = b.itinerary.map(p => p.place_name || 'Point').join(' → ');
+          routeEl.textContent = rText;
+
+          await fleetMapInstance.drawItinerary(b.itinerary, { returnWithVehicle: b.return_with_vehicle });
+          fleetMapInstance.setVehicle(v.code, v);
+
+          if (fleetMapInstance.legs && fleetMapInstance.legs.length > 0) {
+            const allCoords = [];
+            fleetMapInstance.legs.forEach(l => { if (l.coordinates) allCoords.push(...l.coordinates); });
+            const prog = GeoRoute.progress(allCoords, { lat: v.lat, lng: v.lng, speed_kmh: v.speed_kmh });
+            etaEl.textContent = `${prog.remaining_km} km (${prog.remaining_min} min)`;
+          } else {
+            etaEl.textContent = 'Active Corridor';
+          }
+        } else {
+          routeEl.textContent = 'Mission underway';
+          etaEl.textContent = 'Active';
+        }
+      } else {
+        tripEl.textContent = 'Standby Depot';
+        routeEl.textContent = 'Home site base';
+        etaEl.textContent = 'Stationary';
+        missionCta.style.display = 'none';
+      }
+
+      fleetMapInstance.focusVehicle(v.code);
+    }
+
+    function selectVehicleByCode(code) {
+      const all = Telemetry.getAllLiveVehicles();
+      const v = all.find(item => item.code === code);
+      if (v) inspectVehicle(v);
+    }
+
+    function initDispatchMap() {
+      populateFilterDropdowns();
+
+      fleetMapInstance = GeoMap.create('dispatch-fleet-map', {
+        center: [28.2, 31.0],
+        zoom: 7,
+        onVehicleClick: (id, data) => {
+          inspectVehicle(data);
+        }
+      });
+
+      applyFilters();
+
+      const allLive = Telemetry.getAllLiveVehicles();
+      const firstActive = allLive.find(v => v.status === 'Moving') || allLive[0];
+      if (firstActive) {
+        inspectVehicle(firstActive);
+      }
+
+      unsubscribeTelemetry = Telemetry.subscribe(() => {
+        applyFilters();
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
-      if (!Auth.requireAuth(["Dispatcher"])) return;
-      Auth.renderAppShell('map');
-      
-function inspectVehicle(code, model, driver, trip, route, speed, fuel, temp, status) {
-  document.getElementById('mi-code').textContent = code;
-  document.getElementById('mi-model').textContent = model;
-  document.getElementById('mi-driver').textContent = driver;
-  document.getElementById('mi-trip').textContent = trip;
-  document.getElementById('mi-route').textContent = route;
-  document.getElementById('mi-speed').textContent = speed + ' km/h';
-  document.getElementById('mi-fuel').textContent = fuel + '%';
-  document.getElementById('mi-temp').textContent = temp + ' °C';
-  
-  const b = document.getElementById('mi-badge');
-  b.textContent = status;
-  b.className = 'badge ' + (status === 'Incident' ? 'badge-danger' : status === 'Moving' ? 'badge-info' : 'badge-success');
-  
-  const cta = document.getElementById('mi-incident-cta');
-  if (code === 'B-03' || status === 'Incident') {
-    cta.style.display = 'block';
-  } else {
-    cta.style.display = 'none';
-  }
-}
+      if (!Auth.requireAuth(['Dispatcher', 'Fleet admin'])) return;
+      Auth.renderAppShell('dispatch-map');
+      initDispatchMap();
+    });
+
+    window.addEventListener('beforeunload', function () {
+      if (unsubscribeTelemetry) unsubscribeTelemetry();
     });
   </script>
 </body>

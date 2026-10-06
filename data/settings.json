@@ -23,9 +23,9 @@
   },
   "contacts": {
     "office": "CIRA Central Logistics Directorate, Campus Admin Bldg, G-14",
-    "dispatchDesk": "Ext. 4108 / 4109",
-    "emergencyHotline": "+20 10 2233 4455",
-    "email": "fleet.operations@cira.com.eg",
+    "dispatchDesk": "Ext. 0000",
+    "emergencyHotline": "+20 000 000 0000",
+    "email": "operations@example.com",
     "hours": "24/7 Operations Command & Dispatch"
   },
   "fuelPrices": {

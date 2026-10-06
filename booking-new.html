@@ -541,58 +541,6 @@
     </main>
   </div>
 
-  <!-- Map Picker Modal -->
-  <div id="map-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: #FFFFFF; border-radius: 12px; max-width: 640px; width: 100%; padding: 24px; box-shadow: var(--shadow-xl); position: relative; max-height: 92vh; display: flex; flex-direction: column; gap: 16px;">
-      
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
-        <div>
-          <h3 style="margin: 0; color: var(--navy-800); font-size: 19px;">Pick Location on Map</h3>
-          <span style="font-size: 12.5px; color: var(--text-muted);">Search a campus or click anywhere on the map to drop a pin</span>
-        </div>
-        <button type="button" onclick="closeMapModal();" style="background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; display: inline-flex;" aria-label="Close modal">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-
-      <!-- Search Location in Modal (Nominatim) -->
-      <div>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="modal-place-search" class="form-input" placeholder="Search address, campus or landmark in Egypt (e.g. Cairo University, Assiut)..." onkeydown="if(event.key==='Enter'){event.preventDefault();executeNominatimSearch();}">
-          <button type="button" class="btn btn-primary" id="btn-modal-search" onclick="executeNominatimSearch();" style="flex-shrink:0; display:inline-flex; align-items:center; gap:6px;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span>Search</span>
-          </button>
-        </div>
-        <div id="modal-search-results" style="display: none; max-height: 140px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-top: 6px; background: #FFF; box-shadow: var(--shadow-md);"></div>
-      </div>
-
-      <!-- Quick Preset Locations -->
-      <div id="modal-place-chips" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 60px; overflow-y: auto;">
-        <!-- Chips injected by JS -->
-      </div>
-
-      <!-- Real Leaflet Map Container -->
-      <div id="modal-leaflet-map" style="position: relative; height: 320px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); z-index: 10;"></div>
-
-      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-page); padding: 10px 14px; border-radius: var(--radius-sm);">
-        <div>
-          <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; display: block;">Selected Location</span>
-          <strong id="modal-pin-label" style="color: var(--navy-800); font-size: 13.5px;">Badr University in Assiut</strong>
-        </div>
-        <div style="text-align: right;">
-          <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; display: block;">Coordinates</span>
-          <strong id="modal-coords-display" style="font-family: var(--font-mono); font-size: 13px; color: var(--navy-800);">27.1809° N, 31.1837° E</strong>
-        </div>
-      </div>
-
-      <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); padding-top: 14px;">
-        <button type="button" class="btn btn-secondary" onclick="closeMapModal();">Cancel</button>
-        <button type="button" class="btn btn-gold" onclick="confirmModalPin();">Use this location</button>
-      </div>
-
-    </div>
-  </div>
 
   <!-- Re-Approval Confirmation Modal for Approved Bookings -->
   <div id="reapproval-confirm-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
@@ -641,9 +589,9 @@
         <div class="footer-col">
           <h4>Fleet Operations Center</h4>
           <span>CIRA Education HQ · Central Logistics Operations</span>
-          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
-          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
-          <span>Email: fleet.operations@cira.com.eg</span>
+          <span>Operations Desk: <strong>Ext. 0000</strong></span>
+          <span>Emergency Line: <strong>+20 000 000 0000</strong></span>
+          <span>Email: operations@example.com</span>
           <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
         </div>
       </div>
@@ -680,11 +628,6 @@
     let itineraryPoints = [];
     let returnWithVehicle = true;
     let editingBookingId = null;
-    let activeModalPointIndex = null;
-    let modalTempCoords = { lat: 27.1809, lng: 31.1837, placeName: 'Badr University in Assiut' };
-
-    let modalLeafletMap = null;
-    let modalMarker = null;
     let summaryLeafletMap = null;
     let summaryMapLayers = [];
     let routingDebounceTimer = null;
@@ -702,8 +645,6 @@
       } else {
         initDefaultPrefill();
       }
-
-      renderModalLocationChips();
     });
 
     function initDefaultPrefill() {
@@ -1110,7 +1051,7 @@
 
             <div class="form-group" style="margin:0;">
               <label class="form-label" style="font-size:12px; color:var(--text-muted);">Waybill Notes / Gate / Loading Contact (Optional)</label>
-              <input type="text" class="form-input" style="font-size:13px;" placeholder="e.g. Lead contact Dr. Sarah (+20 10 2233 4455) · Gate 2 Bay 4" value="${escapeHtml(point.notes || '')}" onchange="updatePointNotes(${index}, this.value);">
+              <input type="text" class="form-input" style="font-size:13px;" placeholder="e.g. Lead contact Demo Requester 1 (+20 000 000 0000) · Gate 2 Bay 4" value="${escapeHtml(point.notes || '')}" onchange="updatePointNotes(${index}, this.value);">
             </div>
           </div>
         `;
@@ -1499,167 +1440,28 @@
       return executeRoutingUpdate();
     }
 
-    function openMapModalForPoint(index) {
+    async function openMapModalForPoint(index) {
       activeModalPointIndex = index;
       const pt = itineraryPoints[index];
-      modalTempCoords.lat = (typeof pt.lat === 'number') ? pt.lat : 27.1809;
-      modalTempCoords.lng = (typeof pt.lng === 'number') ? pt.lng : 31.1837;
-      modalTempCoords.placeName = pt.place_name || '';
+      const initial = {
+        lat: (typeof pt.lat === 'number') ? pt.lat : 27.1809,
+        lng: (typeof pt.lng === 'number') ? pt.lng : 31.1837,
+        place_name: pt.place_name || ''
+      };
 
-      document.getElementById('modal-place-search').value = pt.place_name || '';
-      document.getElementById('modal-pin-label').textContent = pt.place_name || 'Selected Location';
-      document.getElementById('modal-coords-display').textContent = `${modalTempCoords.lat.toFixed(6)}° N, ${modalTempCoords.lng.toFixed(6)}° E`;
-      document.getElementById('modal-search-results').style.display = 'none';
-
-      const modalEl = document.getElementById('map-modal');
-      modalEl.style.display = 'flex';
-
-      setTimeout(() => {
-        initOrUpdateModalMap(modalTempCoords.lat, modalTempCoords.lng, pt.pinned);
-      }, 120);
-    }
-
-    function initOrUpdateModalMap(lat, lng, isPinned) {
-      if (typeof L === 'undefined') return;
-
-      const mapContainer = document.getElementById('modal-leaflet-map');
-      if (!mapContainer) return;
-
-      const initialZoom = isPinned ? 13 : 6;
-
-      if (!modalLeafletMap) {
-        modalLeafletMap = L.map('modal-leaflet-map', {
-          zoomControl: true,
-          attributionControl: true
-        }).setView([lat, lng], initialZoom);
-
-        const tileLayer = GeoService.createTileLayer();
-        if (tileLayer) tileLayer.addTo(modalLeafletMap);
-
-        modalLeafletMap.on('click', (e) => {
-          updateModalMarkerPosition(e.latlng.lat, e.latlng.lng, null);
-        });
-      } else {
-        modalLeafletMap.setView([lat, lng], initialZoom);
-        modalLeafletMap.invalidateSize();
-      }
-
-      if (!modalMarker) {
-        modalMarker = L.marker([lat, lng], { draggable: true }).addTo(modalLeafletMap);
-        modalMarker.on('dragend', (e) => {
-          const pos = e.target.getLatLng();
-          updateModalMarkerPosition(pos.lat, pos.lng, null);
-        });
-      } else {
-        modalMarker.setLatLng([lat, lng]);
-      }
-
-      modalLeafletMap.invalidateSize();
-    }
-
-    function updateModalMarkerPosition(lat, lng, name) {
-      modalTempCoords.lat = Number(Number(lat).toFixed(6));
-      modalTempCoords.lng = Number(Number(lng).toFixed(6));
-
-      if (name) {
-        modalTempCoords.placeName = name;
-        document.getElementById('modal-place-search').value = name;
-        document.getElementById('modal-pin-label').textContent = name;
-      }
-
-      document.getElementById('modal-coords-display').textContent = `${modalTempCoords.lat.toFixed(6)}° N, ${modalTempCoords.lng.toFixed(6)}° E`;
-
-      if (modalMarker) {
-        modalMarker.setLatLng([modalTempCoords.lat, modalTempCoords.lng]);
-      }
-      if (modalLeafletMap) {
-        modalLeafletMap.panTo([modalTempCoords.lat, modalTempCoords.lng]);
-      }
-    }
-
-    function closeMapModal() {
-      document.getElementById('map-modal').style.display = 'none';
-      document.getElementById('modal-search-results').style.display = 'none';
-      activeModalPointIndex = null;
-    }
-
-    async function executeNominatimSearch() {
-      const q = document.getElementById('modal-place-search').value.trim();
-      if (!q) return;
-
-      const resultsContainer = document.getElementById('modal-search-results');
-      resultsContainer.style.display = 'block';
-      resultsContainer.innerHTML = '<div style="padding:10px; color:var(--text-muted); font-size:12.5px;">Searching locations in Egypt...</div>';
-
-      try {
-        const results = await GeoService.searchNominatim(q);
-        if (!results || results.length === 0) {
-          resultsContainer.innerHTML = '<div style="padding:10px; color:var(--text-muted); font-size:12.5px;">No locations found. Try a different search term or click directly on the map.</div>';
-          return;
+      const picked = await GeoMap.pickLocation(initial);
+      if (picked) {
+        pt.lat = picked.lat;
+        pt.lng = picked.lng;
+        pt.pinned = true;
+        pt.approx = false;
+        pt.location_not_set = false;
+        if (picked.place_name) {
+          pt.place_name = picked.place_name;
         }
-
-        resultsContainer.innerHTML = '';
-        results.forEach(res => {
-          const item = document.createElement('div');
-          item.className = 'modal-search-item';
-          item.innerHTML = `
-            <strong>${escapeHtml(res.name)}</strong>
-            <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">${escapeHtml(res.fullAddress)}</div>
-          `;
-          item.onclick = () => {
-            selectModalSearchResult(res);
-          };
-          resultsContainer.appendChild(item);
-        });
-      } catch (err) {
-        resultsContainer.innerHTML = '<div style="padding:10px; color:#B91C1C; font-size:12.5px;">Search error. You can drop a pin directly on the map.</div>';
+        renderPointsList();
+        scheduleRoutingUpdate();
       }
-    }
-
-    function selectModalSearchResult(result) {
-      document.getElementById('modal-search-results').style.display = 'none';
-      updateModalMarkerPosition(result.lat, result.lng, result.name);
-      if (modalLeafletMap) {
-        modalLeafletMap.setView([result.lat, result.lng], 14);
-      }
-    }
-
-    function renderModalLocationChips() {
-      const container = document.getElementById('modal-place-chips');
-      if (!container) return;
-      container.innerHTML = '';
-      FleetStore.RouteEstimator.locations.forEach(loc => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'role-pill-btn';
-        btn.style.color = 'var(--navy-800)';
-        btn.style.borderColor = 'var(--border)';
-        btn.style.background = 'var(--bg-page)';
-        btn.textContent = loc.name;
-        btn.onclick = () => {
-          updateModalMarkerPosition(loc.lat, loc.lng, loc.name);
-          if (modalLeafletMap) {
-            modalLeafletMap.setView([loc.lat, loc.lng], 13);
-          }
-        };
-        container.appendChild(btn);
-      });
-    }
-
-    function confirmModalPin() {
-      if (activeModalPointIndex === null) return;
-      const pt = itineraryPoints[activeModalPointIndex];
-      pt.lat = Number(modalTempCoords.lat.toFixed(6));
-      pt.lng = Number(modalTempCoords.lng.toFixed(6));
-      pt.pinned = true;
-      pt.approx = false;
-      pt.location_not_set = false;
-      if (modalTempCoords.placeName) {
-        pt.place_name = modalTempCoords.placeName;
-      }
-      closeMapModal();
-      renderPointsList();
-      scheduleRoutingUpdate();
     }
 
     // Validation & Submission
@@ -1848,7 +1650,7 @@
       const overnightInput = document.getElementById('driver-overnight-location');
       const overnightLoc = overnightInput ? overnightInput.value.trim() : '';
 
-      const user = Auth.getUser() || { name: 'Dr. Sarah Mansour', dept: 'Faculty of Pharmacy', id: 'USR-REQ-101' };
+      const user = Auth.getUser() || { name: 'Demo Requester 1', dept: 'Faculty of Pharmacy', id: 'USR-REQ-101' };
       const costCenter = FleetStore.getCostCenterForDepartment(user.dept);
 
       const loadFactor = (hasExtra && cargoWeight > 0) ? (1.0 + Math.min(0.3, (cargoWeight / 1000) * 0.15)) : 1.0;
@@ -1873,7 +1675,7 @@
         cost_center: costCenter,
         requester: {
           id: user.id || 'USR-REQ-101',
-          name: user.name || 'Dr. Sarah Mansour',
+          name: user.name || 'Demo Requester 1',
           department: user.dept || 'Faculty of Pharmacy'
         }
       };

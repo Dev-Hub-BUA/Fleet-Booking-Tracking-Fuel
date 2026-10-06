@@ -7,73 +7,78 @@
     "version": "3.0.0",
     "contact": {
       "location": "CIRA Education HQ · Central Fleet Operations Command",
-      "dispatchDesk": "Ext. 4108 / 4109",
-      "emergencyLine": "+20 10 2233 4455",
-      "email": "fleet.operations@cira.com.eg",
+      "dispatchDesk": "Ext. 0000",
+      "emergencyLine": "+20 000 000 0000",
+      "email": "operations@example.com",
       "workingHours": "24/7 Operations Command & Dispatch"
     }
   },
   "users": {
     "Requester": {
-      "id": "USR-RQ-101",
-      "name": "Dr. Sarah Mansour",
+      "id": "USR-REQ-101",
+      "name": "Demo Requester 1",
       "role": "Requester",
-      "title": "Associate Professor & Lab Director",
+      "title": "Faculty Member",
       "dept": "Faculty of Pharmacy",
-      "email": "sarah.mansour@buc.edu.eg",
-      "initials": "SM",
+      "cost_center": "CC-101",
+      "email": "demo.requester1@example.com",
+      "initials": "DR",
       "bell": 3,
       "avatarBg": "#0B2545",
       "quotaRemainingEGP": 14200,
       "quotaUsedPct": 64
     },
     "Dispatcher": {
-      "id": "USR-DS-202",
-      "name": "Tarek El-Sayed",
+      "id": "USR-DSP-204",
+      "name": "Demo Ops Manager",
       "role": "Dispatcher",
-      "title": "Chief Dispatch Officer",
-      "dept": "Central Fleet Operations Desk",
-      "email": "tarek.elsayed@buc.edu.eg",
-      "initials": "TE",
+      "title": "Operations & Dispatch Manager",
+      "dept": "Logistics Command Desk",
+      "cost_center": "CC-201",
+      "email": "demo.ops@example.com",
+      "initials": "DO",
       "bell": 6,
       "avatarBg": "#1D4E89",
       "activeShiftsCount": 8,
       "pendingRequestsCount": 4
     },
     "Driver": {
-      "id": "USR-DR-303",
-      "name": "Ahmed Hassan (Driver A)",
+      "id": "D-101",
+      "name": "Demo Driver 01",
       "role": "Driver",
-      "title": "Senior Fleet Driver",
-      "dept": "Transport & Fleet Services",
-      "email": "ahmed.hassan@buc.edu.eg",
-      "initials": "AH",
+      "title": "Field Fleet Driver",
+      "dept": "Central Transport Pool",
+      "cost_center": "CC-201",
+      "email": "demo.driver01@example.com",
+      "initials": "DD",
       "bell": 2,
       "avatarBg": "#D4AF37",
-      "assignedVehicle": "Hyundai H-1 (V-122)",
+      "assignedVehicle": "Toyota HiAce (V-122)",
       "shiftDuty": "6.5 / 8.0 h"
     },
     "Fleet admin": {
-      "id": "USR-FA-404",
-      "name": "Eng. Mahmoud Fawzy",
+      "id": "USR-ADM-401",
+      "name": "Demo Fleet Admin",
       "role": "Fleet admin",
       "title": "Director of Transport & Logistics",
-      "dept": "Campus Operations & Logistics",
-      "email": "mahmoud.fawzy@buc.edu.eg",
-      "initials": "MF",
+      "dept": "Fleet Operations Directorate",
+      "cost_center": "CC-301",
+      "email": "demo.admin@example.com",
+      "initials": "DF",
       "bell": 4,
       "avatarBg": "#0B2545",
       "totalVehicles": 24,
       "fleetAvailabilityPct": 87.5
     },
     "Auditor": {
-      "id": "USR-AU-505",
-      "name": "Laila Rostom",
+      "id": "USR-AUD-505",
+      "name": "Demo Auditor",
       "role": "Auditor",
       "title": "Internal Audit & Financial Controller",
-      "dept": "Internal Audit Bureau",
-      "email": "laila.rostom@buc.edu.eg",
-      "initials": "LR",
+      "dept": "Financial Compliance Bureau",
+      "cost_center": "CC-401",
+      "email": "demo.auditor@example.com",
+      "initials": "DA",
       "bell": 3,
       "avatarBg": "#3B82F6",
       "unreconciledTrips": 2,
@@ -580,7 +585,7 @@
   ],
   "bookingDetail": {
     "id": "BK-2047",
-    "requester": "Dr. Sarah Mansour · Faculty of Pharmacy",
+    "requester": "Demo Requester 1 · Faculty of Pharmacy",
     "dept": "Faculty of Pharmacy",
     "purpose": "Industrial Lab Equipment Collection & Student Site Visit",
     "costCenter": "CC-410 (Pharmacy Operations)",
@@ -596,9 +601,9 @@
       "note": "Requested V-114 had buffer conflict; V-122 assigned with identical capacity."
     },
     "assignedDriver": {
-      "name": "Ahmed Hassan (Driver A)",
-      "phone": "+20 10 9988 7766",
-      "license": "Professional Class 2 · Valid to 03/2028",
+      "name": "Demo Driver 01",
+      "phone": "+20 000 000 0000",
+      "license": "LIC-DEMO-0001 · Valid to 03/2028",
       "dutyToday": "6.5 / 8.0 h"
     },
     "costEstimate": {
@@ -615,14 +620,14 @@
       {
         "step": "Submitted",
         "when": "Mon 12 Oct · 11:40",
-        "who": "Dr. Sarah Mansour",
+        "who": "Demo Requester 1",
         "status": "done",
         "note": "Route and specs configured"
       },
       {
         "step": "Approved",
         "when": "Mon 12 Oct · 14:20",
-        "who": "Tarek El-Sayed (Dispatcher 2)",
+        "who": "Demo Ops Manager (Dispatcher 2)",
         "status": "done",
         "note": "Vehicle swapped to V-122 due to V-114 buffer overlap"
       },
@@ -631,7 +636,7 @@
         "when": "Tue 13 Oct · 08:20",
         "who": "Central Operations Desk",
         "status": "done",
-        "note": "Driver Ahmed Hassan accepted assignment"
+        "note": "Driver Demo Driver 01 accepted assignment"
       },
       {
         "step": "Active",
@@ -657,21 +662,21 @@
     ],
     "messages": [
       {
-        "who": "Tarek El-Sayed (Dispatcher)",
+        "who": "Demo Ops Manager (Dispatcher)",
         "at": "Mon 14:20",
-        "text": "Approved request BK-2047. Note: V-114 was busy in a morning return buffer, so I assigned V-122 (Hyundai H-1, 9 seats) with Driver Ahmed Hassan.",
+        "text": "Approved request BK-2047. Note: V-114 was busy in a morning return buffer, so I assigned V-122 (Hyundai H-1, 9 seats) with Driver Demo Driver 01.",
         "mine": false
       },
       {
-        "who": "Dr. Sarah Mansour (You)",
+        "who": "Demo Requester 1 (You)",
         "at": "Mon 14:31",
-        "text": "Thank you Tarek. The cargo includes 2 fragile reagent crates; please ensure the driver has cargo securing straps.",
+        "text": "Thank you Operations. The cargo includes 2 fragile reagent crates; please ensure the driver has cargo securing straps.",
         "mine": true
       },
       {
-        "who": "Tarek El-Sayed (Dispatcher)",
+        "who": "Demo Ops Manager (Dispatcher)",
         "at": "Mon 14:40",
-        "text": "Confirmed. Cargo tie-down straps added to Driver Ahmed's trip manifest checklist.",
+        "text": "Confirmed. Cargo tie-down straps added to Driver Demo Driver 01's trip manifest checklist.",
         "mine": false
       }
     ]
@@ -681,7 +686,7 @@
       "id": "BK-2047",
       "route": "Main Campus → Obour → 10th of Ramadan",
       "meta": "Tue 13 Oct · 08:30–14:00 · 4 pax · 350 kg · CC-410 (Pharmacy)",
-      "requester": "Dr. Sarah Mansour · Faculty of Pharmacy",
+      "requester": "Demo Requester 1 · Faculty of Pharmacy",
       "dist": "61.4 km",
       "fuel": "14.1 L",
       "hold": "15:43",
@@ -691,13 +696,13 @@
       "flag": "CONFLICT",
       "kind": "danger",
       "suggestedVehicle": "V-122",
-      "suggestedDriver": "Ahmed Hassan (Driver A)"
+      "suggestedDriver": "Demo Driver 01 (Driver A)"
     },
     {
       "id": "BK-2049",
       "route": "Main Campus → Cairo International Airport Terminal 3",
       "meta": "Tue 13 Oct · 05:00–07:30 · 2 pax · CC-120 (President’s Office)",
-      "requester": "Prof. Hesham Badawi · President’s Office",
+      "requester": "Demo Requester 2 · President’s Office",
       "dist": "38.2 km",
       "fuel": "7.0 L",
       "hold": "08:15",
@@ -713,7 +718,7 @@
       "id": "BK-2051",
       "route": "Main Campus → Ain Sokhna Marine Research Facility",
       "meta": "Wed 14 Oct · 07:00–18:00 · 22 pax · Bus Class · CC-300 (Student Affairs)",
-      "requester": "Dr. Mona Wagdy · Student Activities & Trips",
+      "requester": "Demo Requester 3 · Student Activities & Trips",
       "dist": "118.0 km",
       "fuel": "68.2 L",
       "hold": "20:45",
@@ -729,7 +734,7 @@
       "id": "BK-2052",
       "route": "Plant 3 Industrial Zone → Campus Central Warehouse B",
       "meta": "Wed 14 Oct · 10:00–12:00 · Heavy Cargo 2,400 kg · CC-410 (Procurement)",
-      "requester": "Eng. Karim Nabil · Central Procurement Bureau",
+      "requester": "Demo Requester 1 · Central Procurement Bureau",
       "dist": "18.5 km",
       "fuel": "3.4 L",
       "hold": "12:45",
@@ -1117,8 +1122,8 @@
     "tripId": "BK-2039",
     "vehicleCode": "B-03",
     "vehicleModel": "MCV 500 Bus (45 Seats)",
-    "driverName": "Driver K (Mahmoud Reda)",
-    "driverPhone": "+20 10 5544 3322",
+    "driverName": "Demo Driver 10",
+    "driverPhone": "+20 000 000 0000",
     "reportedAt": "13 Oct 2026 · 09:12",
     "location": "Cairo–Ismailia Desert Road, Km 42 (Opposite Shurouk City Gate 3)",
     "type": "Mechanical Breakdown · Coolant Line Rupture & Overheating",
@@ -1176,19 +1181,19 @@
     ],
     "passengers": [
       {
-        "name": "Dr. Tamer Shawky",
+        "name": "Demo Passenger 1",
         "role": "Faculty Leader · Faculty of Nursing",
-        "phone": "+20 12 1122 3344"
+        "phone": "+20 000 000 0000"
       },
       {
-        "name": "Nouran Mostafa",
+        "name": "Demo Passenger 2",
         "role": "Senior Student Rep (Group 1 - 9 pax)",
-        "phone": "+20 11 4455 6677"
+        "phone": "+20 000 000 0000"
       },
       {
-        "name": "Ziad Abdel-Rahman",
+        "name": "Demo Passenger 3",
         "role": "Student Rep (Group 2 - 9 pax)",
-        "phone": "+20 10 7788 9900"
+        "phone": "+20 000 000 0000"
       }
     ],
     "tows": [
@@ -1212,7 +1217,7 @@
     "replacementVehicle": {
       "code": "B-07",
       "model": "MCV 500 Bus (45 Seats)",
-      "driver": "Driver H (Hassan Metwally)",
+      "driver": "Driver H (Demo Driver 08)",
       "eta": "22 mins",
       "status": "Dispatched from Badr Campus at 09:20"
     },
@@ -1224,12 +1229,12 @@
       },
       {
         "time": "09:14",
-        "who": "Tarek El-Sayed (Dispatcher)",
+        "who": "Demo Ops Manager (Dispatcher)",
         "note": "Contacted Driver K. Confirmed all 18 passengers uninjured and off the highway."
       },
       {
         "time": "09:20",
-        "who": "Tarek El-Sayed (Dispatcher)",
+        "who": "Demo Ops Manager (Dispatcher)",
         "note": "Dispatched standby coach B-07 to transfer students to clinical training."
       },
       {
@@ -1242,7 +1247,7 @@
   "drivers": [
     {
       "id": "D-101",
-      "name": "Ahmed Hassan (Driver A)",
+      "name": "Demo Driver 01 (Driver A)",
       "licenseClass": "Class 2 (Professional)",
       "licenseNo": "EG-CAI-84920",
       "expires": "2028-03-15",
@@ -1259,7 +1264,7 @@
     },
     {
       "id": "D-102",
-      "name": "Mostafa Kamel (Driver B)",
+      "name": "Demo Driver 02 (Driver B)",
       "licenseClass": "Class 2 (Professional)",
       "licenseNo": "EG-GIZ-39102",
       "expires": "2027-11-20",
@@ -1275,7 +1280,7 @@
     },
     {
       "id": "D-103",
-      "name": "Hany Mahmoud (Driver C)",
+      "name": "Demo Driver 03 (Driver C)",
       "licenseClass": "Class 2 (Professional)",
       "licenseNo": "EG-CAI-12948",
       "expires": "2027-08-10",
@@ -1291,7 +1296,7 @@
     },
     {
       "id": "D-104",
-      "name": "Sherif Fathy (Driver D)",
+      "name": "Demo Driver 04 (Driver D)",
       "licenseClass": "Class 2 (Professional)",
       "licenseNo": "EG-SHR-77291",
       "expires": "2026-10-09",
@@ -1307,7 +1312,7 @@
     },
     {
       "id": "D-105",
-      "name": "Sameh Adel (Driver E)",
+      "name": "Demo Driver 05 (Driver E)",
       "licenseClass": "Class 3 (Private)",
       "licenseNo": "EG-CAI-99201",
       "expires": "2029-01-18",
@@ -1322,7 +1327,7 @@
     },
     {
       "id": "D-106",
-      "name": "Khaled Soliman (Driver F)",
+      "name": "Demo Driver 06 (Driver F)",
       "licenseClass": "Class 2 (Professional)",
       "licenseNo": "EG-CAI-66419",
       "expires": "2027-05-30",
@@ -1338,7 +1343,7 @@
     },
     {
       "id": "D-107",
-      "name": "Walid Saad (Driver G)",
+      "name": "Demo Driver 07 (Driver G)",
       "licenseClass": "Class 2 (Professional)",
       "licenseNo": "EG-CAI-33820",
       "expires": "2028-09-12",
@@ -1355,7 +1360,7 @@
     },
     {
       "id": "D-108",
-      "name": "Hassan Metwally (Driver H)",
+      "name": "Demo Driver 08 (Driver H)",
       "licenseClass": "Class 1 (Heavy / Bus)",
       "licenseNo": "EG-CAI-00192",
       "expires": "2027-12-05",
@@ -1372,7 +1377,7 @@
     },
     {
       "id": "D-109",
-      "name": "Ibrahim Gamal (Driver I)",
+      "name": "Demo Driver 09 (Driver I)",
       "licenseClass": "Class 1 (Heavy / Truck)",
       "licenseNo": "EG-SHR-44109",
       "expires": "2028-04-22",
@@ -1389,7 +1394,7 @@
     },
     {
       "id": "D-110",
-      "name": "Mahmoud Reda (Driver K)",
+      "name": "Demo Driver 10 (Driver K)",
       "licenseClass": "Class 1 (Heavy / Bus)",
       "licenseNo": "EG-CAI-55219",
       "expires": "2028-07-14",
@@ -1405,7 +1410,7 @@
     }
   ],
   "driverShiftData": {
-    "driverName": "Ahmed Hassan (Driver A)",
+    "driverName": "Demo Driver 01 (Driver A)",
     "assignedVehicle": "V-122 · Hyundai H-1",
     "clockInTime": "07:40",
     "currentDutyHours": 6.5,
@@ -1443,7 +1448,7 @@
     "tripId": "BK-2047",
     "vehicleCode": "V-122 (Hyundai H-1)",
     "plate": "BDR 3307",
-    "leadPassenger": "Dr. Sarah Mansour (+20 10 2233 4455)",
+    "leadPassenger": "Demo Requester 1 (+20 000 000 0000)",
     "offlineStorageStatus": "Synced (Cache valid for 72 hrs)",
     "stops": [
       {
@@ -1460,7 +1465,7 @@
         "name": "Supplier Depot · Obour City Industrial Zone",
         "time": "Departed 09:18",
         "detail": "Collected 350 kg lab reagent supplies and pallet straps.",
-        "contact": "Depot Warehouse Manager · +20 12 3344 5566",
+        "contact": "Depot Warehouse Manager · +20 000 000 0000",
         "done": true,
         "current": false
       },
@@ -1469,7 +1474,7 @@
         "name": "Plant 3 Industrial Facility · 10th of Ramadan City",
         "time": "ETA 09:52",
         "detail": "Unload cargo at Bay 4; escort faculty delegates to main conference hall.",
-        "contact": "Plant 3 Receiving Bureau · +20 11 9988 7766",
+        "contact": "Plant 3 Receiving Bureau · +20 000 000 0000",
         "done": false,
         "current": true
       },
@@ -1828,7 +1833,7 @@
       {
         "id": "LOG-8811",
         "timestamp": "13 Oct 2026 · 08:20:19",
-        "actor": "Driver Ahmed Hassan (D-101)",
+        "actor": "Driver Demo Driver 01 (D-101)",
         "action": "ASSIGNMENT_ACCEPTED",
         "entity": "BK-2047 · V-122",
         "details": "Pre-trip checklist validated. Duty hour window confirmed 6.5h / 8h."
@@ -1836,7 +1841,7 @@
       {
         "id": "LOG-8810",
         "timestamp": "12 Oct 2026 · 14:20:44",
-        "actor": "Tarek El-Sayed (DS-202)",
+        "actor": "Demo Ops Manager (DS-202)",
         "action": "VEHICLE_SUBSTITUTION",
         "entity": "BK-2047 · V-114 → V-122",
         "details": "Automated conflict detector identified 45-min buffer overlap on V-114. Swapped to V-122."
@@ -1844,7 +1849,7 @@
       {
         "id": "LOG-8809",
         "timestamp": "12 Oct 2026 · 14:20:30",
-        "actor": "Tarek El-Sayed (DS-202)",
+        "actor": "Demo Ops Manager (DS-202)",
         "action": "REQUEST_APPROVED",
         "entity": "BK-2047",
         "details": "Booking approved for Faculty of Pharmacy (CC-410). Pre-authorization hold 350.00 EGP logged."
@@ -1852,7 +1857,7 @@
       {
         "id": "LOG-8808",
         "timestamp": "12 Oct 2026 · 11:40:12",
-        "actor": "Dr. Sarah Mansour (RQ-101)",
+        "actor": "Demo Requester 1 (RQ-101)",
         "action": "BOOKING_SUBMITTED",
         "entity": "BK-2047",
         "details": "Initial request submitted via web portal: 61.4 km, estimated fuel 14.1 L Diesel."
@@ -1860,7 +1865,7 @@
       {
         "id": "LOG-8807",
         "timestamp": "12 Oct 2026 · 09:15:00",
-        "actor": "Eng. Mahmoud Fawzy (FA-404)",
+        "actor": "Demo Fleet Admin (FA-404)",
         "action": "PRICE_BOOK_AUDIT",
         "entity": "Price Book v3",
         "details": "Quarterly fuel prices cross-checked against official Egyptian Petroleum pricing gazette."
@@ -1974,7 +1979,7 @@
         "id": "N-RQ-1",
         "category": "Bookings",
         "title": "Trip BK-2047 is now Active on the road",
-        "body": "Driver Ahmed Hassan departed Obour Depot en route to Plant 3. Live tracking is active.",
+        "body": "Driver Demo Driver 01 departed Obour Depot en route to Plant 3. Live tracking is active.",
         "time": "12 mins ago",
         "unread": true
       },
@@ -2024,7 +2029,7 @@
         "id": "N-DS-4",
         "category": "Shift",
         "title": "Driver D license expiring in 48 hours",
-        "body": "Driver Sherif Fathy cannot be assigned trips after 09 Oct 2026 without renewed license upload.",
+        "body": "Driver Demo Driver 04 cannot be assigned trips after 09 Oct 2026 without renewed license upload.",
         "time": "4 hours ago",
         "unread": false
       },
@@ -2032,7 +2037,7 @@
         "id": "N-DS-5",
         "category": "Shift",
         "title": "Driver C duty limit alert (7.5 / 8.0 h)",
-        "body": "Driver Hany Mahmoud is approaching maximum daily driving regulation.",
+        "body": "Driver Demo Driver 03 is approaching maximum daily driving regulation.",
         "time": "5 hours ago",
         "unread": false
       },

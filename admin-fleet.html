@@ -462,14 +462,12 @@
             <span id="site-coords-display" style="font-size:11.5px; font-family:var(--font-mono); color:var(--text-muted);">27.1809° N, 31.1837° E</span>
           </div>
 
-          <div style="position:relative; margin-bottom:8px;">
-            <input type="text" id="site-map-search" placeholder="Search address or landmark on OpenStreetMap…" oninput="handleSiteMapSearch(this.value)" style="width:100%; padding:7px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:12.5px;">
-            <div id="site-search-results" style="display:none; position:absolute; top:100%; left:0; right:0; background:#FFF; border:1px solid var(--border); border-radius:0 0 6px 6px; box-shadow:var(--shadow-md); z-index:3000; max-height:160px; overflow-y:auto;"></div>
-          </div>
-
-          <div id="site-leaflet-map" style="height:260px; width:100%; border-radius:var(--radius-sm); border:1px solid var(--border);"></div>
-          <div style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">
-            Click on map or drag the pin to set the accurate campus gate coordinates.
+          <div style="display:flex; gap:10px; align-items:center; background:var(--navy-50); border:1px solid var(--border); padding:10px 14px; border-radius:var(--radius-sm);">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="openSiteLocationPicker()" style="display:inline-flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              <span>Pick on Real Map</span>
+            </button>
+            <span style="font-size:12px; color:var(--text-muted);">Launch the interactive OpenStreetMap picker to pin exact campus gate coordinates.</span>
           </div>
         </div>
 
@@ -639,9 +637,9 @@
         <div class="footer-col">
           <h4>Fleet Operations Center</h4>
           <span>CIRA Education HQ · Central Logistics Operations</span>
-          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
-          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
-          <span>Email: fleet.operations@cira.com.eg</span>
+          <span>Operations Desk: <strong>Ext. 0000</strong></span>
+          <span>Emergency Line: <strong>+20 000 000 0000</strong></span>
+          <span>Email: operations@example.com</span>
           <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
         </div>
       </div>
@@ -662,10 +660,7 @@
   <script src="js/main.js"></script>
 
   <script>
-    let siteMap = null;
-    let siteMarker = null;
     let currentSiteCoords = { lat: 27.1809, lng: 31.1837, pinned: false };
-    let searchDebounceTimer = null;
 
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Fleet admin"])) return;
@@ -925,7 +920,6 @@
       updateSitePinDisplay(currentSiteCoords.lat, currentSiteCoords.lng, false);
 
       document.getElementById('site-modal').style.display = 'flex';
-      setTimeout(initSiteMap, 150);
     }
 
     function openEditSiteModal(id) {
@@ -951,47 +945,30 @@
       updateSitePinDisplay(currentSiteCoords.lat, currentSiteCoords.lng, currentSiteCoords.pinned);
 
       document.getElementById('site-modal').style.display = 'flex';
-      setTimeout(initSiteMap, 150);
     }
 
     function closeSiteModal() {
       document.getElementById('site-modal').style.display = 'none';
     }
 
-    function initSiteMap() {
-      const mapContainer = document.getElementById('site-leaflet-map');
-      if (!mapContainer || typeof L === 'undefined') return;
+    async function openSiteLocationPicker() {
+      const siteName = document.getElementById('site-input-name').value || 'CIRA Campus';
+      const initial = {
+        lat: currentSiteCoords.lat,
+        lng: currentSiteCoords.lng,
+        place_name: siteName
+      };
 
-      if (!siteMap) {
-        siteMap = L.map('site-leaflet-map').setView([currentSiteCoords.lat, currentSiteCoords.lng], 13);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(siteMap);
-
-        siteMarker = L.marker([currentSiteCoords.lat, currentSiteCoords.lng], {
-          draggable: true
-        }).addTo(siteMap);
-
-        siteMarker.on('dragend', function (e) {
-          const pos = e.target.getLatLng();
-          currentSiteCoords.lat = pos.lat;
-          currentSiteCoords.lng = pos.lng;
-          currentSiteCoords.pinned = true;
-          updateSitePinDisplay(pos.lat, pos.lng, true);
-        });
-
-        siteMap.on('click', function (e) {
-          siteMarker.setLatLng(e.latlng);
-          currentSiteCoords.lat = e.latlng.lat;
-          currentSiteCoords.lng = e.latlng.lng;
-          currentSiteCoords.pinned = true;
-          updateSitePinDisplay(e.latlng.lat, e.latlng.lng, true);
-        });
-      } else {
-        siteMap.invalidateSize();
-        siteMap.setView([currentSiteCoords.lat, currentSiteCoords.lng], 13);
-        siteMarker.setLatLng([currentSiteCoords.lat, currentSiteCoords.lng]);
+      const picked = await GeoMap.pickLocation(initial);
+      if (picked) {
+        currentSiteCoords.lat = picked.lat;
+        currentSiteCoords.lng = picked.lng;
+        currentSiteCoords.pinned = true;
+        updateSitePinDisplay(picked.lat, picked.lng, true);
+        const addrInput = document.getElementById('site-input-address');
+        if (addrInput && !addrInput.value && picked.place_name) {
+          addrInput.value = picked.place_name;
+        }
       }
     }
 
@@ -1004,47 +981,6 @@
       if (badgeEl) {
         badgeEl.className = isPinned ? 'badge badge-success' : 'badge badge-warning';
         badgeEl.textContent = isPinned ? 'Pinned Location' : 'To verify';
-      }
-    }
-
-    function handleSiteMapSearch(val) {
-      clearTimeout(searchDebounceTimer);
-      const resContainer = document.getElementById('site-search-results');
-      if (!val || val.trim().length < 3) {
-        resContainer.style.display = 'none';
-        return;
-      }
-
-      searchDebounceTimer = setTimeout(async () => {
-        try {
-          const results = await GeoService.searchNominatim(val);
-          if (results && results.length > 0) {
-            resContainer.innerHTML = results.map(r => `
-              <div class="search-result-item" onclick="selectSiteSearchResult(${r.lat}, ${r.lon}, '${escapeHtml(r.display_name.replace(/'/g, ''))}')">
-                <strong>${escapeHtml(r.display_name.split(',')[0])}</strong>
-                <div style="font-size:11px; color:var(--text-muted);">${escapeHtml(r.display_name)}</div>
-              </div>
-            `).join('');
-            resContainer.style.display = 'block';
-          } else {
-            resContainer.style.display = 'none';
-          }
-        } catch (e) {
-          resContainer.style.display = 'none';
-        }
-      }, 350);
-    }
-
-    function selectSiteSearchResult(lat, lng, name) {
-      document.getElementById('site-search-results').style.display = 'none';
-      currentSiteCoords.lat = lat;
-      currentSiteCoords.lng = lng;
-      currentSiteCoords.pinned = true;
-      updateSitePinDisplay(lat, lng, true);
-
-      if (siteMap && siteMarker) {
-        siteMap.setView([lat, lng], 14);
-        siteMarker.setLatLng([lat, lng]);
       }
     }
 

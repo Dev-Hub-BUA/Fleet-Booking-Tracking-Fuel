@@ -8,7 +8,7 @@
    *
    * @typedef {Object} RequesterInfo
    * @property {string} id - Requester user ID (e.g. "USR-REQ-101")
-   * @property {string} name - Requester full name (e.g. "Dr. Sarah Mansour")
+   * @property {string} name - Requester full name (e.g. "Demo Requester 1")
    * @property {string} department - Requester institutional department (e.g. "Faculty of Pharmacy")
    *
    * @typedef {Object} ItineraryPoint
@@ -122,9 +122,9 @@
     },
     contacts: {
       office: 'CIRA Central Logistics Directorate, Campus Admin Bldg, G-14',
-      dispatchDesk: 'Ext. 4108 / 4109',
-      emergencyHotline: '+20 10 2233 4455',
-      email: 'fleet.operations@cira.com.eg',
+      dispatchDesk: 'Ext. 0000',
+      emergencyHotline: '+20 000 000 0000',
+      email: 'operations@example.com',
       hours: '24/7 Operations Command & Dispatch'
     },
     fuelPrices: {
@@ -305,16 +305,18 @@
   ];
 
   const DEFAULT_DRIVERS = [
-    { id: 'D-101', name: 'Mahmoud Fawzy', home_site_id: 'SITE-BUA', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-84920', expires: '2028-03-15', status: 'Available', totalTrips: 412, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
-    { id: 'D-102', name: 'Mostafa Kamel', home_site_id: 'SITE-BUC', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-GIZ-39102', expires: '2027-11-20', status: 'Available', totalTrips: 345, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
-    { id: 'D-103', name: 'Hany Mahmoud', home_site_id: 'SITE-BUC', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-12948', expires: '2027-08-10', status: 'Available', totalTrips: 520, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
-    { id: 'D-104', name: 'Sherif Fathy', home_site_id: 'SITE-BUC', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-SHR-77291', expires: '2026-09-15', status: 'Off Duty (Expired)', totalTrips: 288, allowedVehicles: ['Sedan', 'Van'] },
-    { id: 'D-105', name: 'Sameh Adel', home_site_id: 'SITE-BUA', licenseClass: 'Class 3 (Private)', licenseNo: 'EG-CAI-99201', expires: '2029-01-18', status: 'Available', totalTrips: 180, allowedVehicles: ['Sedan only'] },
-    { id: 'D-106', name: 'Khaled Soliman', home_site_id: 'SITE-HQ', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-66419', expires: '2027-05-30', status: 'Available', totalTrips: 390, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
-    { id: 'D-107', name: 'Walid Saad', home_site_id: 'SITE-ALEX', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-33820', expires: '2028-09-12', status: 'Available', totalTrips: 210, allowedVehicles: ['Sedan', 'Van', 'CNG'] },
-    { id: 'D-108', name: 'Hassan Metwally', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-CAI-00192', expires: '2027-12-05', status: 'Available', totalTrips: 640, allowedVehicles: ['Bus', 'Heavy Coach', 'Van', 'Sedan'] },
-    { id: 'D-109', name: 'Ibrahim Gamal', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-SHR-44109', expires: '2028-04-22', status: 'Available', totalTrips: 480, allowedVehicles: ['Truck', 'Van', 'Heavy Cargo'] },
-    { id: 'D-110', name: 'Mahmoud Reda', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-CAI-55219', expires: '2028-07-14', status: 'Suspended: Incident Triage', totalTrips: 310, allowedVehicles: ['Bus', 'Van'] }
+    { id: 'D-101', name: 'Demo Driver 01', home_site_id: 'SITE-BUA', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'LIC-DEMO-0001', expires: '2028-03-15', status: 'Available', totalTrips: 412, allowedVehicles: ['Sedan', 'Van', 'Minibus'], phone: '+20 000 000 0000', email: 'demo.driver01@example.com' },
+    { id: 'D-102', name: 'Demo Driver 02', home_site_id: 'SITE-BUC', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'LIC-DEMO-0002', expires: '2027-11-20', status: 'Available', totalTrips: 345, allowedVehicles: ['Sedan', 'Van', 'Minibus'], phone: '+20 000 000 0000', email: 'demo.driver02@example.com' },
+    { id: 'D-103', name: 'Demo Driver 03', home_site_id: 'SITE-BUC', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'LIC-DEMO-0003', expires: '2027-08-10', status: 'Available', totalTrips: 520, allowedVehicles: ['Sedan', 'Van', 'Minibus'], phone: '+20 000 000 0000', email: 'demo.driver03@example.com' },
+    { id: 'D-104', name: 'Demo Driver 04', home_site_id: 'SITE-BUC', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'LIC-DEMO-0004', expires: '2026-09-15', status: 'Off Duty (Expired)', totalTrips: 288, allowedVehicles: ['Sedan', 'Van'], phone: '+20 000 000 0000', email: 'demo.driver04@example.com' },
+    { id: 'D-105', name: 'Demo Driver 05', home_site_id: 'SITE-BUA', licenseClass: 'Class 3 (Private)', licenseNo: 'LIC-DEMO-0005', expires: '2029-01-18', status: 'Available', totalTrips: 180, allowedVehicles: ['Sedan only'], phone: '+20 000 000 0000', email: 'demo.driver05@example.com' },
+    { id: 'D-106', name: 'Demo Driver 06', home_site_id: 'SITE-HQ', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'LIC-DEMO-0006', expires: '2027-05-30', status: 'Available', totalTrips: 390, allowedVehicles: ['Sedan', 'Van', 'Minibus'], phone: '+20 000 000 0000', email: 'demo.driver06@example.com' },
+    { id: 'D-107', name: 'Demo Driver 07', home_site_id: 'SITE-ALEX', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'LIC-DEMO-0007', expires: '2028-09-12', status: 'Available', totalTrips: 210, allowedVehicles: ['Sedan', 'Van', 'CNG'], phone: '+20 000 000 0000', email: 'demo.driver07@example.com' },
+    { id: 'D-108', name: 'Demo Driver 08', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'LIC-DEMO-0008', expires: '2027-12-05', status: 'Available', totalTrips: 640, allowedVehicles: ['Bus', 'Heavy Coach', 'Van', 'Sedan'], phone: '+20 000 000 0000', email: 'demo.driver08@example.com' },
+    { id: 'D-109', name: 'Demo Driver 09', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'LIC-DEMO-0009', expires: '2028-04-22', status: 'Available', totalTrips: 480, allowedVehicles: ['Truck', 'Van', 'Heavy Cargo'], phone: '+20 000 000 0000', email: 'demo.driver09@example.com' },
+    { id: 'D-110', name: 'Demo Driver 10', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'LIC-DEMO-0010', expires: '2028-07-14', status: 'Suspended: Incident Triage', totalTrips: 310, allowedVehicles: ['Bus', 'Van'], phone: '+20 000 000 0000', email: 'demo.driver10@example.com' },
+    { id: 'D-111', name: 'Demo Driver 11', home_site_id: 'SITE-BUA', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'LIC-DEMO-0011', expires: '2028-10-10', status: 'Available', totalTrips: 150, allowedVehicles: ['Sedan', 'Van'], phone: '+20 000 000 0000', email: 'demo.driver11@example.com' },
+    { id: 'D-112', name: 'Demo Driver 12', home_site_id: 'SITE-ALEX', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'LIC-DEMO-0012', expires: '2029-04-01', status: 'Available', totalTrips: 195, allowedVehicles: ['Sedan', 'Van'], phone: '+20 000 000 0000', email: 'demo.driver12@example.com' }
   ];
 
   function toEgyptISOString(date) {
@@ -723,9 +725,28 @@
     const id = String(raw.id || 'BK-2050');
     const status = String(raw.status || 'Pending');
 
-    const reqId = (raw.requester && raw.requester.id) || 'USR-REQ-101';
-    const reqName = (raw.requester && raw.requester.name) || raw.requesterName || 'Dr. Sarah Mansour';
-    const reqDept = (raw.requester && raw.requester.department) || raw.dept || 'Faculty of Pharmacy';
+    let reqId = (raw.requester && raw.requester.id) || 'USR-REQ-101';
+    let reqName = (raw.requester && raw.requester.name) || raw.requesterName || 'Demo Requester 1';
+    let reqDept = (raw.requester && raw.requester.department) || raw.dept || 'Faculty of Pharmacy';
+
+    if (reqId === 'USR-REQ-101' || reqName.includes('Requester 1')) {
+      reqId = 'USR-REQ-101';
+      reqName = 'Demo Requester 1';
+      reqDept = 'Faculty of Pharmacy';
+    } else if (reqId === 'USR-REQ-102' || reqName.includes('Requester 2')) {
+      reqId = 'USR-REQ-102';
+      reqName = 'Demo Requester 2';
+      reqDept = 'Faculty of Physical Therapy';
+    } else if (reqId === 'USR-REQ-103' || reqName.includes('Requester 3')) {
+      reqId = 'USR-REQ-103';
+      reqName = 'Demo Requester 3';
+      reqDept = 'Faculty of Engineering';
+    } else if (reqId === 'USR-REQ-104') {
+      reqId = 'USR-REQ-101';
+      reqName = 'Demo Requester 1';
+      reqDept = 'Faculty of Pharmacy';
+    }
+
     const requester = {
       id: reqId,
       name: reqName,
@@ -833,7 +854,7 @@
       assignment = {
         vehicle_id: vCode,
         driver_ids: dIds,
-        approved_by: (raw.assignment && raw.assignment.approved_by) || raw.approved_by || 'Khaled Ibrahim (Dispatcher)',
+        approved_by: (raw.assignment && raw.assignment.approved_by) || raw.approved_by || 'Demo Ops Manager (Dispatcher)',
         approved_at: formatEgyptISO((raw.assignment && raw.assignment.approved_at) || raw.approved_at || raw.createdAt || new Date()),
         linked_to: (raw.assignment && raw.assignment.linked_to) || null,
         deadhead_used_by: (raw.assignment && raw.assignment.deadhead_used_by) || null,
@@ -974,7 +995,7 @@
           status: 'Pending',
           requester: {
             id: 'USR-REQ-101',
-            name: 'Dr. Sarah Mansour',
+            name: 'Demo Requester 1',
             department: 'Faculty of Pharmacy'
           },
           cost_center: 'CC-410 (Faculty of Pharmacy)',
@@ -1064,7 +1085,7 @@
             {
               status: 'Submitted',
               at: '2026-10-18T07:15:00+03:00',
-              by: 'Dr. Sarah Mansour (Requester)',
+              by: 'Demo Requester 1 (Requester)',
               note: 'Initial booking request submitted'
             }
           ],
@@ -1075,8 +1096,8 @@
           status: 'Approved',
           requester: {
             id: 'USR-REQ-102',
-            name: 'Dr. Mahmoud Zaki',
-            department: 'Faculty of Science'
+            name: 'Demo Requester 2',
+            department: 'Faculty of Physical Therapy'
           },
           cost_center: 'CC-330 (Faculty of Science)',
           start_date: '2026-10-19',
@@ -1139,7 +1160,7 @@
           assignment: {
             vehicle_id: 'V-130',
             driver_ids: ['D-102'],
-            approved_by: 'Khaled Ibrahim (Dispatcher)',
+            approved_by: 'Demo Ops Manager (Dispatcher)',
             approved_at: '2026-10-18T10:00:00+03:00'
           },
           hold_window: {
@@ -1157,14 +1178,14 @@
             {
               status: 'Submitted',
               at: '2026-10-18T08:00:00+03:00',
-              by: 'Dr. Mahmoud Zaki (Requester)',
+              by: 'Demo Requester 2 (Requester)',
               note: 'Initial booking request submitted'
             },
             {
               status: 'Approved',
               at: '2026-10-18T10:00:00+03:00',
-              by: 'Khaled Ibrahim (Dispatcher)',
-              note: 'Assigned Toyota HiAce (V-130) with driver Mostafa Kamel'
+              by: 'Demo Ops Manager (Dispatcher)',
+              note: 'Assigned Toyota HiAce (V-130) with driver Demo Driver 02'
             }
           ],
           messages: []
@@ -1174,7 +1195,7 @@
           status: 'Changes requested',
           requester: {
             id: 'USR-REQ-103',
-            name: 'Dr. Tarek Hegazy',
+            name: 'Demo Requester 3',
             department: 'Faculty of Engineering'
           },
           cost_center: 'CC-220 (Faculty of Engineering)',
@@ -1243,13 +1264,13 @@
             {
               status: 'Submitted',
               at: '2026-10-18T10:00:00+03:00',
-              by: 'Dr. Tarek Hegazy (Requester)',
+              by: 'Demo Requester 3 (Requester)',
               note: 'Initial booking request submitted'
             },
             {
               status: 'Changes requested',
               at: '2026-10-18T12:00:00+03:00',
-              by: 'Khaled Ibrahim (Dispatcher)',
+              by: 'Demo Ops Manager (Dispatcher)',
               note: 'Please adjust departure time from 06:00 to 07:30 to match driver shift availability.'
             }
           ],
@@ -1259,8 +1280,8 @@
           id: 'BK-2049',
           status: 'Rejected',
           requester: {
-            id: 'USR-REQ-104',
-            name: 'Hossam Nabil',
+            id: 'USR-REQ-101',
+            name: 'Demo Requester 1',
             department: 'General Administration'
           },
           cost_center: 'CC-100 (General Administration)',
@@ -1329,13 +1350,13 @@
             {
               status: 'Submitted',
               at: '2026-10-18T11:00:00+03:00',
-              by: 'Hossam Nabil (Requester)',
+              by: 'Demo Requester 1 (Requester)',
               note: 'Initial booking request submitted'
             },
             {
               status: 'Rejected',
               at: '2026-10-18T13:00:00+03:00',
-              by: 'Khaled Ibrahim (Dispatcher)',
+              by: 'Demo Ops Manager (Dispatcher)',
               note: 'Outside policy: Cargo exceeds standard courier limit and non-official transport is not approved for this cost center.'
             }
           ],
@@ -1346,7 +1367,7 @@
           status: 'Completed',
           requester: {
             id: 'USR-REQ-101',
-            name: 'Dr. Sarah Mansour',
+            name: 'Demo Requester 1',
             department: 'Faculty of Pharmacy'
           },
           cost_center: 'CC-410 (Faculty of Pharmacy)',
@@ -1402,7 +1423,7 @@
           assignment: {
             vehicle_id: 'V-205',
             driver_ids: ['D-101'],
-            approved_by: 'Khaled Ibrahim (Dispatcher)',
+            approved_by: 'Demo Ops Manager (Dispatcher)',
             approved_at: '2026-10-11T16:00:00+03:00'
           },
           hold_window: {
@@ -1420,19 +1441,19 @@
             {
               status: 'Submitted',
               at: '2026-10-11T12:00:00+03:00',
-              by: 'Dr. Sarah Mansour (Requester)',
+              by: 'Demo Requester 1 (Requester)',
               note: 'Initial booking request submitted'
             },
             {
               status: 'Approved',
               at: '2026-10-11T16:00:00+03:00',
-              by: 'Khaled Ibrahim (Dispatcher)',
-              note: 'Assigned Toyota Corolla (V-205) with driver Mahmoud Fawzy'
+              by: 'Demo Ops Manager (Dispatcher)',
+              note: 'Assigned Toyota Corolla (V-205) with driver Demo Driver 01'
             },
             {
               status: 'Completed',
               at: '2026-10-12T19:15:00+03:00',
-              by: 'Khaled Ibrahim (Dispatcher)',
+              by: 'Demo Ops Manager (Dispatcher)',
               note: 'Trip reconciled and closed'
             }
           ],
@@ -1443,7 +1464,7 @@
           status: 'Approved',
           requester: {
             id: 'USR-REQ-102',
-            name: 'Dr. Mona Radwan',
+            name: 'Demo Requester 2',
             department: 'Faculty of Physical Therapy'
           },
           cost_center: 'CC-420 (Faculty of Physical Therapy)',
@@ -1495,7 +1516,7 @@
           assignment: {
             vehicle_id: 'V-125',
             driver_ids: ['D-107'],
-            approved_by: 'Khaled Ibrahim (Dispatcher)',
+            approved_by: 'Demo Ops Manager (Dispatcher)',
             approved_at: '2026-10-17T14:00:00+03:00'
           },
           hold_window: {
@@ -1513,14 +1534,14 @@
             {
               status: 'Submitted',
               at: '2026-10-17T10:00:00+03:00',
-              by: 'Dr. Mona Radwan (Requester)',
+              by: 'Demo Requester 2 (Requester)',
               note: 'Initial booking request submitted'
             },
             {
               status: 'Approved',
               at: '2026-10-17T14:00:00+03:00',
-              by: 'Khaled Ibrahim (Dispatcher)',
-              note: 'Assigned Toyota HiAce (V-125) with driver Walid Saad'
+              by: 'Demo Ops Manager (Dispatcher)',
+              note: 'Assigned Toyota HiAce (V-125) with driver Demo Driver 07'
             }
           ],
           messages: []
@@ -1530,7 +1551,7 @@
           status: 'Pending',
           requester: {
             id: 'USR-REQ-103',
-            name: 'Dr. Tamer Samir',
+            name: 'Demo Requester 3',
             department: 'Faculty of Engineering'
           },
           cost_center: 'CC-430 (Faculty of Engineering)',
@@ -1590,7 +1611,7 @@
             {
               status: 'Submitted',
               at: '2026-10-18T10:15:00+03:00',
-              by: 'Dr. Tamer Samir (Requester)',
+              by: 'Demo Requester 3 (Requester)',
               note: 'Booking submitted for afternoon departure'
             }
           ],
@@ -1601,10 +1622,10 @@
         {
           id: 'AUD-8801',
           time: 'Today · 08:35',
-          user: 'Khaled Ibrahim (Dispatcher)',
+          user: 'Demo Ops Manager (Dispatcher)',
           action: 'Approve Multi-Day Itinerary',
           ref: 'BK-2050',
-          details: 'Assigned Toyota HiAce (V-130) with Driver Mostafa Kamel for Marine Field Trip.'
+          details: 'Assigned Toyota HiAce (V-130) with Driver Demo Driver 02 for Marine Field Trip.'
         }
       ],
       notifications: [
@@ -1612,7 +1633,7 @@
           id: 'NOTIF-1',
           targetRole: 'Dispatcher',
           title: 'New Booking Awaiting Operations Review',
-          message: 'Dr. Sarah Mansour submitted 5-day itinerary BK-2047 (Assiut → Cairo → BUC).',
+          message: 'Demo Requester 1 submitted 5-day itinerary BK-2047 (Assiut → Cairo → BUC).',
           time: '2 hours ago',
           read: false,
           link: 'dispatch-queue.html?id=BK-2047'
@@ -1639,6 +1660,11 @@
       if (!parsed.sites || parsed.sites.length === 0) parsed.sites = JSON.parse(JSON.stringify(DEFAULT_SITES));
       if (!parsed.vehicles || parsed.vehicles.length === 0) parsed.vehicles = JSON.parse(JSON.stringify(DEFAULT_VEHICLES));
       if (!parsed.drivers || parsed.drivers.length === 0) parsed.drivers = JSON.parse(JSON.stringify(DEFAULT_DRIVERS));
+
+      parsed.sites = (parsed.sites || []).filter(s => s && s.id !== 'SITE-SUEZCA');
+      parsed.vehicles = (parsed.vehicles || []).filter(v => v && v.id !== 'V-TEST-99' && v.code !== 'V-TEST-99');
+      parsed.drivers = (parsed.drivers || []).filter(d => d && d.id !== 'D-TEST-99' && (!d.name || !d.name.includes('TEST-99')) && (!d.id || !d.id.includes('TEST-99')));
+      parsed.bookings = (parsed.bookings || []).filter(b => b && b.id !== 'BK-TEST-99' && (!b.assignment || b.assignment.vehicle_id !== 'V-TEST-99'));
 
       DEFAULT_SITES.forEach(ds => {
         if (!parsed.sites.some(s => s.id === ds.id)) {
@@ -1802,6 +1828,22 @@
         .map(raw => migrateBooking(raw, parsed.vehicles, parsed.drivers))
         .filter(Boolean);
 
+      (parsed.drivers || []).forEach(d => {
+        if (d.id && d.id.startsWith('D-')) {
+          const num = d.id.replace('D-', '').padStart(2, '0');
+          d.name = `Demo Driver ${num}`;
+          d.licenseNo = `LIC-DEMO-${d.id.replace('D-', '').padStart(4, '0')}`;
+          d.phone = '+20 000 000 0000';
+          d.email = `demo.driver${num}@example.com`;
+        }
+      });
+
+      if (parsed.settings && parsed.settings.contacts) {
+        parsed.settings.contacts.emergencyHotline = '+20 000 000 0000';
+        parsed.settings.contacts.email = 'operations@example.com';
+        parsed.settings.contacts.dispatchDesk = 'Ext. 0000';
+      }
+
       return parsed;
     },
 
@@ -1908,7 +1950,7 @@
       }) || null;
     },
 
-    saveSite: function (siteData, user = 'Khaled Ibrahim (Fleet Admin)') {
+    saveSite: function (siteData, user = 'Demo Fleet Admin (Fleet Admin)') {
       if (!siteData || !siteData.name || !siteData.name.trim()) {
         return { success: false, error: 'Site name is required.' };
       }
@@ -1961,7 +2003,7 @@
       return { success: true, site: site };
     },
 
-    deactivateSite: function (id, user = 'Khaled Ibrahim (Fleet Admin)') {
+    deactivateSite: function (id, user = 'Demo Fleet Admin (Fleet Admin)') {
       const data = this.load();
       const site = (data.sites || []).find(s => s.id === id);
       if (!site) return { success: false, error: 'Site not found.' };
@@ -1981,7 +2023,7 @@
       return { success: true, site: site };
     },
 
-    activateSite: function (id, user = 'Khaled Ibrahim (Fleet Admin)') {
+    activateSite: function (id, user = 'Demo Fleet Admin (Fleet Admin)') {
       const data = this.load();
       const site = (data.sites || []).find(s => s.id === id);
       if (!site) return { success: false, error: 'Site not found.' };
@@ -2001,7 +2043,7 @@
       return { success: true, site: site };
     },
 
-    deleteSite: function (id, user = 'Khaled Ibrahim (Fleet Admin)') {
+    deleteSite: function (id, user = 'Demo Fleet Admin (Fleet Admin)') {
       const data = this.load();
       const site = (data.sites || []).find(s => s.id === id);
       if (!site) return { success: false, error: 'Site not found.' };
@@ -2030,7 +2072,7 @@
       return { success: true };
     },
 
-    updateVehicleHomeSite: function (vehicleCode, newHomeSiteId, reason, user = 'Khaled Ibrahim (Fleet Admin)') {
+    updateVehicleHomeSite: function (vehicleCode, newHomeSiteId, reason, user = 'Demo Fleet Admin (Fleet Admin)') {
       if (!reason || !reason.trim()) {
         return { success: false, error: 'A reason is required when changing a vehicle home site.' };
       }
@@ -2072,7 +2114,7 @@
       };
     },
 
-    saveVehicle: function (vData, reason = '', user = 'Khaled Ibrahim (Fleet Admin)') {
+    saveVehicle: function (vData, reason = '', user = 'Demo Fleet Admin (Fleet Admin)') {
       if (!vData || !vData.code) return { success: false, error: 'Vehicle code is required.' };
       const data = this.load();
       data.vehicles = data.vehicles || [];
@@ -2115,7 +2157,7 @@
       return { success: true, vehicle: v, warning: warning };
     },
 
-    saveDriver: function (dData, user = 'Khaled Ibrahim (Fleet Admin)') {
+    saveDriver: function (dData, user = 'Demo Fleet Admin (Fleet Admin)') {
       if (!dData) return { success: false, error: 'Driver data is required.' };
       const data = this.load();
       data.drivers = data.drivers || [];
@@ -2145,7 +2187,7 @@
       return { success: true, driver: d };
     },
 
-    updateDriverHomeSite: function (driverId, newHomeSiteId, user = 'Khaled Ibrahim (Fleet Admin)') {
+    updateDriverHomeSite: function (driverId, newHomeSiteId, user = 'Demo Fleet Admin (Fleet Admin)') {
       const data = this.load();
       const d = (data.drivers || []).find(item => item.id === driverId);
       if (!d) return { success: false, error: 'Driver not found.' };
@@ -2179,7 +2221,7 @@
       return data.settings || DEFAULT_SETTINGS;
     },
 
-    saveSettings: function (newSettings, user = 'Khaled Ibrahim (Fleet Admin)') {
+    saveSettings: function (newSettings, user = 'Demo Fleet Admin (Fleet Admin)') {
       const data = this.load();
       data.settings = data.settings || JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
       if (newSettings.rules) {
@@ -2526,7 +2568,7 @@
       return matches;
     },
 
-    linkReturnTrip: function (bookingAId, bookingBId, note = '', user = 'Khaled Ibrahim (Dispatcher)') {
+    linkReturnTrip: function (bookingAId, bookingBId, note = '', user = 'Demo Ops Manager (Dispatcher)') {
       const data = this.load();
       const bA = (data.bookings || []).find(b => b.id === bookingAId);
       const bB = (data.bookings || []).find(b => b.id === bookingBId);
@@ -2638,7 +2680,7 @@
       return { success: true, bookingA: bA, bookingB: bB, match: match };
     },
 
-    unlinkReturnTrip: function (bookingBId, reason = 'Operations unlink', user = 'Khaled Ibrahim (Dispatcher)') {
+    unlinkReturnTrip: function (bookingBId, reason = 'Operations unlink', user = 'Demo Ops Manager (Dispatcher)') {
       const data = this.load();
       const bB = (data.bookings || []).find(b => b.id === bookingBId);
       if (!bB) return { success: false, error: 'Booking not found.' };
@@ -3185,7 +3227,7 @@
       b.assignment = {
         vehicle_id: vMatch.vehicle.code,
         driver_ids: assignedDrivers.map(d => d.id),
-        approved_by: 'Khaled Ibrahim (Dispatcher)',
+        approved_by: 'Demo Ops Manager (Dispatcher)',
         approved_at: toEgyptISOString(new Date())
       };
 
@@ -3204,7 +3246,7 @@
       b.history.push({
         status: 'Approved',
         at: toEgyptISOString(new Date()),
-        by: 'Khaled Ibrahim (Dispatcher)',
+        by: 'Demo Ops Manager (Dispatcher)',
         note: note || `Assigned ${vMatch.vehicle.model} (${vMatch.vehicle.code}) with driver ${assignedDrivers.map(d => d.name).join(' & ')}.`
       });
 
@@ -3212,7 +3254,7 @@
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
-        user: 'Khaled Ibrahim (Dispatcher)',
+        user: 'Demo Ops Manager (Dispatcher)',
         action: 'Approve & Assign Vehicle',
         ref: b.id,
         details: `Assigned ${vMatch.vehicle.code} + ${assignedDrivers.map(d => d.name).join(' & ')} for window ${b.hold_window.start} → ${b.hold_window.end}. Fuel estimate: ${b.estimate.fuel_liters} L.`
@@ -3229,10 +3271,10 @@
 
       if (b.assignment && b.assignment.deadhead_used_by) {
         const linkedBId = b.assignment.deadhead_used_by;
-        this.unlinkReturnTrip(linkedBId, `Preceding trip ${id} was rejected or cancelled`, 'Khaled Ibrahim (Dispatcher)');
+        this.unlinkReturnTrip(linkedBId, `Preceding trip ${id} was rejected or cancelled`, 'Demo Ops Manager (Dispatcher)');
       }
       if (b.assignment && b.assignment.linked_to) {
-        this.unlinkReturnTrip(b.id, `Trip ${id} was rejected or cancelled`, 'Khaled Ibrahim (Dispatcher)');
+        this.unlinkReturnTrip(b.id, `Trip ${id} was rejected or cancelled`, 'Demo Ops Manager (Dispatcher)');
       }
 
       const refreshedData = this.load();
@@ -3242,7 +3284,7 @@
       refreshedB.history.push({
         status: 'Rejected',
         at: toEgyptISOString(new Date()),
-        by: 'Khaled Ibrahim (Dispatcher)',
+        by: 'Demo Ops Manager (Dispatcher)',
         note: `Reason: ${reasonCode || 'Policy'}. Details: ${text || 'Rejected by Operations'}`
       });
 
@@ -3250,7 +3292,7 @@
       refreshedData.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
-        user: 'Khaled Ibrahim (Dispatcher)',
+        user: 'Demo Ops Manager (Dispatcher)',
         action: 'Reject Booking',
         ref: id,
         details: `Rejected with reason: "${reasonCode}". Message: ${text}`
@@ -3269,7 +3311,7 @@
       b.history.push({
         status: 'Changes requested',
         at: toEgyptISOString(new Date()),
-        by: 'Khaled Ibrahim (Dispatcher)',
+        by: 'Demo Ops Manager (Dispatcher)',
         note: message || 'Please adjust your mission schedule or itinerary.'
       });
 
@@ -3277,7 +3319,7 @@
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
-        user: 'Khaled Ibrahim (Dispatcher)',
+        user: 'Demo Ops Manager (Dispatcher)',
         action: 'Request Changes',
         ref: id,
         details: `Sent change request: "${message}"`
@@ -3285,6 +3327,79 @@
 
       this.save(data);
       return { success: true, booking: b };
+    },
+
+    canCancelBooking: function (bookingOrId) {
+      const b = typeof bookingOrId === 'string' ? this.getBookingById(bookingOrId) : bookingOrId;
+      if (!b) return { allowed: false, reason: 'Booking not found' };
+      if (['Dispatched', 'Active', 'Completed', 'Closed'].includes(b.status)) {
+        return { allowed: false, reason: 'Trip is already active or completed' };
+      }
+      if (b.status === 'Rejected') {
+        return { allowed: false, reason: 'Booking is already cancelled or rejected' };
+      }
+      if (b.status === 'Pending' || b.status === 'Changes requested') {
+        return { allowed: true };
+      }
+      if (b.status === 'Approved') {
+        const settings = this.getSettings();
+        const windowHours = (settings && settings.rules && settings.rules.selfCancelWindowHours) || 2;
+        const depTimeStr = (b.itinerary && b.itinerary[0] && b.itinerary[0].depart_at) || `${b.start_date}T08:00:00+03:00`;
+        const depTime = new Date(depTimeStr).getTime();
+        const diffHours = (depTime - Date.now()) / (1000 * 3600);
+        if (diffHours < windowHours) {
+          return {
+            allowed: false,
+            reason: `Self-cancellation locked within ${windowHours} hours of departure (${Math.max(0, Math.round(diffHours * 10) / 10)}h remaining). Contact Operations Desk.`
+          };
+        }
+        return { allowed: true };
+      }
+      return { allowed: false, reason: 'Cancellation not allowed for current status' };
+    },
+
+    cancelBooking: function (id, reason, cancelledByUser) {
+      const data = this.load();
+      const b = (data.bookings || []).find(item => item.id === id);
+      if (!b) return { success: false, error: 'Booking not found' };
+
+      const check = this.canCancelBooking(b);
+      if (!check.allowed) {
+        return { success: false, error: check.reason };
+      }
+
+      if (b.assignment && b.assignment.deadhead_used_by) {
+        this.unlinkReturnTrip(b.assignment.deadhead_used_by, `Preceding trip ${id} was cancelled by requester`, cancelledByUser || 'Requester');
+      }
+      if (b.assignment && b.assignment.linked_to) {
+        this.unlinkReturnTrip(b.id, `Trip ${id} was cancelled by requester`, cancelledByUser || 'Requester');
+      }
+
+      const refreshedData = this.load();
+      const refreshedB = (refreshedData.bookings || []).find(item => item.id === id) || b;
+      refreshedB.status = 'Rejected';
+      refreshedB.rejectionReason = `Cancelled by requester: ${reason || 'User cancelled'}`;
+      refreshedB.assignment = null;
+      refreshedB.history = refreshedB.history || [];
+      refreshedB.history.push({
+        status: 'Rejected',
+        at: toEgyptISOString(new Date()),
+        by: cancelledByUser || 'Requester',
+        note: `Cancelled by requester: ${reason || 'User cancelled requisition'}`
+      });
+
+      refreshedData.auditTrail = refreshedData.auditTrail || [];
+      refreshedData.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: cancelledByUser || 'Requester',
+        action: 'Cancel Booking',
+        ref: id,
+        details: `Cancelled by requester with note: "${reason || 'No reason provided'}"`
+      });
+
+      this.save(refreshedData);
+      return { success: true, booking: refreshedB };
     },
 
     dispatchBooking: function (id) {
@@ -3296,7 +3411,7 @@
       b.history.push({
         status: 'Dispatched',
         at: toEgyptISOString(new Date()),
-        by: 'Khaled Ibrahim (Dispatcher)',
+        by: 'Demo Ops Manager (Dispatcher)',
         note: `Dispatched vehicle ${b.assignment ? b.assignment.vehicle_id : 'TBD'}.`
       });
 
@@ -3304,7 +3419,7 @@
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
-        user: 'Khaled Ibrahim (Dispatcher)',
+        user: 'Demo Ops Manager (Dispatcher)',
         action: 'Dispatch Mission',
         ref: id,
         details: `Dispatched ${b.id}.`
@@ -3331,7 +3446,7 @@
         status: 'Pending',
         requester: payload.requester || {
           id: 'USR-REQ-101',
-          name: payload.requesterName || 'Dr. Sarah Mansour',
+          name: payload.requesterName || 'Demo Requester 1',
           department: payload.dept || 'Faculty of Pharmacy'
         },
         cost_center: payload.cost_center || getCostCenterForDepartment(payload.dept || (payload.requester && payload.requester.department)),
@@ -3355,7 +3470,7 @@
           {
             status: 'Submitted',
             at: toEgyptISOString(new Date()),
-            by: `${(payload.requester && payload.requester.name) || payload.requesterName || 'Dr. Sarah Mansour'} (Requester)`,
+            by: `${(payload.requester && payload.requester.name) || payload.requesterName || 'Demo Requester 1'} (Requester)`,
             note: 'Initial booking request submitted'
           }
         ],
@@ -3518,7 +3633,7 @@
       b.history.push({
         status: 'Completed',
         at: toEgyptISOString(new Date()),
-        by: 'Mona Adel (Auditor)',
+        by: 'Demo Auditor (Auditor)',
         note: auditorNotes || 'Cleared fuel variance. Final department chargeback approved.'
       });
 
@@ -3526,7 +3641,7 @@
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
-        user: 'Mona Adel (Auditor)',
+        user: 'Demo Auditor (Auditor)',
         action: 'Audit Reconcile & Settle',
         ref: id,
         details: auditorNotes || 'Cleared fuel variance. Final department chargeback approved.'

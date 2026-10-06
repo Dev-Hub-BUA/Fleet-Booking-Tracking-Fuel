@@ -7,6 +7,63 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/auth.js"></script>
+  <style>
+    .filter-tab-btn {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+    .filter-tab-btn:hover {
+      background: var(--navy-50);
+      color: var(--navy-800);
+    }
+    .filter-tab-btn.active {
+      background: var(--navy-800);
+      color: #FFFFFF;
+      border-color: var(--navy-800);
+    }
+    .filter-tab-count {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.07);
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .filter-tab-btn.active .filter-tab-count {
+      background: rgba(255, 255, 255, 0.22);
+      color: #FFFFFF;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-md);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      max-width: 480px;
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+  </style>
 </head>
 <body>
 
@@ -23,16 +80,9 @@
 
       <!-- Authenticated Controls -->
       <div class="header-actions">
-        <div class="search-wrapper">
-          <span class="search-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          </span>
-          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
-        </div>
-
         <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
-          <span class="badge-counter">3</span>
+          <span class="badge-counter">0</span>
         </a>
 
         <!-- User Dropdown Menu -->
@@ -62,48 +112,126 @@
 
     <main class="main-content" role="main">
       <div class="page-header">
-  <div class="page-title-group">
-    <span class="page-pretitle">Department Requests</span>
-    <h1 class="page-title">My Bookings</h1>
-    <span class="page-subtitle">Track status and fuel reconciliation records</span>
-  </div>
-  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-    <button class="btn btn-secondary btn-sm" onclick="clearAllData()" style="color:#C62828; display:inline-flex; align-items:center; gap:6px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-      <span>Clear All Data</span>
-    </button>
-    <button class="btn btn-secondary btn-sm" onclick="resetDemoData()" style="display:inline-flex; align-items:center; gap:6px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-      <span>Reset Demo Data</span>
-    </button>
-    <a href="booking-new.html" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px;">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>New Booking</span>
-    </a>
-  </div>
-</div>
+        <div class="page-title-group">
+          <span class="page-pretitle">Department Requests</span>
+          <h1 class="page-title">My Bookings</h1>
+          <span class="page-subtitle">Track status, vehicle assignments, and official mission requisitions</span>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <a href="booking-new.html" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>New Booking</span>
+          </a>
+        </div>
+      </div>
 
-<div class="card" style="padding: 0; overflow: hidden;">
-  <div class="table-wrapper">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Booking ID</th>
-          <th>Route &amp; Purpose</th>
-          <th>Date / Time</th>
-          <th>Requested Category</th>
-          <th>Allocated Vehicle</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="bookings-table-body">
-        <!-- Rendered dynamically via FleetStore -->
-      </tbody>
-    </table>
-  </div>
-</div>
+      <!-- Controls bar: Tabs, Search, Sort -->
+      <div class="card" style="margin-bottom: 16px; padding: 14px 18px;">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <!-- Status Tabs -->
+          <div style="display:flex; flex-wrap:wrap; gap:8px;" id="status-tabs-container">
+            <button type="button" class="filter-tab-btn active" data-tab="all" onclick="setBookingTab('all')">
+              <span>All</span>
+              <span class="filter-tab-count" id="count-all">0</span>
+            </button>
+            <button type="button" class="filter-tab-btn" data-tab="pending" onclick="setBookingTab('pending')">
+              <span>Pending</span>
+              <span class="filter-tab-count" id="count-pending">0</span>
+            </button>
+            <button type="button" class="filter-tab-btn" data-tab="approved" onclick="setBookingTab('approved')">
+              <span>Approved</span>
+              <span class="filter-tab-count" id="count-approved">0</span>
+            </button>
+            <button type="button" class="filter-tab-btn" data-tab="active" onclick="setBookingTab('active')">
+              <span>Active / Dispatched</span>
+              <span class="filter-tab-count" id="count-active">0</span>
+            </button>
+            <button type="button" class="filter-tab-btn" data-tab="changes" onclick="setBookingTab('changes')">
+              <span>Changes requested</span>
+              <span class="filter-tab-count" id="count-changes">0</span>
+            </button>
+            <button type="button" class="filter-tab-btn" data-tab="completed_rejected" onclick="setBookingTab('completed_rejected')">
+              <span>Completed / Rejected</span>
+              <span class="filter-tab-count" id="count-past">0</span>
+            </button>
+          </div>
+
+          <!-- Search and Sort Filter Row -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding-top:10px; border-top:1px solid var(--border);">
+            <div style="position:relative; flex:1 1 300px; max-width:440px;">
+              <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-muted); display:flex;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+              </span>
+              <input type="search" id="booking-search-input" oninput="handleSearchChange(this.value)" placeholder="Search by booking ID or place name…" style="width:100%; padding:8px 12px 8px 34px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px; background:var(--bg-main);" aria-label="Search my bookings">
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px;">
+              <label for="booking-sort-select" style="font-size:12.5px; color:var(--text-muted); font-weight:600;">Sort:</label>
+              <select id="booking-sort-select" onchange="handleSortChange(this.value)" style="padding:7px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px; background:var(--bg-card); color:var(--text-main);">
+                <option value="newest">Trip Start (Newest first)</option>
+                <option value="oldest">Trip Start (Oldest first)</option>
+                <option value="submitted">Recently Submitted</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookings Data Table -->
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="min-width:110px;">Booking ID</th>
+                <th style="min-width:240px;">Route</th>
+                <th style="min-width:180px;">Trip Period</th>
+                <th style="min-width:140px;">Passengers &amp; Cargo</th>
+                <th style="min-width:190px;">Allocated Vehicle</th>
+                <th style="min-width:130px;">Status</th>
+                <th style="min-width:140px; text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-table-body">
+              <!-- Rendered dynamically via FleetStore -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </main>
+  </div>
+
+  <!-- Cancellation Confirmation Modal -->
+  <div id="cancel-modal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title">
+    <div class="modal-card">
+      <div style="padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="color:#DC2626; display:flex;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          </span>
+          <h3 id="cancel-modal-title" style="margin:0; font-size:16px; font-weight:700; color:var(--navy-900);">Cancel Booking</h3>
+        </div>
+        <button type="button" onclick="closeCancelModal()" style="border:none; background:transparent; cursor:pointer; color:var(--text-muted); padding:4px;" aria-label="Close dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div style="padding:20px;">
+        <p style="margin:0 0 12px; font-size:13.5px; color:var(--text-main); line-height:1.5;">
+          Are you sure you want to cancel booking <strong id="cancel-target-id" style="font-family:var(--font-mono);">BK-XXXX</strong>? Any assigned vehicle or hold reservation will be immediately released.
+        </p>
+        <label for="cancel-reason-input" style="display:block; font-size:12.5px; font-weight:600; color:var(--navy-800); margin-bottom:6px;">
+          Reason for cancellation (optional):
+        </label>
+        <textarea id="cancel-reason-input" rows="3" placeholder="Provide context for Logistics Operations…" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px; font-family:inherit; resize:vertical;"></textarea>
+        <div id="cancel-modal-error" style="display:none; margin-top:10px; padding:8px 12px; background:#FEE2E2; border:1px solid #FCA5A5; border-radius:4px; font-size:12.5px; color:#B91C1C;"></div>
+      </div>
+      <div style="padding:14px 20px; background:#F8FAFC; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeCancelModal()">Keep Booking</button>
+        <button type="button" id="confirm-cancel-btn" class="btn btn-danger" onclick="submitCancellation()" style="background:#DC2626; border-color:#DC2626; color:#FFFFFF;">
+          Confirm Cancellation
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Master Footer -->
@@ -134,9 +262,9 @@
         <div class="footer-col">
           <h4>Fleet Operations Center</h4>
           <span>CIRA Education HQ · Central Logistics Operations</span>
-          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
-          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
-          <span>Email: fleet.operations@cira.com.eg</span>
+          <span>Operations Desk: <strong>Ext. 0000</strong></span>
+          <span>Emergency Line: <strong>+20 000 000 0000</strong></span>
+          <span>Email: operations@example.com</span>
           <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
         </div>
       </div>
@@ -153,48 +281,219 @@
 
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/dev.js"></script>
   <script src="js/main.js"></script>
   <script>
+    let currentTab = 'all';
+    let searchQuery = '';
+    let sortMode = 'newest';
+    let targetCancelBookingId = null;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function getStatusBadge(status) {
       switch (status) {
         case 'Pending':
-          return '<span class="badge badge-warning">Pending Review</span>';
+          return '<span class="badge badge-warning" style="background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;">Pending Review</span>';
         case 'Approved':
-          return '<span class="badge badge-success">Approved</span>';
+          return '<span class="badge badge-success" style="background:#DCFCE7;color:#166534;border:1px solid #BBF7D0;">Approved</span>';
         case 'Changes requested':
-          return '<span class="badge badge-warning" style="background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;">Changes Requested</span>';
+          return '<span class="badge badge-warning" style="background:#FFF7ED;color:#C2410C;border:1px solid #FFEDD5;">Changes Requested</span>';
         case 'Rejected':
-          return '<span class="badge badge-danger">Rejected</span>';
+          return '<span class="badge badge-danger" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;">Rejected</span>';
         case 'Dispatched':
-          return '<span class="badge badge-info">Dispatched</span>';
+          return '<span class="badge badge-info" style="background:#E0F2FE;color:#0369A1;border:1px solid #BAE6FD;">Dispatched</span>';
         case 'Active':
-          return '<span class="badge badge-primary" style="background:var(--navy-600);color:#fff;">Active Run</span>';
+          return '<span class="badge" style="background:var(--navy-700);color:#FFFFFF;">Active Run</span>';
         case 'Closed':
           return '<span class="badge badge-warning" style="background:#FFF3E0;color:#E65100;">Audit Pending</span>';
         case 'Completed':
-          return '<span class="badge badge-success">Completed</span>';
+          return '<span class="badge badge-success" style="background:#F0FDF4;color:#15803D;border:1px solid #DCFCE7;">Completed</span>';
         default:
-          return `<span class="badge badge-neutral">${status || 'Draft'}</span>`;
+          return `<span class="badge badge-neutral">${escapeHtml(status || 'Draft')}</span>`;
       }
     }
 
-    function renderBookingsTable() {
+    function formatTripPeriod(b) {
+      if (!b.start_date || !b.end_date) {
+        return { range: 'Dates pending', depTime: 'Schedule unconfirmed' };
+      }
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const d1 = new Date(b.start_date + 'T00:00:00');
+      const d2 = new Date(b.end_date + 'T00:00:00');
+      const d1Day = d1.getDate();
+      const d2Day = d2.getDate();
+      const d1Month = months[d1.getMonth()];
+      const d2Month = months[d2.getMonth()];
+      const year = d1.getFullYear();
+      const diffDays = Math.max(1, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)) + 1);
+      const dayStr = diffDays === 1 ? '1 day' : `${diffDays} days`;
+
+      let dateRangeStr = '';
+      if (b.start_date === b.end_date) {
+        dateRangeStr = `${d1Day} ${d1Month} ${year}`;
+      } else if (d1.getMonth() === d2.getMonth()) {
+        dateRangeStr = `${d1Day} → ${d2Day} ${d1Month} ${year}`;
+      } else {
+        dateRangeStr = `${d1Day} ${d1Month} → ${d2Day} ${d2Month} ${year}`;
+      }
+
+      const depTime = (b.itinerary && b.itinerary[0] && b.itinerary[0].depart_at)
+        ? b.itinerary[0].depart_at.split('T')[1].slice(0, 5)
+        : '08:00';
+
+      return {
+        range: `${dateRangeStr} · ${dayStr}`,
+        depTime: `${depTime} · ${b.return_with_vehicle ? 'Round-trip' : 'One-way'}`
+      };
+    }
+
+    function buildRouteSummary(b) {
+      if (!b.itinerary || b.itinerary.length === 0) {
+        return 'Route unassigned';
+      }
+      const places = b.itinerary.map(p => p.place_name || 'Location');
+      let text = places.join(' → ');
+      if (b.return_with_vehicle && places.length > 1 && places[0] !== places[places.length - 1]) {
+        text += ' (+ return)';
+      }
+      return text;
+    }
+
+    function getUserBookings() {
+      const user = Auth.currentUser();
+      if (!user) return [];
+      const allBookings = FleetStore.getBookings() || [];
+      return allBookings.filter(b => b.requester && b.requester.id === user.id);
+    }
+
+    function updateTabCounts(userBookings) {
+      const counts = {
+        all: userBookings.length,
+        pending: 0,
+        approved: 0,
+        active: 0,
+        changes: 0,
+        past: 0
+      };
+
+      userBookings.forEach(b => {
+        if (b.status === 'Pending') counts.pending++;
+        else if (b.status === 'Approved') counts.approved++;
+        else if (b.status === 'Active' || b.status === 'Dispatched') counts.active++;
+        else if (b.status === 'Changes requested') counts.changes++;
+        else if (b.status === 'Completed' || b.status === 'Rejected' || b.status === 'Closed') counts.past++;
+      });
+
+      document.getElementById('count-all').textContent = counts.all;
+      document.getElementById('count-pending').textContent = counts.pending;
+      document.getElementById('count-approved').textContent = counts.approved;
+      document.getElementById('count-active').textContent = counts.active;
+      document.getElementById('count-changes').textContent = counts.changes;
+      document.getElementById('count-past').textContent = counts.past;
+    }
+
+    function setBookingTab(tabKey) {
+      currentTab = tabKey;
+      document.querySelectorAll('.filter-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-tab') === tabKey);
+      });
+      renderBookings();
+    }
+
+    function handleSearchChange(val) {
+      searchQuery = (val || '').trim().toLowerCase();
+      renderBookings();
+    }
+
+    function handleSortChange(val) {
+      sortMode = val;
+      renderBookings();
+    }
+
+    function renderBookings() {
       const tbody = document.getElementById('bookings-table-body');
       if (!tbody) return;
-      const bookings = FleetStore.getBookings();
 
-      if (!bookings || bookings.length === 0) {
+      const userBookings = getUserBookings();
+      updateTabCounts(userBookings);
+
+      let filtered = userBookings.filter(b => {
+        if (currentTab === 'pending') return b.status === 'Pending';
+        if (currentTab === 'approved') return b.status === 'Approved';
+        if (currentTab === 'active') return b.status === 'Active' || b.status === 'Dispatched';
+        if (currentTab === 'changes') return b.status === 'Changes requested';
+        if (currentTab === 'completed_rejected') return b.status === 'Completed' || b.status === 'Rejected' || b.status === 'Closed';
+        return true;
+      });
+
+      if (searchQuery) {
+        filtered = filtered.filter(b => {
+          if (b.id && b.id.toLowerCase().includes(searchQuery)) return true;
+          if (b.itinerary && b.itinerary.some(p => (p.place_name || '').toLowerCase().includes(searchQuery))) return true;
+          if (b.notes_for_dispatch && b.notes_for_dispatch.toLowerCase().includes(searchQuery)) return true;
+          return false;
+        });
+      }
+
+      filtered.sort((a, b) => {
+        if (sortMode === 'submitted') {
+          const aHist = (a.history && a.history[0] && a.history[0].at) || a.start_date || '';
+          const bHist = (b.history && b.history[0] && b.history[0].at) || b.start_date || '';
+          return new Date(bHist) - new Date(aHist);
+        }
+        if (sortMode === 'oldest') {
+          const aTime = a.start_date ? new Date(a.start_date).getTime() : 0;
+          const bTime = b.start_date ? new Date(b.start_date).getTime() : 0;
+          return aTime - bTime;
+        }
+        const aTime = a.start_date ? new Date(a.start_date).getTime() : 0;
+        const bTime = b.start_date ? new Date(b.start_date).getTime() : 0;
+        return bTime - aTime;
+      });
+
+      if (filtered.length === 0) {
+        let emptyTitle = 'No bookings found';
+        let emptyDesc = 'Submit a vehicle booking request for your official mission.';
+        if (currentTab === 'pending') {
+          emptyTitle = 'No pending requests';
+          emptyDesc = 'You have no requests currently awaiting Operations manager review.';
+        } else if (currentTab === 'approved') {
+          emptyTitle = 'No approved bookings';
+          emptyDesc = 'Bookings approved by Operations will appear here awaiting vehicle dispatch.';
+        } else if (currentTab === 'active') {
+          emptyTitle = 'No active or dispatched trips';
+          emptyDesc = 'Vehicles currently on the road will be available here for live GPS tracking.';
+        } else if (currentTab === 'changes') {
+          emptyTitle = 'No changes requested';
+          emptyDesc = 'There are no requisitions returned by Operations for schedule adjustments.';
+        } else if (currentTab === 'completed_rejected') {
+          emptyTitle = 'No completed or archived records';
+          emptyDesc = 'Past completed trips and reconciled records will show here.';
+        } else if (searchQuery) {
+          emptyTitle = 'No matching bookings found';
+          emptyDesc = `No requisitions matched your search "${searchQuery}".`;
+        }
+
         tbody.innerHTML = `
           <tr>
-            <td colspan="7" style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
-              <div style="display:flex; justify-content:center; margin-bottom: 12px; color:var(--text-muted);">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            <td colspan="7" style="text-align:center; padding:54px 20px; color:var(--text-muted);">
+              <div style="display:flex; justify-content:center; margin-bottom:12px; color:var(--text-muted);">
+                <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
               </div>
-              <strong style="display:block; font-size:16px; color:var(--navy-800); margin-bottom:4px;">No bookings currently recorded</strong>
-              <span style="font-size:13px;">Submit a vehicle booking request for your official mission.</span>
+              <strong style="display:block; font-size:15px; color:var(--navy-900); margin-bottom:4px;">${escapeHtml(emptyTitle)}</strong>
+              <span style="font-size:13px;">${escapeHtml(emptyDesc)}</span>
               <div style="margin-top:16px;">
-                <a href="booking-new.html" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <a href="booking-new.html" class="btn btn-gold btn-sm" style="display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                   <span>Submit New Booking</span>
                 </a>
               </div>
@@ -204,63 +503,125 @@
         return;
       }
 
-      tbody.innerHTML = bookings.map(b => {
-        let allocatedVehicleHtml = '';
+      const allVehicles = FleetStore.getVehicles() || [];
+      const allDrivers = FleetStore.getDrivers() || [];
+
+      tbody.innerHTML = filtered.map(b => {
+        let vehicleHtml = '';
         if (b.status === 'Pending') {
-          allocatedVehicleHtml = '<span class="badge badge-neutral" style="background:#F0F4F8; color:var(--text-muted); font-size:12px;">Pending Assignment by Operations</span>';
+          vehicleHtml = '<span class="badge badge-neutral" style="background:#F1F5F9; color:#64748B; font-size:11.5px;">Pending assignment</span>';
         } else if (b.status === 'Changes requested') {
-          allocatedVehicleHtml = `
-            <span class="badge badge-warning" style="background:#FEF3C7;color:#92400E;font-size:11.5px;">Awaiting Requester Edit</span>
-            ${b.changesRequestedMessage ? `<div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">${escapeHtml(b.changesRequestedMessage)}</div>` : ''}
-          `;
+          vehicleHtml = '<span class="badge badge-warning" style="background:#FEF3C7; color:#92400E; font-size:11.5px;">Awaiting Requester Edit</span>';
         } else if (b.status === 'Rejected') {
-          allocatedVehicleHtml = `
-            <span class="badge badge-danger" style="font-size:11.5px;">Requisition Rejected</span>
-            ${b.rejectionReason ? `<div style="font-size:11px;color:#DC2626;margin-top:2px;">Reason: ${escapeHtml(b.rejectionReason)}</div>` : ''}
+          vehicleHtml = '<span class="badge badge-danger" style="font-size:11.5px;">Requisition Rejected</span>';
+        } else if (b.assignment && b.assignment.vehicle_id) {
+          const v = allVehicles.find(item => item.id === b.assignment.vehicle_id || item.code === b.assignment.vehicle_id);
+          const vName = v ? `${v.code} (${v.make} ${v.model})` : b.assignment.vehicle_id;
+          const assignedDriverNames = (b.assignment.driver_ids || []).map(dId => {
+            const dObj = allDrivers.find(d => d.id === dId);
+            return dObj ? dObj.name : dId;
+          }).join(', ');
+
+          vehicleHtml = `
+            <div style="font-weight:600; color:var(--navy-900); font-size:13px;">${escapeHtml(vName)}</div>
+            ${assignedDriverNames ? `<div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">Driver: ${escapeHtml(assignedDriverNames)}</div>` : ''}
           `;
         } else {
-          const vCode = b.assignment ? b.assignment.vehicle_id : 'Assigned';
-          const dIds = b.assignment && b.assignment.driver_ids.length > 0 ? b.assignment.driver_ids.join(', ') : 'Assigned';
-          allocatedVehicleHtml = `
-            <strong>${vCode}</strong>
-            <div style="font-size:12px;color:var(--text-muted); margin-top:2px;">Driver ID: ${dIds}</div>
+          vehicleHtml = '<span class="badge badge-neutral" style="font-size:11.5px;">Assignment pending</span>';
+        }
+
+        const routeSummary = buildRouteSummary(b);
+        const period = formatTripPeriod(b);
+
+        let cargoHtml = '';
+        if (b.has_extra_cargo || (b.cargo_kg && b.cargo_kg > 0)) {
+          cargoHtml = `
+            <span class="badge" style="background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; font-size:11px; margin-top:4px; display:inline-block;">
+              Cargo ${escapeHtml(b.cargo_kg || 0)} kg
+            </span>
           `;
         }
 
-        const trackBtn = (b.status === 'Active' || b.status === 'Dispatched')
-          ? `<a href="booking-track.html?id=${b.id}" class="btn btn-gold btn-sm" style="display:inline-flex; align-items:center; gap:4px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg><span>Track</span></a>`
-          : '';
+        const cancelCheck = FleetStore.canCancelBooking(b);
+        const detailsBtn = `
+          <a href="booking-detail.html?id=${escapeHtml(b.id)}" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:4px; text-decoration:none;" title="View Booking Details">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Details</span>
+          </a>
+        `;
 
-        const editBtn = (b.status === 'Changes requested')
-          ? `<a href="booking-new.html?edit=${b.id}" class="btn btn-warning-outline btn-sm" style="padding:4px 8px;font-size:12px;border:1px solid #D97706;color:#D97706;text-decoration:none;border-radius:4px;display:inline-flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>Edit</span></a>`
-          : '';
+        let editBtn = '';
+        if (b.status === 'Pending' || b.status === 'Changes requested') {
+          editBtn = `
+            <a href="booking-new.html?edit=${escapeHtml(b.id)}" class="btn btn-warning-outline btn-sm" style="display:inline-flex; align-items:center; gap:4px; text-decoration:none;" title="Edit Itinerary & Dates">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span>Edit</span>
+            </a>
+          `;
+        }
 
-        const routeText = (b.itinerary && b.itinerary.length > 0)
-          ? b.itinerary.map(p => p.place_name).join(' → ')
-          : 'Trip Route';
-        const notesText = b.notes_for_dispatch || (b.requester ? b.requester.department : 'Institutional Mission');
-        const depTime = (b.itinerary && b.itinerary[0] && b.itinerary[0].depart_at)
-          ? b.itinerary[0].depart_at.split('T')[1].slice(0, 5)
-          : '08:00';
+        let cancelBtn = '';
+        if (b.status === 'Pending' || b.status === 'Changes requested') {
+          cancelBtn = `
+            <button type="button" class="btn btn-sm" onclick="openCancelModal('${escapeHtml(b.id)}')" style="display:inline-flex; align-items:center; gap:4px; border:1px solid #FCA5A5; color:#DC2626; background:#FEF2F2;" title="Cancel this booking request">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <span>Cancel</span>
+            </button>
+          `;
+        } else if (b.status === 'Approved') {
+          if (cancelCheck.allowed) {
+            cancelBtn = `
+              <button type="button" class="btn btn-sm" onclick="openCancelModal('${escapeHtml(b.id)}')" style="display:inline-flex; align-items:center; gap:4px; border:1px solid #FCA5A5; color:#DC2626; background:#FEF2F2;" title="Cancel approved booking prior to lock window">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                <span>Cancel</span>
+              </button>
+            `;
+          } else {
+            cancelBtn = `
+              <button type="button" class="btn btn-sm" disabled style="display:inline-flex; align-items:center; gap:4px; border:1px solid var(--border); color:var(--text-muted); background:var(--bg-main); opacity:0.6; cursor:not-allowed;" title="${escapeHtml(cancelCheck.reason || 'Locked')}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                <span>Cancel</span>
+              </button>
+            `;
+          }
+        }
+
+        let trackBtn = '';
+        if (b.status === 'Active' || b.status === 'Dispatched') {
+          trackBtn = `
+            <a href="booking-track.html?id=${escapeHtml(b.id)}" class="btn btn-gold btn-sm" style="display:inline-flex; align-items:center; gap:4px; text-decoration:none;" title="Track Live Vehicle">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              <span>Track</span>
+            </a>
+          `;
+        }
 
         return `
           <tr>
-            <td><span style="font-family:var(--font-mono);font-weight:700;">${b.id}</span></td>
             <td>
-              <strong>${escapeHtml(routeText)}</strong>
-              <div style="font-size:12px;color:var(--text-muted);">${escapeHtml(notesText)}</div>
+              <a href="booking-detail.html?id=${escapeHtml(b.id)}" style="font-family:var(--font-mono); font-weight:700; color:var(--navy-900); text-decoration:none; display:inline-block; border-bottom:1px dashed var(--cira-gold);">
+                ${escapeHtml(b.id)}
+              </a>
             </td>
             <td>
-              <div>${escapeHtml(b.start_date)} → ${escapeHtml(b.end_date)}</div>
-              <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">${depTime} · ${b.return_with_vehicle ? 'Round-trip' : 'One-way'}</div>
+              <strong style="color:var(--navy-900); font-size:13.5px; display:block; line-height:1.4;">${escapeHtml(routeSummary)}</strong>
+              ${b.notes_for_dispatch ? `<div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${escapeHtml(b.notes_for_dispatch)}</div>` : ''}
             </td>
-            <td><span style="font-size:13px; font-weight:600; color:var(--navy-700);">${b.passengers || 1} pax${b.has_extra_cargo ? ` · ${b.cargo_kg}kg cargo` : ''}</span></td>
-            <td>${allocatedVehicleHtml}</td>
+            <td>
+              <div style="font-weight:600; color:var(--navy-900); font-size:13px;">${escapeHtml(period.range)}</div>
+              <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">${escapeHtml(period.depTime)}</div>
+            </td>
+            <td>
+              <div style="font-size:13px; font-weight:600; color:var(--navy-800);">${escapeHtml(b.passengers || 1)} pax</div>
+              ${cargoHtml}
+            </td>
+            <td>${vehicleHtml}</td>
             <td>${getStatusBadge(b.status)}</td>
-            <td>
-              <div style="display:flex;gap:6px;">
-                <a href="booking-detail.html?id=${b.id}" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:4px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg><span>Details</span></a>
+            <td style="text-align:right;">
+              <div style="display:inline-flex; gap:6px; justify-content:flex-end; flex-wrap:wrap;">
+                ${detailsBtn}
                 ${editBtn}
+                ${cancelBtn}
                 ${trackBtn}
               </div>
             </td>
@@ -269,24 +630,54 @@
       }).join('');
     }
 
-    function clearAllData() {
-      if (confirm('Confirm: Do you want to clear all bookings and data to start a clean scenario from scratch?')) {
-        FleetStore.clearAll();
-        renderBookingsTable();
+    function openCancelModal(id) {
+      targetCancelBookingId = id;
+      const targetLabel = document.getElementById('cancel-target-id');
+      const errBox = document.getElementById('cancel-modal-error');
+      const reasonInput = document.getElementById('cancel-reason-input');
+
+      if (targetLabel) targetLabel.textContent = id;
+      if (errBox) {
+        errBox.style.display = 'none';
+        errBox.textContent = '';
       }
+      if (reasonInput) reasonInput.value = '';
+
+      const modal = document.getElementById('cancel-modal');
+      if (modal) modal.style.display = 'flex';
     }
 
-    function resetDemoData() {
-      if (confirm('Do you want to restore default demo data?')) {
-        FleetStore.resetDemo();
-        renderBookingsTable();
+    function closeCancelModal() {
+      targetCancelBookingId = null;
+      const modal = document.getElementById('cancel-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function submitCancellation() {
+      if (!targetCancelBookingId) return;
+
+      const reason = (document.getElementById('cancel-reason-input').value || '').trim();
+      const user = Auth.currentUser();
+      const userName = user ? `${user.name} (${user.role})` : 'Requester';
+
+      const res = FleetStore.cancelBooking(targetCancelBookingId, reason, userName);
+      if (!res.success) {
+        const errBox = document.getElementById('cancel-modal-error');
+        if (errBox) {
+          errBox.textContent = res.error || 'Failed to cancel booking.';
+          errBox.style.display = 'block';
+        }
+        return;
       }
+
+      closeCancelModal();
+      renderBookings();
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-      if (!Auth.requireAuth(["Requester"])) return;
+      if (!Auth.requireAuth(['Requester'])) return;
       Auth.renderAppShell('bookings');
-      renderBookingsTable();
+      renderBookings();
     });
   </script>
 </body>

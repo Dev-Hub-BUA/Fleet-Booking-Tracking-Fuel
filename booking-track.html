@@ -6,6 +6,7 @@
   <title>Track Active Trip — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="js/auth.js"></script>
 </head>
 <body>
@@ -23,16 +24,9 @@
 
       <!-- Authenticated Controls -->
       <div class="header-actions">
-        <div class="search-wrapper">
-          <span class="search-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          </span>
-          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
-        </div>
-
         <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
-          <span class="badge-counter">3</span>
+          <span class="badge-counter">0</span>
         </a>
 
         <!-- User Dropdown Menu -->
@@ -62,79 +56,96 @@
 
     <main class="main-content" role="main">
       <div class="page-header">
-  <div class="page-title-group">
-    <span class="page-pretitle">BK-2047 · Real-Time Telemetry</span>
-    <h1 class="page-title">Track Active Trip</h1>
-    <span class="page-subtitle">Private live location streaming during active mission</span>
-  </div>
-  <a href="booking-detail.html" class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:6px;">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-    <span>Trip Details</span>
-  </a>
-</div>
-
-<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: start;">
-  <div class="map-canvas-container" style="flex: 999 1 540px;">
-    <div class="map-toolbar">
-      <span style="font-size: 13px; font-weight: 700; color: var(--navy-800); display:flex; align-items:center; gap:6px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.93 19.07a10 10 0 0 1 0-14.14"/><path d="M7.76 16.24a6 6 0 0 1 0-8.48"/><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.48"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-        GPS Telemetry Live
-      </span>
-      <span class="badge badge-success">Online · 4s refresh</span>
-    </div>
-
-    <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" preserveAspectRatio="none">
-      <line x1="80" y1="380" x2="680" y2="120" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
-      <line x1="80" y1="380" x2="380" y2="250" stroke="#1D4E89" stroke-width="8" stroke-linecap="round"/>
-    </svg>
-
-    <div style="position: absolute; left: 80px; top: 380px; transform: translate(-50%, -50%);">
-      <div class="pin-marker" style="background: var(--navy-800); width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700;">A</div>
-      <div class="pin-bubble" style="margin-top: 4px;">Main Campus</div>
-    </div>
-
-    <div class="map-vehicle-pin" style="left: 380px; top: 250px;">
-      <div class="pin-bubble" style="background: var(--navy-600);">V-122 · 72 km/h</div>
-      <div class="pin-marker moving"></div>
-    </div>
-
-    <div style="position: absolute; left: 680px; top: 120px; transform: translate(-50%, -50%);">
-      <div class="pin-marker" style="background: var(--gold-500); width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; color: var(--navy-800); font-size: 12px; font-weight: 700;">B</div>
-      <div class="pin-bubble" style="margin-top: 4px;">Plant 3 (10th Ramadan)</div>
-    </div>
-  </div>
-
-  <div style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 16px;">
-    <div class="card">
-      <span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">ACTIVE RUN</span>
-      <h2 style="font-family: var(--font-condensed); font-size: 34px; line-height: 1; color: var(--navy-800); margin: 0;">Arriving 09:52</h2>
-      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; margin-top: 8px;">
-        <div style="display: flex; justify-content: space-between;"><span>Vehicle:</span><strong>Hyundai H-1 (V-122)</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Driver:</span><strong>Ahmed Hassan (Driver A)</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Remaining:</span><strong style="font-family:var(--font-mono);">28 km (14 min)</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Current Speed:</span><strong style="font-family:var(--font-mono); color:var(--navy-600);">72 km/h</strong></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3 class="card-title">Route Waypoints</h3>
-      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--success);"></span>
-          <span>Main Campus · Departed 08:31</span>
+        <div class="page-title-group">
+          <span class="page-pretitle" id="track-header-pretitle">Trip Telemetry</span>
+          <h1 class="page-title" id="track-header-title">Track Active Trip</h1>
+          <span class="page-subtitle" id="track-header-subtitle">Real-time GPS positioning along authorized road corridor</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--success);"></span>
-          <span>Obour Depot · Departed 09:18</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--gold-500);"></span>
-          <strong>Plant 3 · ETA 09:52</strong>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <a href="bookings.html" class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span>Back to My Bookings</span>
+          </a>
+          <a id="btn-view-details" href="booking-detail.html" class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span>Trip Details</span>
+          </a>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: start;">
+        <!-- Real Leaflet Map Container -->
+        <div class="card" style="flex: 999 1 540px; padding: 0; overflow: hidden; position: relative;">
+          <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #FFFFFF;">
+            <span style="font-size: 13px; font-weight: 700; color: var(--navy-800); display:flex; align-items:center; gap:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.93 19.07a10 10 0 0 1 0-14.14"/><path d="M7.76 16.24a6 6 0 0 1 0-8.48"/><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.48"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+              <span>GPS Telemetry Feed</span>
+            </span>
+            <span id="telemetry-status-badge" class="badge badge-neutral">Checking status…</span>
+          </div>
+
+          <div id="track-leaflet-map" style="width: 100%; height: 520px; background: #E2E8F0;"></div>
+        </div>
+
+        <!-- Right Side Live Telemetry Panel -->
+        <div style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 16px;">
+          <div class="card">
+            <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); text-transform: uppercase;" id="live-mission-code">MISSION RUN</span>
+            <h2 style="font-family: var(--font-condensed); font-size: 32px; line-height: 1.1; color: var(--navy-800); margin: 6px 0 12px;" id="live-eta-headline">Awaiting Dispatch</h2>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13.5px;">
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                <span style="color:var(--text-muted);">Vehicle:</span>
+                <strong id="live-vehicle-val">—</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                <span style="color:var(--text-muted);">Driver:</span>
+                <strong id="live-driver-val">—</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                <span style="color:var(--text-muted);">Driver Contact:</span>
+                <strong id="live-phone-val" style="font-family:var(--font-mono);">—</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                <span style="color:var(--text-muted);">Remaining Distance:</span>
+                <strong id="live-distance-val" style="font-family:var(--font-mono);">—</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                <span style="color:var(--text-muted);">Current Speed:</span>
+                <strong id="live-speed-val" style="font-family:var(--font-mono); color:var(--navy-700);">—</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-top: 2px;">
+                <span style="color:var(--text-muted);">Last Telemetry Ping:</span>
+                <strong id="live-ping-val" style="font-size:12px; font-family:var(--font-mono); color:var(--text-muted);">—</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title" style="margin-bottom: 10px;">Passenger &amp; Mission Manifest</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13.5px;">
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color:var(--text-muted);">Authorized Passengers:</span>
+                <strong id="live-passengers-val">1 pax</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color:var(--text-muted);">Cargo Payload:</span>
+                <strong id="live-cargo-val">None</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color:var(--text-muted);">Department:</span>
+                <strong id="live-dept-val">—</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title" style="margin-bottom: 10px;">Route Waypoints</h3>
+            <div id="live-waypoints-list" style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -166,9 +177,9 @@
         <div class="footer-col">
           <h4>Fleet Operations Center</h4>
           <span>CIRA Education HQ · Central Logistics Operations</span>
-          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
-          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
-          <span>Email: fleet.operations@cira.com.eg</span>
+          <span>Operations Desk: <strong>Ext. 0000</strong></span>
+          <span>Emergency Line: <strong>+20 000 000 0000</strong></span>
+          <span>Email: operations@example.com</span>
           <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
         </div>
       </div>
@@ -185,25 +196,229 @@
 
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/geo.js"></script>
+  <script src="js/telemetry.js"></script>
+  <script src="js/dev.js"></script>
   <script src="js/main.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      if (!Auth.requireAuth(["Requester", "Dispatcher"])) return;
-      Auth.renderAppShell('track');
+    let mapInstance = null;
+    let currentTrip = null;
+    let unsubscribeTelemetry = null;
+    let fullRouteGeometry = [];
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function (m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[m];
+      });
+    }
+
+    function renderWaypointsList(trip, nextIndex = 1) {
+      const listEl = document.getElementById('live-waypoints-list');
+      if (!listEl || !trip.itinerary) return;
+
+      listEl.innerHTML = trip.itinerary.map((pt, idx) => {
+        let color = '#CBD5E1';
+        let statusText = '';
+        if (trip.status === 'Active' || trip.status === 'Dispatched') {
+          if (idx < nextIndex) {
+            color = 'var(--success)';
+            statusText = 'Departed';
+          } else if (idx === nextIndex) {
+            color = 'var(--cira-gold)';
+            statusText = 'Next Stop';
+          } else {
+            color = '#94A3B8';
+            statusText = 'Upcoming';
+          }
+        } else {
+          color = (idx === 0) ? 'var(--navy-800)' : (idx === trip.itinerary.length - 1 ? 'var(--cira-gold)' : '#64748B');
+          statusText = (idx === 0) ? 'Departure' : (idx === trip.itinerary.length - 1 ? 'Destination' : 'Stop');
+        }
+
+        return `
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: ${color}; flex-shrink: 0;"></span>
+              <strong>${idx + 1}. ${escapeHtml(pt.place_name || 'Location')}</strong>
+            </div>
+            <span style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono);">${statusText}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateLiveTelemetry(ping) {
+      if (!ping || !currentTrip) return;
+
+      const vCode = currentTrip.assignment ? currentTrip.assignment.vehicle_id : 'Vehicle';
+      mapInstance.setVehicle(vCode, ping);
+
+      const prog = GeoRoute.progress(fullRouteGeometry, {
+        lat: ping.lat,
+        lng: ping.lng,
+        speed_kmh: ping.speed_kmh
+      });
+
+      document.getElementById('live-speed-val').textContent = `${ping.speed_kmh} km/h`;
+      document.getElementById('live-distance-val').textContent = `${prog.remaining_km} km (${prog.remaining_min} min)`;
+      document.getElementById('live-eta-headline').textContent = prog.remaining_min > 0 ? `Arriving in ${prog.remaining_min} min` : 'At Destination';
+
+      const pingDate = new Date(ping.at);
+      const pingTimeStr = !isNaN(pingDate.getTime()) ? pingDate.toLocaleTimeString('en-GB') : 'Just now';
+      document.getElementById('live-ping-val').textContent = `${pingTimeStr} (${ping.is_stale ? 'Signal stale' : 'Live'})`;
+
+      const statusBadge = document.getElementById('telemetry-status-badge');
+      if (ping.is_stale) {
+        statusBadge.className = 'badge badge-warning';
+        statusBadge.textContent = 'Signal Degraded (>5m)';
+      } else {
+        statusBadge.className = 'badge badge-success';
+        statusBadge.textContent = 'Online · GPS Live (4s)';
+      }
+
+      renderWaypointsList(currentTrip, prog.next_point_index);
+    }
+
+    async function initTrackPage() {
+      const user = Auth.currentUser();
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
 
       const urlParams = new URLSearchParams(window.location.search);
       const reqId = urlParams.get('id');
-      const bookings = FleetStore.getBookings();
-      const trip = (reqId ? bookings.find(b => b.id === reqId) : null) || bookings.find(b => b.status === 'Active' || b.status === 'Dispatched') || bookings[0];
+      const allBookings = FleetStore.getBookings() || [];
 
-      if (trip) {
-        const pretitle = document.querySelector('.page-pretitle');
-        if (pretitle) pretitle.textContent = `${trip.id} · Real-Time Telemetry (${trip.status})`;
-        const cardTitle = document.querySelector('.card strong');
-        // Update driver / vehicle details if elements exist
-        const vehicleInfo = document.querySelector('.card div strong');
-        if (vehicleInfo && trip.vehicle) vehicleInfo.textContent = trip.vehicle;
+      let trip = null;
+      if (reqId) {
+        trip = allBookings.find(b => b.id === reqId);
+      } else {
+        if (user.role === 'Requester') {
+          trip = allBookings.find(b => b.requester && b.requester.id === user.id && (b.status === 'Active' || b.status === 'Dispatched'))
+            || allBookings.find(b => b.requester && b.requester.id === user.id);
+        } else {
+          trip = allBookings.find(b => b.status === 'Active' || b.status === 'Dispatched') || allBookings[0];
+        }
       }
+
+      if (!trip) {
+        document.querySelector('.main-content').innerHTML = `
+          <div class="card" style="text-align:center; padding:60px 20px;">
+            <h2>No Active Trip Found</h2>
+            <p style="color:var(--text-muted); margin:12px 0 20px;">You do not have an active or dispatched trip available for tracking.</p>
+            <a href="bookings.html" class="btn btn-gold">View My Bookings</a>
+          </div>
+        `;
+        return;
+      }
+
+      if (user.role === 'Requester' && trip.requester && trip.requester.id !== user.id) {
+        window.location.href = '403.html';
+        return;
+      }
+
+      currentTrip = trip;
+
+      document.getElementById('track-header-pretitle').textContent = `${trip.id} · Real-Time Telemetry`;
+      document.getElementById('track-header-title').textContent = `Tracking ${trip.id}`;
+      document.getElementById('live-mission-code').textContent = `${trip.id} · ${trip.status.toUpperCase()}`;
+      document.getElementById('btn-view-details').href = `booking-detail.html?id=${trip.id}`;
+
+      document.getElementById('live-passengers-val').textContent = `${trip.passengers || 1} pax`;
+      document.getElementById('live-cargo-val').textContent = trip.has_extra_cargo ? `${trip.cargo_kg || 0} kg` : 'None';
+      document.getElementById('live-dept-val').textContent = trip.requester ? trip.requester.department : 'Institutional Mission';
+
+      const allVehicles = FleetStore.getVehicles() || [];
+      const allDrivers = FleetStore.getDrivers() || [];
+      const allSites = FleetStore.getSites() || [];
+
+      let vehicleStr = 'Pending Assignment';
+      let homeSiteName = 'Base Depot';
+      if (trip.assignment && trip.assignment.vehicle_id) {
+        const v = allVehicles.find(item => item.id === trip.assignment.vehicle_id || item.code === trip.assignment.vehicle_id);
+        if (v) {
+          vehicleStr = `${v.code} (${v.make} ${v.model})`;
+          const s = allSites.find(site => site.id === v.home_site_id);
+          if (s) homeSiteName = s.name;
+        } else {
+          vehicleStr = trip.assignment.vehicle_id;
+        }
+      }
+      document.getElementById('live-vehicle-val').textContent = vehicleStr;
+
+      let driverName = 'Pending Assignment';
+      let driverPhone = '—';
+      if (trip.assignment && trip.assignment.driver_ids && trip.assignment.driver_ids.length > 0) {
+        const dId = trip.assignment.driver_ids[0];
+        const d = allDrivers.find(item => item.id === dId);
+        if (d) {
+          driverName = d.name;
+          driverPhone = d.phone || '+20 000 000 0000';
+        } else {
+          driverName = dId;
+        }
+      }
+      document.getElementById('live-driver-val').textContent = driverName;
+      document.getElementById('live-phone-val').textContent = driverPhone;
+
+      renderWaypointsList(trip, 1);
+
+      mapInstance = GeoMap.create('track-leaflet-map');
+      const itineraryRes = await mapInstance.drawItinerary(trip.itinerary, {
+        returnWithVehicle: trip.return_with_vehicle
+      });
+
+      fullRouteGeometry = [];
+      if (itineraryRes && itineraryRes.legs) {
+        itineraryRes.legs.forEach(leg => {
+          if (leg.coordinates) fullRouteGeometry.push(...leg.coordinates);
+        });
+      }
+
+      const statusBadge = document.getElementById('telemetry-status-badge');
+
+      if (trip.status === 'Dispatched' || trip.status === 'Active') {
+        statusBadge.className = 'badge badge-success';
+        statusBadge.textContent = 'Connecting GPS…';
+
+        const initialPing = Telemetry.latestForBooking(trip.id) || (trip.assignment ? Telemetry.latest(trip.assignment.vehicle_id) : null);
+        if (initialPing) {
+          updateLiveTelemetry(initialPing);
+        }
+
+        unsubscribeTelemetry = Telemetry.subscribe(() => {
+          const ping = Telemetry.latestForBooking(trip.id) || (trip.assignment ? Telemetry.latest(trip.assignment.vehicle_id) : null);
+          if (ping) {
+            updateLiveTelemetry(ping);
+          }
+        });
+      } else {
+        statusBadge.className = 'badge badge-neutral';
+        statusBadge.textContent = `Awaiting Dispatch at ${homeSiteName}`;
+        document.getElementById('live-eta-headline').textContent = 'Scheduled';
+        document.getElementById('live-speed-val').textContent = '0 km/h (Standby)';
+        document.getElementById('live-distance-val').textContent = 'Awaiting Dispatch';
+        document.getElementById('live-ping-val').textContent = 'Vehicle stationary at base';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!Auth.requireAuth(['Requester', 'Dispatcher', 'Fleet admin'])) return;
+      Auth.renderAppShell('track');
+      initTrackPage();
+    });
+
+    window.addEventListener('beforeunload', function () {
+      if (unsubscribeTelemetry) unsubscribeTelemetry();
     });
   </script>
 </body>

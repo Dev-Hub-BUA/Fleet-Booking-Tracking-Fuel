@@ -4,63 +4,80 @@
   const USERS = {
     'Requester': {
       id: 'USR-REQ-101',
-      name: 'Dr. Sarah Mansour',
-      titleAr: 'Dr. Sarah Mansour',
+      name: 'Demo Requester 1',
       role: 'Requester',
-      roleAr: 'Vehicle Requester (Faculty)',
       dept: 'Faculty of Pharmacy',
-      deptAr: 'Faculty of Pharmacy — BUC',
-      email: 'sarah.mansour@buc.edu.eg',
+      cost_center: 'CC-101',
+      email: 'demo.requester1@example.com',
       password: 'Cira@2026',
-      initials: 'SM'
+      phone: '+20 000 000 0000',
+      initials: 'DR'
+    },
+    'Requester2': {
+      id: 'USR-REQ-102',
+      name: 'Demo Requester 2',
+      role: 'Requester',
+      dept: 'Faculty of Physical Therapy',
+      cost_center: 'CC-102',
+      email: 'demo.requester2@example.com',
+      password: 'Cira@2026',
+      phone: '+20 000 000 0000',
+      initials: 'DR'
+    },
+    'Requester3': {
+      id: 'USR-REQ-103',
+      name: 'Demo Requester 3',
+      role: 'Requester',
+      dept: 'Faculty of Engineering',
+      cost_center: 'CC-103',
+      email: 'demo.requester3@example.com',
+      password: 'Cira@2026',
+      phone: '+20 000 000 0000',
+      initials: 'DR'
     },
     'Dispatcher': {
       id: 'USR-DSP-204',
-      name: 'Khaled Ibrahim',
-      titleAr: 'Khaled Ibrahim',
+      name: 'Demo Ops Manager',
       role: 'Dispatcher',
-      roleAr: 'Operations & Dispatch Officer',
       dept: 'Logistics Command Desk',
-      deptAr: 'Central Operations & Dispatch Desk',
-      email: 'khaled.ibrahim@cira.com.eg',
+      cost_center: 'CC-201',
+      email: 'demo.ops@example.com',
       password: 'Cira@2026',
-      initials: 'KI'
+      phone: '+20 000 000 0000',
+      initials: 'DO'
     },
     'Driver': {
-      id: 'USR-DRV-309',
-      name: 'Ahmed Hassan',
-      titleAr: 'Capt. Ahmed Hassan',
+      id: 'D-101',
+      name: 'Demo Driver 01',
       role: 'Driver',
-      roleAr: 'Field Fleet Driver',
       dept: 'Central Transport Pool',
-      deptAr: 'Field Transport & Fleet Pool',
-      email: 'ahmed.hassan@cira.com.eg',
+      cost_center: 'CC-201',
+      email: 'demo.driver01@example.com',
       password: 'Cira@2026',
-      initials: 'AH'
+      phone: '+20 000 000 0000',
+      initials: 'DD'
     },
     'Fleet admin': {
       id: 'USR-ADM-401',
-      name: 'Eng. Tarek Fathy',
-      titleAr: 'Eng. Tarek Fathy',
+      name: 'Demo Fleet Admin',
       role: 'Fleet admin',
-      roleAr: 'General Manager of Fleet & Logistics',
       dept: 'Fleet Operations Directorate',
-      deptAr: 'General Directorate of Fleet & Equipment',
-      email: 'tarek.fathy@cira.com.eg',
+      cost_center: 'CC-301',
+      email: 'demo.admin@example.com',
       password: 'Cira@2026',
-      initials: 'TF'
+      phone: '+20 000 000 0000',
+      initials: 'DF'
     },
     'Auditor': {
       id: 'USR-AUD-505',
-      name: 'Mona Adel',
-      titleAr: 'Mona Adel',
+      name: 'Demo Auditor',
       role: 'Auditor',
-      roleAr: 'Financial & Compliance Auditor',
       dept: 'Financial Compliance Bureau',
-      deptAr: 'Financial Audit & Control Bureau',
-      email: 'mona.adel@cira.com.eg',
+      cost_center: 'CC-401',
+      email: 'demo.auditor@example.com',
       password: 'Cira@2026',
-      initials: 'MA'
+      phone: '+20 000 000 0000',
+      initials: 'DA'
     }
   };
 
@@ -138,6 +155,10 @@
       } catch (e) {
         return null;
       }
+    },
+
+    currentUser: function () {
+      return this.getUser();
     },
 
     getUsersList: function () {

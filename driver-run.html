@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live Run Navigation & SOS — CIRA Education Fleet Platform</title>
+  <title>Live Run Navigation &amp; SOS — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="js/auth.js"></script>
 </head>
 <body>
@@ -23,16 +24,9 @@
 
       <!-- Authenticated Controls -->
       <div class="header-actions">
-        <div class="search-wrapper">
-          <span class="search-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          </span>
-          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
-        </div>
-
         <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
-          <span class="badge-counter">3</span>
+          <span class="badge-counter">0</span>
         </a>
 
         <!-- User Dropdown Menu -->
@@ -62,40 +56,74 @@
 
     <main class="main-content" role="main">
       <div class="page-header">
-  <div class="page-title-group">
-    <span class="page-pretitle">BK-2047 · Navigation Active</span>
-    <h1 class="page-title">Live Navigation &amp; Run</h1>
-    <span class="page-subtitle">In 1.2 km, take the ramp onto 10th of Ramadan South Boulevard</span>
-  </div>
-  <button class="btn btn-danger btn-lg" onclick="alert('EMERGENCY SOS DISPATCHED: Highway recovery and central desk alerted.');" style="display:flex; align-items:center; gap:8px;">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <span>Emergency SOS</span>
-  </button>
-</div>
+        <div class="page-title-group">
+          <span class="page-pretitle" id="run-header-pretitle">Mission Run</span>
+          <h1 class="page-title">Live Navigation &amp; Run</h1>
+          <span class="page-subtitle" id="run-header-subtitle">Follow authorized corridor toward next scheduled waypoint</span>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <a href="driver-trip.html" class="btn btn-secondary" style="display:flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span>Manifest</span>
+          </a>
+          <button class="btn btn-danger btn-lg" onclick="triggerSosAlert();" style="display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Emergency SOS</span>
+          </button>
+        </div>
+      </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; align-items: start;">
-  <div class="card" style="text-align: center; padding: 40px;">
-    <span style="font-size: 14px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Live Speedometer</span>
-    <div style="font-family: var(--font-condensed); font-size: 88px; font-weight: 700; line-height: 1; color: var(--navy-800); margin: 12px 0;">
-      72
-    </div>
-    <span style="font-family: var(--font-mono); font-size: 18px; color: var(--text-muted);">km/h (Limit: 90 km/h)</span>
-  </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; align-items: start;">
+        <div class="card" style="text-align: center; padding: 36px;">
+          <span style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Live Speedometer</span>
+          <div id="run-speedometer" style="font-family: var(--font-condensed); font-size: 88px; font-weight: 700; line-height: 1; color: var(--navy-800); margin: 12px 0;">
+            0
+          </div>
+          <span style="font-family: var(--font-mono); font-size: 16px; color: var(--text-muted);">km/h (Authorized Limit: 90 km/h)</span>
+        </div>
 
-  <div class="card">
-    <h2 class="card-title">Run Telemetry</h2>
-    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 15px;">
-      <div style="display: flex; justify-content: space-between;"><span>Distance Covered:</span><strong>33.4 km</strong></div>
-      <div style="display: flex; justify-content: space-between;"><span>Distance Remaining:</span><strong>28 km</strong></div>
-      <div style="display: flex; justify-content: space-between;"><span>Estimated Arrival:</span><strong style="color:var(--navy-600);">09:52 (In 14 mins)</strong></div>
-      <div style="display: flex; justify-content: space-between;"><span>GPS Accuracy:</span><span class="badge badge-success">High Precision (±2.5m · 12 Satellites)</span></div>
-    </div>
-    <a href="driver-close.html" class="btn btn-secondary" style="margin-top: 16px; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
-      <span>Arrived at Destination · Close Trip</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-    </a>
-  </div>
-</div>
+        <div class="card">
+          <h2 class="card-title">Run Telemetry &amp; Waypoint ETA</h2>
+          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 14px;">
+            <div style="display: flex; justify-content: space-between; border-bottom:1px solid var(--border-light); padding-bottom:6px;">
+              <span style="color:var(--text-muted);">Assigned Vehicle:</span>
+              <strong id="run-vehicle-val">—</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom:1px solid var(--border-light); padding-bottom:6px;">
+              <span style="color:var(--text-muted);">Next Destination:</span>
+              <strong id="run-next-stop">—</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom:1px solid var(--border-light); padding-bottom:6px;">
+              <span style="color:var(--text-muted);">Distance Remaining:</span>
+              <strong style="font-family:var(--font-mono);" id="run-remaining-dist">—</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom:1px solid var(--border-light); padding-bottom:6px;">
+              <span style="color:var(--text-muted);">Estimated Arrival:</span>
+              <strong style="color:var(--navy-700); font-family:var(--font-mono);" id="run-eta-val">—</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color:var(--text-muted);">GPS Satellite Feed:</span>
+              <span class="badge badge-success" id="run-gps-badge">High Precision (±2.5m · Live)</span>
+            </div>
+          </div>
+          <a href="driver-close.html" class="btn btn-secondary" style="margin-top: 18px; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
+            <span>Arrived at Final Destination · Close Trip</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Real Leaflet Live Navigation Corridor Map -->
+      <div class="card" style="padding: 0; overflow: hidden; margin-top: 24px;">
+        <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #FFFFFF;">
+          <strong style="font-size: 14px; color: var(--navy-800); display: flex; align-items: center; gap: 6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            <span>Live Route Corridor &amp; Real-Time Positioning</span>
+          </strong>
+          <span class="badge badge-success">Live Telemetry · 4s update</span>
+        </div>
+        <div id="driver-run-map" style="width: 100%; height: 460px; background: #E2E8F0;"></div>
+      </div>
     </main>
   </div>
 
@@ -127,9 +155,9 @@
         <div class="footer-col">
           <h4>Fleet Operations Center</h4>
           <span>CIRA Education HQ · Central Logistics Operations</span>
-          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
-          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
-          <span>Email: fleet.operations@cira.com.eg</span>
+          <span>Operations Desk: <strong>Ext. 0000</strong></span>
+          <span>Emergency Line: <strong>+20 000 000 0000</strong></span>
+          <span>Email: operations@example.com</span>
           <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
         </div>
       </div>
@@ -146,18 +174,100 @@
 
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/geo.js"></script>
+  <script src="js/telemetry.js"></script>
+  <script src="js/dev.js"></script>
   <script src="js/main.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      if (!Auth.requireAuth(["Driver"])) return;
-      Auth.renderAppShell('run');
+    let runMapInstance = null;
+    let activeRunTrip = null;
+    let unsubscribeTelemetry = null;
+    let routeCoords = [];
 
-      const bookings = FleetStore.getBookings();
-      const trip = bookings.find(b => b.status === 'Active' || b.status === 'Dispatched') || bookings[0];
-      if (trip) {
-        const pretitle = document.querySelector('.page-pretitle');
-        if (pretitle) pretitle.textContent = `${trip.id} · Navigation Active`;
+    function triggerSosAlert() {
+      alert('EMERGENCY SOS DISPATCHED: Highway recovery and central operations command desk alerted with live GPS coordinates.');
+    }
+
+    function updateRunTelemetry(ping) {
+      if (!ping || !activeRunTrip) return;
+
+      const vCode = activeRunTrip.assignment ? activeRunTrip.assignment.vehicle_id : 'Vehicle';
+      runMapInstance.setVehicle(vCode, ping);
+
+      document.getElementById('run-speedometer').textContent = ping.speed_kmh;
+
+      if (routeCoords.length > 0) {
+        const prog = GeoRoute.progress(routeCoords, {
+          lat: ping.lat,
+          lng: ping.lng,
+          speed_kmh: ping.speed_kmh
+        });
+
+        document.getElementById('run-remaining-dist').textContent = `${prog.remaining_km} km`;
+        document.getElementById('run-eta-val').textContent = prog.remaining_min > 0 ? `In ${prog.remaining_min} min` : 'Arrived at stop';
+
+        if (activeRunTrip.itinerary && activeRunTrip.itinerary[prog.next_point_index]) {
+          const nextPt = activeRunTrip.itinerary[prog.next_point_index];
+          document.getElementById('run-next-stop').textContent = nextPt.place_name || `Waypoint #${prog.next_point_index + 1}`;
+        }
       }
+    }
+
+    async function initRunPage() {
+      const bookings = FleetStore.getBookings() || [];
+      const trip = bookings.find(b => b.status === 'Active' || b.status === 'Dispatched') || bookings[0];
+
+      if (!trip) {
+        document.querySelector('.main-content').innerHTML = `
+          <div class="card" style="text-align:center; padding:60px 20px;">
+            <h2>No Active Mission Assigned</h2>
+            <p style="color:var(--text-muted); margin:12px 0 20px;">You currently have no active or dispatched driving runs.</p>
+            <a href="driver-shift.html" class="btn btn-gold">View Shift Manifest</a>
+          </div>
+        `;
+        return;
+      }
+
+      activeRunTrip = trip;
+
+      document.getElementById('run-header-pretitle').textContent = `${trip.id} · Navigation Active`;
+      const vId = trip.assignment ? trip.assignment.vehicle_id : 'Vehicle';
+      document.getElementById('run-vehicle-val').textContent = vId;
+
+      runMapInstance = GeoMap.create('driver-run-map');
+      const itineraryRes = await runMapInstance.drawItinerary(trip.itinerary, {
+        returnWithVehicle: trip.return_with_vehicle
+      });
+
+      routeCoords = [];
+      if (itineraryRes && itineraryRes.legs) {
+        itineraryRes.legs.forEach(l => {
+          if (l.coordinates) routeCoords.push(...l.coordinates);
+        });
+      }
+
+      const initialPing = Telemetry.latestForBooking(trip.id) || (trip.assignment ? Telemetry.latest(trip.assignment.vehicle_id) : null);
+      if (initialPing) {
+        updateRunTelemetry(initialPing);
+      }
+
+      unsubscribeTelemetry = Telemetry.subscribe(() => {
+        const ping = Telemetry.latestForBooking(trip.id) || (trip.assignment ? Telemetry.latest(trip.assignment.vehicle_id) : null);
+        if (ping) {
+          updateRunTelemetry(ping);
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!Auth.requireAuth(["Driver", "Dispatcher", "Fleet admin"])) return;
+      Auth.renderAppShell('run');
+      initRunPage();
+    });
+
+    window.addEventListener('beforeunload', function () {
+      if (unsubscribeTelemetry) unsubscribeTelemetry();
     });
   </script>
 </body>
