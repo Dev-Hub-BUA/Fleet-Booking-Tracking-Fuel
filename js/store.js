@@ -65,10 +65,11 @@
 
   const RouteEstimator = {
     locations: KNOWN_LOCATIONS,
+    CONSUMPTION_RATES: CONSUMPTION_RATES,
 
     findLocation: findLocationByName,
 
-    estimateLeg: function (fromPoint, toPoint, vehicleCategory) {
+    estimateLeg: function (fromPoint, toPoint, vehicleCategory, loadFactor = 1.0) {
       const fromName = (fromPoint.place_name || fromPoint.name || '').trim();
       const toName = (toPoint.place_name || toPoint.name || '').trim();
 
@@ -94,7 +95,7 @@
       }
 
       const catConfig = CONSUMPTION_RATES[vehicleCategory] || CONSUMPTION_RATES['Passenger Van'];
-      const fuelLiters = Math.round((distanceKm * (catConfig.ratePer100Km / 100)) * 10) / 10;
+      const fuelLiters = Math.round((distanceKm * (catConfig.ratePer100Km / 100) * (loadFactor || 1.0)) * 10) / 10;
       const legCostEGP = Math.round(fuelLiters * catConfig.fuelPrice * 100) / 100;
 
       let plannedMinutes = null;
@@ -133,11 +134,11 @@
       };
     },
 
-    computeItineraryLegs: function (points, vehicleCategory) {
+    computeItineraryLegs: function (points, vehicleCategory, loadFactor = 1.0) {
       if (!Array.isArray(points) || points.length < 2) return [];
       const legs = [];
       for (let i = 0; i < points.length - 1; i++) {
-        legs.push(this.estimateLeg(points[i], points[i + 1], vehicleCategory));
+        legs.push(this.estimateLeg(points[i], points[i + 1], vehicleCategory, loadFactor));
       }
       return legs;
     },
@@ -210,7 +211,15 @@
           vehicleCode: 'V-122',
           driver: 'Ahmed Hassan (Driver A)',
           passengers: 4,
+          has_extra_cargo: true,
+          cargo_kg: 350,
           cargoWeightKg: 350,
+          cargo_description: '6 boxes of lab equipment, 2 projectors, fragile',
+          cargo_flags: {
+            fragile: true,
+            strap: true,
+            loading_help: false
+          },
           purpose: 'Official University Delegation Mission & Central Research Symposium',
           notes: 'Delegates traveling with 2 fragile reagent crates; tie-down straps requested.',
           cost_center: 'CC-410 (Faculty of Pharmacy)',
@@ -333,7 +342,15 @@
           vehicleCode: 'V-205',
           driver: 'Mahmoud Fawzy',
           passengers: 2,
-          cargoWeightKg: 40,
+          has_extra_cargo: false,
+          cargo_kg: 0,
+          cargoWeightKg: 0,
+          cargo_description: '',
+          cargo_flags: {
+            fragile: false,
+            strap: false,
+            loading_help: false
+          },
           purpose: 'Visiting External Accreditation Delegation Pickup',
           dept: 'Faculty of Pharmacy',
           requesterName: 'Dr. Sarah Mansour',
@@ -433,7 +450,19 @@
     load: function () {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const b2047 = (parsed.bookings || []).find(b => b.id === 'BK-2047');
+          if (b2047 && b2047.has_extra_cargo === undefined) {
+            b2047.has_extra_cargo = true;
+            b2047.cargo_kg = 350;
+            b2047.cargoWeightKg = 350;
+            b2047.cargo_description = '6 boxes of lab equipment, 2 projectors, fragile';
+            b2047.cargo_flags = { fragile: true, strap: true, loading_help: false };
+            this.save(parsed);
+          }
+          return parsed;
+        }
       } catch (e) {}
 
       const init = getInitialData();
@@ -544,8 +573,11 @@
         vehicleCode: 'TBD',
         driver: 'Pending Assignment',
         passengers: parseInt(payload.passengers || 4, 10),
-        cargo_kg: parseInt(payload.cargo_kg || payload.cargoWeightKg || 250, 10),
-        cargoWeightKg: parseInt(payload.cargo_kg || payload.cargoWeightKg || 250, 10),
+        has_extra_cargo: Boolean(payload.has_extra_cargo),
+        cargo_kg: payload.has_extra_cargo ? (parseFloat(payload.cargo_kg || payload.cargoWeightKg) || 0) : 0,
+        cargoWeightKg: payload.has_extra_cargo ? (parseFloat(payload.cargo_kg || payload.cargoWeightKg) || 0) : 0,
+        cargo_description: payload.has_extra_cargo ? (payload.cargo_description || '') : '',
+        cargo_flags: payload.cargo_flags || { fragile: false, strap: false, loading_help: false },
         purpose: payload.purpose || 'Official Delegation Mission',
         notes: payload.notes || '',
         cost_center: payload.cost_center || 'CC-410 (Faculty of Pharmacy)',
@@ -620,6 +652,25 @@
       }
       if (itineraryPayload.driver_overnight_location !== undefined) {
         b.driver_overnight_location = itineraryPayload.driver_overnight_location;
+      }
+      if (itineraryPayload.passengers !== undefined) {
+        b.passengers = parseInt(itineraryPayload.passengers, 10);
+      }
+      if (itineraryPayload.has_extra_cargo !== undefined) {
+        b.has_extra_cargo = Boolean(itineraryPayload.has_extra_cargo);
+      }
+      if (itineraryPayload.cargo_kg !== undefined) {
+        b.cargo_kg = b.has_extra_cargo ? (parseFloat(itineraryPayload.cargo_kg) || 0) : 0;
+        b.cargoWeightKg = b.cargo_kg;
+      }
+      if (itineraryPayload.cargo_description !== undefined) {
+        b.cargo_description = b.has_extra_cargo ? itineraryPayload.cargo_description : '';
+      }
+      if (itineraryPayload.cargo_flags !== undefined) {
+        b.cargo_flags = itineraryPayload.cargo_flags;
+      }
+      if (itineraryPayload.vehicleCategory) {
+        b.vehicleCategory = itineraryPayload.vehicleCategory;
       }
 
       if (b.itinerary && b.itinerary.length >= 2) {

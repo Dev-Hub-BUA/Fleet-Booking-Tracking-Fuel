@@ -241,7 +241,7 @@
             </div>
 
             <!-- Totals Metrics Grid -->
-            <div style="background: var(--bg-page); border-radius: var(--radius-sm); padding: 14px; margin-top: 14px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 13px;">
+            <div style="background: var(--bg-page); border-radius: var(--radius-sm); padding: 14px; margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 13px;">
               <div>
                 <span style="color: var(--text-muted); display: block;">Total Distance</span>
                 <strong id="detail-total-km" style="font-family: var(--font-mono); font-size: 14px;">865.0 km (est.)</strong>
@@ -251,12 +251,8 @@
                 <strong id="detail-total-time" style="font-family: var(--font-mono); font-size: 14px;">11h 20m (est.)</strong>
               </div>
               <div>
-                <span style="color: var(--text-muted); display: block;">Estimated Fuel</span>
-                <strong id="detail-total-fuel" style="font-family: var(--font-mono); font-size: 14px;">82.2 L (est.)</strong>
-              </div>
-              <div>
-                <span style="color: var(--text-muted); display: block;">Estimated Cost</span>
-                <strong id="detail-total-cost" style="color: var(--cira-burgundy); font-family: var(--font-mono); font-size: 14px;">EGP 1,828.95</strong>
+                <span style="color: var(--text-muted); display: block;">Mission Window</span>
+                <strong id="detail-total-days-summary" style="font-size: 14px; color:var(--navy-800);">5 Days Mission</strong>
               </div>
             </div>
           </div>
@@ -542,7 +538,7 @@
               <span style="font-weight:700; color:var(--navy-800);">${leg.distance_km} km</span>
               <span style="color:var(--text-muted); font-family:var(--font-mono);">${h}h ${m.toString().padStart(2, '0')}m driving (est.)</span>
             </div>
-            <div style="font-size:12px; color:var(--text-muted);">${leg.fuel_liters} L (${(leg.cost_egp || 0).toFixed(2)} EGP)</div>
+            <div style="font-size:12px; color:var(--text-muted);">${leg.drive_minutes || 0} mins driving window</div>
             ${leg.warning ? `
               <div style="margin-top:4px; font-size:11.5px; color:#B91C1C; display:flex; align-items:center; gap:4px; font-weight:600;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -558,8 +554,8 @@
       const totH = Math.floor((booking.estDriveMinutes || totMins) / 60);
       const totM = (booking.estDriveMinutes || totMins) % 60;
       document.getElementById('detail-total-time').textContent = `${totH}h ${totM.toString().padStart(2, '0')}m (est.)`;
-      document.getElementById('detail-total-fuel').textContent = `${(booking.estFuelLiters || totFuel).toFixed(1)} L (est.)`;
-      document.getElementById('detail-total-cost').textContent = `EGP ${(booking.estCostEGP || totCost).toFixed(2)}`;
+      const summaryDaysEl = document.getElementById('detail-total-days-summary');
+      if (summaryDaysEl) summaryDaysEl.textContent = `${days} Day${days > 1 ? 's' : ''} Mission`;
 
       drawDetailOverviewMap(points, booking.return_with_vehicle);
     }
