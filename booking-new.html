@@ -3,10 +3,162 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Vehicle Booking — CIRA Education Fleet Platform</title>
+  <title>New Itinerary Booking — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/auth.js"></script>
+  <style>
+    .itinerary-point-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .itinerary-point-card:hover {
+      border-color: var(--navy-600);
+      box-shadow: var(--shadow-sm);
+    }
+    .itinerary-point-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .itinerary-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-action-icon {
+      background: var(--bg-page);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--navy-800);
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .btn-action-icon:hover:not(:disabled) {
+      background: var(--navy-100);
+      color: var(--navy-800);
+      border-color: var(--navy-600);
+    }
+    .btn-action-icon:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .leg-summary-card {
+      background: var(--navy-50);
+      border-left: 3px solid var(--navy-600);
+      padding: 10px 14px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 13px;
+      margin: 8px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .leg-summary-card.return-leg {
+      background: #FFFBF0;
+      border-left: 3px dashed var(--gold-500);
+    }
+    .timeline-node {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 16px;
+    }
+    .timeline-node::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 14px;
+      bottom: -16px;
+      width: 2px;
+      background: var(--border-strong);
+    }
+    .timeline-node:last-child::before {
+      display: none;
+    }
+    .timeline-node.return-node::before {
+      background: repeating-linear-gradient(to bottom, var(--gold-500) 0, var(--gold-500) 4px, transparent 4px, transparent 8px);
+    }
+    .timeline-marker-dot {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--navy-800);
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 0 0 1px var(--navy-800);
+    }
+    .timeline-marker-dot.stop-dot {
+      background: var(--navy-600);
+      box-shadow: 0 0 0 1px var(--navy-600);
+    }
+    .timeline-marker-dot.return-dot {
+      background: var(--gold-500);
+      box-shadow: 0 0 0 1px var(--gold-500);
+    }
+    .itinerary-disabled-overlay {
+      background: rgba(248, 250, 252, 0.85);
+      backdrop-filter: blur(2px);
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      padding: 24px;
+      text-align: center;
+    }
+    .switch-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .switch-toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #CBD5E1;
+      border-radius: 12px;
+      transition: background 0.2s ease;
+    }
+    .switch-toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease;
+    }
+    input[type="checkbox"]:checked + .switch-toggle {
+      background: var(--navy-800);
+    }
+    input[type="checkbox"]:checked + .switch-toggle::after {
+      transform: translateX(20px);
+    }
+  </style>
 </head>
 <body>
 
@@ -21,21 +173,19 @@
         </span>
       </a>
 
-      <!-- Authenticated Controls -->
       <div class="header-actions">
         <div class="search-wrapper">
           <span class="search-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
           </span>
           <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
         </div>
 
         <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
           <span class="badge-counter">3</span>
         </a>
 
-        <!-- User Dropdown Menu -->
         <div class="user-menu-wrapper">
           <button type="button" class="user-btn">
             <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
@@ -62,132 +212,323 @@
 
     <main class="main-content" role="main">
       <div class="page-header">
-  <div class="page-title-group">
-    <span class="page-pretitle">Department Vehicle Requisition</span>
-    <h1 class="page-title">New Booking Request</h1>
-    <span class="page-subtitle">Submit mission requirements · Vehicle allocation handled by Central Dispatch</span>
-  </div>
-</div>
-
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 24px; align-items: start;">
-  <div style="display: flex; flex-direction: column; gap: 20px;">
-    <div class="card">
-      <h2 class="card-title">1. Route &amp; Waypoints</h2>
-      <div style="display: flex; flex-direction: column; gap: 14px;">
-        <div class="form-group">
-          <label class="form-label">A · Origin (Departure Point)</label>
-          <input type="text" class="form-input" id="route-origin" value="Badr University — Main campus, Gate 2">
+        <div class="page-title-group">
+          <span class="page-pretitle">Department Vehicle Requisition</span>
+          <h1 class="page-title">New Itinerary Booking</h1>
+          <span class="page-subtitle">Multi-stop, multi-day mission builder · Vehicle and driver allocated by Central Dispatch</span>
         </div>
-        <div class="form-group">
-          <label class="form-label">1 · Intermediate Stop (Pickup / Delivery)</label>
-          <div style="display: flex; gap: 8px;">
-            <input type="text" class="form-input" value="Supplier depot — Obour City">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="alert('Stop removed');" style="display:inline-flex;align-items:center;justify-content:center;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
+        <div style="display: flex; gap: 10px;">
+          <a href="bookings.html" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span>My Bookings</span>
+          </a>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 24px; align-items: start;">
+        
+        <!-- Left Column: Form & Itinerary Builder -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+
+          <!-- Step 1: Trip Period -->
+          <div class="card" id="step-trip-period-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div>
+                <h2 class="card-title" style="margin:0;">1. Trip Period</h2>
+                <span style="font-size: 13px; color: var(--text-muted);">Set mission boundary dates before adding stops</span>
+              </div>
+              <span class="badge badge-info" id="trip-days-badge" style="font-size: 13px; padding: 4px 10px;">5 days</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label class="form-label" for="trip-start-date">Trip Starts</label>
+                <input type="date" class="form-input" id="trip-start-date" value="2026-10-18" onchange="handleTripDatesChanged();">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="trip-end-date">Trip Ends</label>
+                <input type="date" class="form-input" id="trip-end-date" value="2026-10-22" onchange="handleTripDatesChanged();">
+              </div>
+            </div>
+
+            <div id="date-validation-hint" style="display:none; margin-top: 10px;" class="alert-banner alert-danger">
+              <span id="date-validation-message">End date must be on or after start date.</span>
+            </div>
+          </div>
+
+          <!-- Step 2: Itinerary Points Container -->
+          <div class="card" id="step-itinerary-card" style="position: relative;">
+            
+            <!-- Disabled Overlay if dates invalid -->
+            <div id="itinerary-disabled-overlay" class="itinerary-disabled-overlay" style="display: none;">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--cira-gold); margin-bottom: 8px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <strong style="color:var(--navy-800); font-size:16px;">Choose the trip dates first</strong>
+              <p style="font-size:13px; color:var(--text-muted); margin:4px 0 0; max-width:340px;">
+                Enter valid trip start and end dates above to activate the sequential waypoint itinerary builder.
+              </p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div>
+                <h2 class="card-title" style="margin:0;">2. Sequential Mission Itinerary</h2>
+                <span style="font-size: 13px; color: var(--text-muted);">Configure departure, waypoint stops, and optional vehicle return</span>
+              </div>
+            </div>
+
+            <div id="points-list" style="display: flex; flex-direction: column; gap: 14px;">
+              <!-- Point cards rendered dynamically -->
+            </div>
+
+            <!-- Actions Below Points -->
+            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border);">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="addNewStop();" style="display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>Add Destination Stop</span>
+                </button>
+
+                <!-- Return toggle switch -->
+                <label class="switch-wrapper">
+                  <input type="checkbox" id="toggle-return-vehicle" checked onchange="handleReturnToggleChanged();" style="display: none;">
+                  <span class="switch-toggle"></span>
+                  <span style="font-size: 14px; font-weight: 600; color: var(--navy-800);">Return with the vehicle</span>
+                </label>
+              </div>
+
+              <!-- Multi-day Driver Accommodation -->
+              <div id="driver-accommodation-section" style="display: block; background: var(--bg-page); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <strong style="color: var(--navy-800); font-size: 14px; display:inline-flex; align-items:center; gap:6px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span>Overnight Driver Accommodation</span>
+                  </strong>
+                  <span class="badge badge-info" id="driver-accommodation-nights-badge">Driver accommodation needed: 4 nights</span>
+                </div>
+                <div class="form-group" style="margin: 0;">
+                  <label class="form-label" style="font-size: 12px;">Where will the driver stay overnight? (Optional)</label>
+                  <input type="text" class="form-input" id="driver-overnight-location" placeholder="e.g. BUC Faculty Guesthouse, Badr City / Hotel reservation" value="BUC Faculty Guesthouse, Badr City">
+                </div>
+              </div>
+
+              <!-- Driver Duty Warning Alert (shown if > 8 hrs in any single day) -->
+              <div id="driver-daily-limit-notice" style="display: none;" class="alert-banner alert-warning">
+                <div style="display: flex; align-items: flex-start; gap: 8px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; margin-top:2px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  <span id="driver-daily-limit-text">Day 1 needs 9h 20m of driving. Dispatch will assign a second driver or plan a rest stop.</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Step 3: Load & Required Vehicle Category -->
+          <div class="card">
+            <h2 class="card-title">3. Load &amp; Vehicle Requirements</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+              <div class="form-group">
+                <label class="form-label" for="route-pax">Passengers</label>
+                <input type="number" class="form-input" id="route-pax" min="1" max="50" value="4">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="route-cargo">Cargo Weight (kg)</label>
+                <input type="number" class="form-input" id="route-cargo" min="0" max="5000" value="350">
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label class="form-label" for="route-vehicle-cat">Requested Vehicle Category</label>
+                <select class="form-select" id="route-vehicle-cat" onchange="renderLiveSummary();" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background:#fff;">
+                  <option value="Passenger Van" selected>Passenger Van / Minibus (7 - 12 passengers) — e.g. HiAce / H-1</option>
+                  <option value="Sedan">Sedan (1 - 4 passengers) — e.g. Corolla / Elantra</option>
+                  <option value="Bus">Delegation Bus / Minibus (15 - 28 passengers) — e.g. Coaster / MCV</option>
+                  <option value="Heavy Cargo Truck">Heavy Cargo Truck &amp; Equipment — e.g. Isuzu NPR</option>
+                </select>
+                <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span>Vehicle assignment is verified against turnaround buffers (30m inspection, 45m cleaning).</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Purpose & Billing -->
+          <div class="card">
+            <h2 class="card-title">4. Mission Purpose &amp; Cost Center</h2>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div class="form-group">
+                <label class="form-label" for="route-purpose">Mission Purpose &amp; Justification</label>
+                <textarea class="form-textarea" id="route-purpose" rows="2">Official University Delegation Mission & Central Research Symposium</textarea>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                  <label class="form-label" for="cost-center">Department Cost Center</label>
+                  <input type="text" class="form-input" id="cost-center" value="CC-410 (Faculty of Pharmacy)">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="requester-name">Requester Lead</label>
+                  <input type="text" class="form-input" id="requester-name" readonly value="Dr. Sarah Mansour">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="mission-notes">General Dispatch Instructions / Special Gear (Optional)</label>
+                <input type="text" class="form-input" id="mission-notes" placeholder="e.g. Fragile cargo crates, tie-down ratchet straps needed" value="Delegates traveling with 2 fragile reagent crates; tie-down straps requested.">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Live Trip Summary (Sticky) -->
+        <div style="position: sticky; top: 88px; display: flex; flex-direction: column; gap: 20px;">
+          
+          <div class="card" style="border: 2px solid var(--navy-600); box-shadow: var(--shadow-md);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h3 style="margin: 0; font-size: 18px; color: var(--navy-800); font-weight: 800;">
+                Live Trip Summary
+              </h3>
+              <span class="badge badge-success" id="summary-points-count">4 Waypoints</span>
+            </div>
+
+            <!-- Overview Mini Map -->
+            <div style="position: relative; height: 180px; border-radius: var(--radius-sm); overflow: hidden; background: #E2E8F0; border: 1px solid var(--border); margin-bottom: 16px;">
+              <svg id="overview-map-svg" style="width: 100%; height: 100%;" preserveAspectRatio="none">
+                <!-- Route lines and waypoint pins rendered by JS -->
+              </svg>
+              <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(255,255,255,0.92); border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 600; color: var(--navy-800); display:flex; align-items:center; gap:6px;">
+                <span style="display:inline-block; width:12px; height:2px; background:var(--navy-800);"></span> Outbound
+                <span style="display:inline-block; width:12px; height:2px; border-top:2px dashed var(--gold-500); margin-left:4px;"></span> Return
+              </div>
+            </div>
+
+            <!-- Vertical Timeline of Points & Legs -->
+            <div id="summary-timeline-container" style="max-height: 280px; overflow-y: auto; padding-right: 6px;">
+              <!-- Timeline rendered dynamically -->
+            </div>
+
+            <!-- Totals Metrics Box -->
+            <div style="background: var(--bg-page); border-radius: var(--radius-sm); padding: 14px; margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px;">
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted);">Total Estimated Distance:</span>
+                <strong id="summary-total-km" style="font-family: var(--font-mono);">865.0 km (est.)</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted);">Total Driving Time:</span>
+                <strong id="summary-total-drive" style="font-family: var(--font-mono);">11h 20m (est.)</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted);">Mission Duration:</span>
+                <strong id="summary-total-days">5 days (4 nights)</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 8px; font-size: 13.5px;">
+                <span style="color: var(--text-muted);">Allocation Status:</span>
+                <span class="badge badge-warning" style="font-size:11.5px;">Pending Operations Assignment</span>
+              </div>
+            </div>
+
+            <!-- Vehicle Hold Window Notice -->
+            <div style="background: var(--navy-50); border: 1px solid #C5D7ED; border-radius: var(--radius-sm); padding: 12px; margin-top: 14px; font-size: 12.5px; line-height: 1.5; color: var(--navy-800);">
+              <div style="font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Vehicle Hold Window</span>
+              </div>
+              <div id="summary-hold-window-text" style="font-family: var(--font-mono); font-weight: 600;">
+                18 Oct 08:00 → 22 Oct 18:45
+              </div>
+              <span style="font-size: 11.5px; color: var(--text-muted);">
+                Includes 45-min turnaround buffer. Vehicle is unavailable for other bookings for this entire window.
+              </span>
+            </div>
+
+            <!-- Inline Validation Errors -->
+            <div id="itinerary-validation-errors" style="display:none; margin-top: 14px;" class="alert-banner alert-danger">
+              <div style="font-weight: 700; margin-bottom: 4px;">Please review the following requirements:</div>
+              <ul id="itinerary-validation-list" style="margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.5;"></ul>
+            </div>
+
+            <!-- Submit Button -->
+            <div style="margin-top: 18px;">
+              <button type="button" class="btn btn-gold btn-lg" id="submit-booking-btn" style="width: 100%; font-weight: 800; font-size: 15px; display:inline-flex; align-items:center; justify-content:center; gap:8px;" onclick="validateAndSubmitBooking();">
+                <span>Submit Booking Request to Operations</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            </div>
+
+            <div style="font-size: 11.5px; color: var(--text-muted); text-align: center; margin-top: 8px;">
+              Distances and fuel figures are mock estimates based on route index v3 tariff.
+            </div>
+
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">B · Destination</label>
-          <input type="text" class="form-input" id="route-dest" value="Plant 3 — 10th of Ramadan Industrial Zone">
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px;">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="alert('Added stop waypoint');" style="display:inline-flex; align-items:center; gap:6px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            <span>Add Stop</span>
-          </button>
-          <label style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
-            <input type="checkbox" checked style="accent-color: var(--navy-800);"> Return vehicle to base after trip
-          </label>
-        </div>
-      </div>
-    </div>
 
-    <div class="card">
-      <h2 class="card-title">2. Schedule</h2>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
-        <div class="form-group">
-          <label class="form-label">Date</label>
-          <input type="date" class="form-input" id="route-date" value="2026-10-14">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Departure</label>
-          <input type="time" class="form-input" id="route-time-dep" value="09:00">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Expected End</label>
-          <input type="time" class="form-input" id="route-time-end" value="15:00">
-        </div>
       </div>
-    </div>
-
-    <div class="card">
-      <h2 class="card-title">3. Load &amp; Purpose</h2>
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
-        <div class="form-group">
-          <label class="form-label">Passengers</label>
-          <input type="number" class="form-input" id="route-pax" value="4">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Cargo Weight (kg)</label>
-          <input type="number" class="form-input" id="route-cargo" value="350">
-        </div>
-        <div class="form-group" style="grid-column: span 2;">
-          <label class="form-label">Mission Purpose</label>
-          <textarea class="form-textarea" id="route-purpose">Industrial Lab Equipment Collection & Student Site Visit</textarea>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 class="card-title">4. Required Vehicle Category</h2>
-      <div class="form-group">
-        <label class="form-label">Select Vehicle Category for Mission</label>
-        <select class="form-select" id="route-vehicle-cat" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background:#fff;">
-          <option value="Passenger Van" selected>Passenger Van / Minibus (7 - 12 passengers) — e.g. HiAce / H-1</option>
-          <option value="Sedan">Sedan (1 - 4 passengers) — e.g. Corolla / Elantra</option>
-          <option value="Bus">Delegation Bus / Minibus (15 - 28 passengers) — e.g. Coaster / MCV</option>
-          <option value="Heavy Cargo Truck">Heavy Cargo Truck &amp; Equipment — e.g. Isuzu NPR</option>
-        </select>
-        <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; display:flex; align-items:center; gap:6px;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--navy-600);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <span><strong>Note:</strong> The specific vehicle code and driver details are selected and assigned by the <strong>Operations Dispatcher</strong> upon review and approval.</span>
-        </div>
-      </div>
-    </div>
+    </main>
   </div>
 
-  <div style="display: flex; flex-direction: column; gap: 20px;">
-    <div class="card" style="background: #FFFFFF; border: 1px solid var(--border); box-shadow: var(--shadow-sm); padding: 24px;">
-      <h3 style="margin: 0 0 14px; font-size: 18px; color: var(--cira-burgundy); font-weight: 800;">
-        Booking &amp; Approval Workflow
-      </h3>
-
-      <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; color: var(--text-main); line-height: 1.6;">
-        <div style="display: flex; align-items: flex-start; gap: 10px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--success);flex-shrink:0;margin-top:3px;"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>The request is routed directly to Central Operations to review schedule and fleet availability.</span>
+  <!-- Map Picker Modal -->
+  <div id="map-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #FFFFFF; border-radius: 12px; max-width: 640px; width: 100%; padding: 24px; box-shadow: var(--shadow-xl); position: relative; max-height: 92vh; display: flex; flex-direction: column; gap: 16px;">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+        <div>
+          <h3 style="margin: 0; color: var(--navy-800); font-size: 19px;">Pick Location on Map</h3>
+          <span style="font-size: 12.5px; color: var(--text-muted);">Search a campus or click anywhere on the map to drop a pin</span>
         </div>
-        <div style="display: flex; align-items: flex-start; gap: 10px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--cira-gold);flex-shrink:0;margin-top:3px;"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>The operations dispatcher assigns the suitable vehicle, certified driver, and ensures turnaround buffers.</span>
-        </div>
-        <div style="display: flex; align-items: flex-start; gap: 10px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--navy-600);flex-shrink:0;margin-top:3px;"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>Assigned vehicle and driver details will appear in your bookings list as soon as the request is approved.</span>
-        </div>
-      </div>
-
-      <div style="border-top: 1px solid var(--border); margin-top: 24px; padding-top: 20px;">
-        <button type="button" class="btn btn-gold btn-lg" style="width: 100%; font-weight: 800; font-size: 15px; display:inline-flex; align-items:center; justify-content:center; gap:8px;" onclick="submitNewBooking();">
-          <span>Submit Booking Request to Operations</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <button type="button" onclick="closeMapModal();" style="background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; display: inline-flex;" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
+
+      <!-- Search Location in Modal -->
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="modal-place-search" class="form-input" placeholder="Type campus or place name (e.g. Cairo University, BUA Assiut)..." oninput="filterModalSuggestions();">
+      </div>
+
+      <div id="modal-place-chips" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 70px; overflow-y: auto;">
+        <!-- Chips injected by JS -->
+      </div>
+
+      <!-- Interactive Map Canvas -->
+      <div id="modal-map-canvas" style="position: relative; height: 260px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background-color: #E2E8F0; background-image: radial-gradient(#CBD5E1 1.5px, transparent 1.5px), linear-gradient(#D8E0EB 1px, transparent 1px), linear-gradient(90deg, #D8E0EB 1px, transparent 1px); background-size: 24px 24px, 48px 48px, 48px 48px; cursor: crosshair; overflow: hidden;" onclick="handleModalMapClick(event);">
+        
+        <div style="position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.92); border-radius: 4px; padding: 4px 8px; font-size: 11.5px; color: var(--navy-800); font-weight: 600;">
+          Egypt Strategic Transport Grid
+        </div>
+
+        <!-- Draggable / Click Pin Marker -->
+        <div id="modal-pin-marker" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; pointer-events: none;">
+          <div style="background: var(--navy-800); color: #FFF; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; white-space: nowrap; margin-bottom: 2px;" id="modal-pin-label">Selected Pin</div>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="#B91C1C" stroke="#FFFFFF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="#FFFFFF"/></svg>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-page); padding: 10px 14px; border-radius: var(--radius-sm);">
+        <span style="font-size: 13px; color: var(--text-muted);">Current Pin Coordinates:</span>
+        <strong id="modal-coords-display" style="font-family: var(--font-mono); font-size: 13.5px; color: var(--navy-800);">27.1809° N, 31.1837° E</strong>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); padding-top: 14px;">
+        <button type="button" class="btn btn-secondary" onclick="closeMapModal();">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="confirmModalPin();">Use this location</button>
+      </div>
+
     </div>
   </div>
-</div>
-    </main>
+
+  <!-- Re-Approval Confirmation Modal for Approved Bookings -->
+  <div id="reapproval-confirm-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #FFFFFF; border-radius: 12px; max-width: 500px; width: 100%; padding: 24px; box-shadow: var(--shadow-xl); position: relative;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <h3 style="margin: 0; font-size: 18px; color: var(--navy-800);">Re-Approval Required</h3>
+      </div>
+      <p style="font-size: 14px; color: var(--text-main); line-height: 1.6; margin: 0 0 20px;">
+        Modifying the itinerary of an already approved or dispatched booking will revoke its approval and send the booking back to <strong>Pending Review</strong> at Central Operations Desk.
+      </p>
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('reapproval-confirm-modal').style.display='none';">Cancel</button>
+        <button type="button" class="btn btn-gold" onclick="executeBookingSubmit(true);">Proceed &amp; Re-Submit</button>
+      </div>
+    </div>
   </div>
 
   <!-- Master Footer -->
@@ -235,51 +576,862 @@
     </div>
   </footer>
 
+  <!-- Datalist Suggestions for Locations -->
+  <datalist id="egypt-places-list">
+    <option value="Badr University in Assiut">
+    <option value="Cairo University">
+    <option value="Badr University in Cairo">
+    <option value="Ain Shams University">
+    <option value="Supplier Depot — Obour City">
+    <option value="Plant 3 — 10th of Ramadan">
+    <option value="Ain Sokhna Marine Research Facility">
+    <option value="Alexandria University / Borg El Arab">
+    <option value="Cairo International Airport T3">
+  </datalist>
+
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
+    let itineraryPoints = [];
+    let returnWithVehicle = true;
+    let editingBookingId = null;
+    let activeModalPointIndex = null;
+    let modalTempCoords = { lat: 27.1809, lng: 31.1837, placeName: 'Badr University in Assiut' };
+
     document.addEventListener('DOMContentLoaded', function () {
-      if (!Auth.requireAuth(["Requester"])) return;
+      if (!Auth.requireAuth(["Requester", "Dispatcher", "Fleet admin", "Auditor", "Driver"])) return;
       Auth.renderAppShell('booking-new');
+
+      const urlParams = new URLSearchParams(window.location.search);
+      editingBookingId = urlParams.get('edit') || urlParams.get('id');
+
+      if (editingBookingId) {
+        loadBookingForEditing(editingBookingId);
+      } else {
+        initDefaultPrefill();
+      }
+
+      renderModalLocationChips();
     });
 
-    function submitNewBooking() {
-      const origin = document.getElementById('route-origin').value.trim();
-      const dest = document.getElementById('route-dest').value.trim();
-      const date = document.getElementById('route-date').value;
-      const depTime = document.getElementById('route-time-dep').value;
-      const endTime = document.getElementById('route-time-end').value;
-      const pax = document.getElementById('route-pax').value;
-      const cargo = document.getElementById('route-cargo').value;
-      const purpose = document.getElementById('route-purpose').value.trim();
-      const vehicleCat = document.getElementById('route-vehicle-cat').value;
+    function initDefaultPrefill() {
+      document.getElementById('trip-start-date').value = '2026-10-18';
+      document.getElementById('trip-end-date').value = '2026-10-22';
+      returnWithVehicle = true;
+      document.getElementById('toggle-return-vehicle').checked = true;
 
-      const user = Auth.getUser() || { name: 'Dr. Sarah Mansour', dept: 'Faculty of Pharmacy' };
+      itineraryPoints = [
+        {
+          id: 'pt-1',
+          sequence: 1,
+          type: 'departure',
+          place_name: 'Badr University in Assiut',
+          lat: 27.1809,
+          lng: 31.1837,
+          pinned: true,
+          depart_at: '2026-10-18 08:00',
+          notes: 'Delegation boarding at Main Administrative Gate'
+        },
+        {
+          id: 'pt-2',
+          sequence: 2,
+          type: 'stop',
+          place_name: 'Cairo University',
+          lat: 30.0276,
+          lng: 31.2089,
+          pinned: true,
+          arrive_at: '2026-10-18 14:30',
+          depart_at: '2026-10-18 17:00',
+          notes: 'Faculty of Science Lab Meeting'
+        },
+        {
+          id: 'pt-3',
+          sequence: 3,
+          type: 'stop',
+          place_name: 'Badr University in Cairo',
+          lat: 30.1378,
+          lng: 31.7456,
+          pinned: true,
+          arrive_at: '2026-10-19 10:00',
+          depart_at: '2026-10-21 16:00',
+          notes: 'Symposium & Central Research Lab'
+        },
+        {
+          id: 'pt-4',
+          sequence: 4,
+          type: 'return',
+          place_name: 'Badr University in Assiut',
+          lat: 27.1809,
+          lng: 31.1837,
+          pinned: true,
+          arrive_at: '2026-10-22 18:00',
+          notes: 'Return vehicle to central base garage'
+        }
+      ];
 
-      const newBooking = FleetStore.createBooking({
-        origin: origin,
-        destination: dest,
-        date: date,
-        departureTime: depTime,
-        expectedEnd: endTime,
-        passengers: pax,
-        cargoWeightKg: cargo,
-        purpose: purpose,
-        vehicleCategory: vehicleCat,
-        vehicle: 'Pending Allocation',
-        vehicleCode: 'TBD',
-        driver: 'Pending Assignment',
-        requesterName: user.name,
-        dept: user.dept,
-        distanceKm: 61.4,
-        estFuelLiters: 14.1,
-        estCostEGP: 289.05,
-        holdAmountEGP: 350.0
+      handleTripDatesChanged();
+    }
+
+    function loadBookingForEditing(id) {
+      const b = FleetStore.getBooking(id);
+      if (!b) {
+        initDefaultPrefill();
+        return;
+      }
+
+      document.querySelector('.page-title').textContent = `Edit Itinerary: ${b.id}`;
+      document.getElementById('trip-start-date').value = b.startDate || b.start_date || '2026-10-18';
+      document.getElementById('trip-end-date').value = b.endDate || b.end_date || '2026-10-22';
+      document.getElementById('route-pax').value = b.passengers || 4;
+      document.getElementById('route-cargo').value = b.cargo_kg || b.cargoWeightKg || 250;
+      document.getElementById('route-purpose').value = b.purpose || '';
+      document.getElementById('cost-center').value = b.cost_center || b.dept || 'CC-410 (Pharmacy)';
+      document.getElementById('mission-notes').value = b.notes || '';
+      if (b.vehicleCategory) document.getElementById('route-vehicle-cat').value = b.vehicleCategory;
+      if (b.driver_overnight_location) document.getElementById('driver-overnight-location').value = b.driver_overnight_location;
+
+      returnWithVehicle = b.return_with_vehicle !== undefined ? Boolean(b.return_with_vehicle) : true;
+      document.getElementById('toggle-return-vehicle').checked = returnWithVehicle;
+
+      if (Array.isArray(b.itinerary) && b.itinerary.length >= 2) {
+        itineraryPoints = JSON.parse(JSON.stringify(b.itinerary));
+      } else {
+        initDefaultPrefill();
+      }
+
+      handleTripDatesChanged();
+    }
+
+    function handleTripDatesChanged() {
+      const startInput = document.getElementById('trip-start-date');
+      const endInput = document.getElementById('trip-end-date');
+      const sVal = startInput.value;
+      const eVal = endInput.value;
+      const overlay = document.getElementById('itinerary-disabled-overlay');
+      const hint = document.getElementById('date-validation-hint');
+      const daysBadge = document.getElementById('trip-days-badge');
+
+      if (!sVal || !eVal || eVal < sVal) {
+        overlay.style.display = 'flex';
+        hint.style.display = 'block';
+        daysBadge.textContent = 'Invalid Dates';
+        daysBadge.className = 'badge badge-danger';
+        return;
+      }
+
+      overlay.style.display = 'none';
+      hint.style.display = 'none';
+
+      const days = FleetStore.RouteEstimator.calculateDaysCount(sVal, eVal);
+      daysBadge.textContent = `${days} day${days > 1 ? 's' : ''}`;
+      daysBadge.className = 'badge badge-info';
+
+      const accomSection = document.getElementById('driver-accommodation-section');
+      const accomBadge = document.getElementById('driver-accommodation-nights-badge');
+      if (days > 1) {
+        accomSection.style.display = 'block';
+        accomBadge.textContent = `Driver accommodation needed: ${days - 1} night${(days - 1) > 1 ? 's' : ''}`;
+      } else {
+        accomSection.style.display = 'none';
+      }
+
+      // Clamp existing point dates if out of bounds
+      itineraryPoints.forEach((pt, idx) => {
+        if (pt.type === 'departure' && pt.depart_at) {
+          const parts = pt.depart_at.split(' ');
+          if (parts[0] < sVal || parts[0] > eVal) pt.depart_at = `${sVal} ${parts[1] || '08:00'}`;
+        } else if (pt.type === 'return' && pt.arrive_at) {
+          const parts = pt.arrive_at.split(' ');
+          if (parts[0] < sVal || parts[0] > eVal) pt.arrive_at = `${eVal} ${parts[1] || '18:00'}`;
+        } else {
+          if (pt.arrive_at) {
+            const parts = pt.arrive_at.split(' ');
+            if (parts[0] < sVal || parts[0] > eVal) pt.arrive_at = `${sVal} ${parts[1] || '12:00'}`;
+          }
+          if (pt.depart_at) {
+            const parts = pt.depart_at.split(' ');
+            if (parts[0] < sVal || parts[0] > eVal) pt.depart_at = `${sVal} ${parts[1] || '14:00'}`;
+          }
+        }
       });
 
-      alert(`Booking request submitted successfully!\n\nBooking ID: ${newBooking.id}\nRoute: ${newBooking.route}\nRequired Vehicle Category: ${vehicleCat}\n\nThe request has been routed directly to Fleet Operations for vehicle and driver assignment.`);
-      window.location.href = 'bookings.html';
+      renderPointsList();
+      renderLiveSummary();
+    }
+
+    function handleReturnToggleChanged() {
+      const toggle = document.getElementById('toggle-return-vehicle');
+      returnWithVehicle = toggle.checked;
+
+      const hasReturn = itineraryPoints.some(p => p.type === 'return');
+      const departurePoint = itineraryPoints.find(p => p.type === 'departure');
+
+      if (returnWithVehicle && !hasReturn) {
+        const endDate = document.getElementById('trip-end-date').value || '2026-10-22';
+        itineraryPoints.push({
+          id: 'pt-return-' + Date.now(),
+          sequence: itineraryPoints.length + 1,
+          type: 'return',
+          place_name: departurePoint ? departurePoint.place_name : 'Badr University in Assiut',
+          lat: departurePoint ? departurePoint.lat : 27.1809,
+          lng: departurePoint ? departurePoint.lng : 31.1837,
+          pinned: departurePoint ? departurePoint.pinned : true,
+          arrive_at: `${endDate} 18:00`,
+          notes: 'Return vehicle to base garage and close trip'
+        });
+      } else if (!returnWithVehicle && hasReturn) {
+        itineraryPoints = itineraryPoints.filter(p => p.type !== 'return');
+      }
+
+      resequencePoints();
+      renderPointsList();
+      renderLiveSummary();
+    }
+
+    function addNewStop() {
+      const startDate = document.getElementById('trip-start-date').value || '2026-10-18';
+      const newStop = {
+        id: 'pt-stop-' + Date.now(),
+        sequence: 0,
+        type: 'stop',
+        place_name: '',
+        lat: null,
+        lng: null,
+        pinned: false,
+        arrive_at: `${startDate} 12:00`,
+        depart_at: `${startDate} 14:00`,
+        notes: ''
+      };
+
+      const returnIndex = itineraryPoints.findIndex(p => p.type === 'return');
+      if (returnIndex !== -1) {
+        itineraryPoints.splice(returnIndex, 0, newStop);
+      } else {
+        itineraryPoints.push(newStop);
+      }
+
+      resequencePoints();
+      renderPointsList();
+      renderLiveSummary();
+    }
+
+    function removePoint(index) {
+      if (itineraryPoints[index].type === 'departure') return;
+      itineraryPoints.splice(index, 1);
+      resequencePoints();
+      renderPointsList();
+      renderLiveSummary();
+    }
+
+    function movePointUp(index) {
+      if (index <= 1) return; // Cannot move above departure
+      const temp = itineraryPoints[index];
+      itineraryPoints[index] = itineraryPoints[index - 1];
+      itineraryPoints[index - 1] = temp;
+      resequencePoints();
+      renderPointsList();
+      renderLiveSummary();
+    }
+
+    function movePointDown(index) {
+      const maxIndex = returnWithVehicle ? itineraryPoints.length - 2 : itineraryPoints.length - 1;
+      if (index >= maxIndex) return;
+      const temp = itineraryPoints[index];
+      itineraryPoints[index] = itineraryPoints[index + 1];
+      itineraryPoints[index + 1] = temp;
+      resequencePoints();
+      renderPointsList();
+      renderLiveSummary();
+    }
+
+    function resequencePoints() {
+      itineraryPoints.forEach((p, idx) => {
+        p.sequence = idx + 1;
+      });
+    }
+
+    function renderPointsList() {
+      const container = document.getElementById('points-list');
+      container.innerHTML = '';
+
+      const minDate = document.getElementById('trip-start-date').value || '';
+      const maxDate = document.getElementById('trip-end-date').value || '';
+
+      itineraryPoints.forEach((point, index) => {
+        const isDep = point.type === 'departure';
+        const isRet = point.type === 'return';
+        const isStop = !isDep && !isRet;
+
+        let badgeHtml = '';
+        if (isDep) badgeHtml = `<span class="badge" style="background:var(--cira-burgundy); color:#FFF; font-weight:700;">Departure Point</span>`;
+        else if (isRet) badgeHtml = `<span class="badge" style="background:var(--gold-500); color:var(--navy-800); font-weight:700;">Return Point</span>`;
+        else badgeHtml = `<span class="badge badge-info">Stop #${index}</span>`;
+
+        let pinBadge = point.pinned && point.lat
+          ? `<span class="badge badge-success" style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Pinned: ${point.lat.toFixed(2)}°N, ${point.lng.toFixed(2)}°E</span>`
+          : `<span class="badge badge-neutral" title="Dispatch can confirm it later" style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Location not pinned</span>`;
+
+        const card = document.createElement('div');
+        card.className = 'itinerary-point-card';
+
+        let moveUpDisabled = index <= 1 ? 'disabled' : '';
+        let moveDownDisabled = (isRet || index >= itineraryPoints.length - (returnWithVehicle ? 2 : 1)) ? 'disabled' : '';
+
+        let timingHtml = '';
+        if (isDep) {
+          const dtParts = (point.depart_at || `${minDate} 08:00`).split(' ');
+          timingHtml = `
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="form-group">
+                <label class="form-label" style="font-size:12.5px;">Leaves at (Date)</label>
+                <input type="date" class="form-input" min="${minDate}" max="${maxDate}" value="${dtParts[0] || minDate}" onchange="updatePointTiming(${index}, 'depart_date', this.value);">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-size:12.5px;">Departure Time</label>
+                <input type="time" class="form-input" value="${dtParts[1] || '08:00'}" onchange="updatePointTiming(${index}, 'depart_time', this.value);">
+              </div>
+            </div>
+          `;
+        } else if (isRet) {
+          const dtParts = (point.arrive_at || `${maxDate} 18:00`).split(' ');
+          timingHtml = `
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="form-group">
+                <label class="form-label" style="font-size:12.5px;">Arrive back by (Date)</label>
+                <input type="date" class="form-input" min="${minDate}" max="${maxDate}" value="${dtParts[0] || maxDate}" onchange="updatePointTiming(${index}, 'arrive_date', this.value);">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-size:12.5px;">Arrival Time</label>
+                <input type="time" class="form-input" value="${dtParts[1] || '18:00'}" onchange="updatePointTiming(${index}, 'arrive_time', this.value);">
+              </div>
+            </div>
+          `;
+        } else {
+          const arrParts = (point.arrive_at || `${minDate} 12:00`).split(' ');
+          const depParts = (point.depart_at || `${minDate} 14:00`).split(' ');
+          timingHtml = `
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:12px;">
+              <div class="form-group">
+                <label class="form-label" style="font-size:12.5px;">Arrive by Date</label>
+                <input type="date" class="form-input" min="${minDate}" max="${maxDate}" value="${arrParts[0] || minDate}" onchange="updatePointTiming(${index}, 'arrive_date', this.value);">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-size:12.5px;">Arrive Time</label>
+                <input type="time" class="form-input" value="${arrParts[1] || '12:00'}" onchange="updatePointTiming(${index}, 'arrive_time', this.value);">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-size:12.5px;">Leave at Date (Optional)</label>
+                <input type="date" class="form-input" min="${minDate}" max="${maxDate}" value="${depParts[0] || minDate}" onchange="updatePointTiming(${index}, 'depart_date', this.value);">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-size:12.5px;">Leave Time</label>
+                <input type="time" class="form-input" value="${depParts[1] || '14:00'}" onchange="updatePointTiming(${index}, 'depart_time', this.value);">
+              </div>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="itinerary-point-header">
+            <div style="display:flex; align-items:center; gap:8px;">
+              ${badgeHtml}
+              ${pinBadge}
+            </div>
+            <div class="itinerary-actions">
+              ${isStop ? `
+                <button type="button" class="btn-action-icon" title="Move Up" ${moveUpDisabled} onclick="movePointUp(${index});">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+                </button>
+                <button type="button" class="btn-action-icon" title="Move Down" ${moveDownDisabled} onclick="movePointDown(${index});">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <button type="button" class="btn-action-icon" title="Remove Stop" style="color:var(--danger);" onclick="removePoint(${index});">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" style="font-size:12.5px;">Place / Campus Name</label>
+              <div style="display:flex; gap:8px;">
+                <input type="text" list="egypt-places-list" class="form-input" placeholder="Type campus, city, or address..." value="${escapeHtml(point.place_name || '')}" onchange="updatePointPlace(${index}, this.value);">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openMapModalForPoint(${index});" style="display:inline-flex; align-items:center; gap:5px; white-space:nowrap;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span>Pick on Map</span>
+                </button>
+              </div>
+            </div>
+
+            ${timingHtml}
+
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" style="font-size:12px; color:var(--text-muted);">Waybill Notes / Gate / Loading Contact (Optional)</label>
+              <input type="text" class="form-input" style="font-size:13px;" placeholder="e.g. Lead contact Dr. Sarah (+20 10 2233 4455) · Gate 2 Bay 4" value="${escapeHtml(point.notes || '')}" onchange="updatePointNotes(${index}, this.value);">
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function updatePointPlace(index, val) {
+      itineraryPoints[index].place_name = val;
+      const known = FleetStore.RouteEstimator.findLocation(val);
+      if (known) {
+        itineraryPoints[index].lat = known.lat;
+        itineraryPoints[index].lng = known.lng;
+        itineraryPoints[index].pinned = true;
+      }
+      renderPointsList();
+      renderLiveSummary();
+    }
+
+    function updatePointNotes(index, val) {
+      itineraryPoints[index].notes = val;
+    }
+
+    function updatePointTiming(index, field, val) {
+      const pt = itineraryPoints[index];
+      if (pt.type === 'departure') {
+        const curParts = (pt.depart_at || '2026-10-18 08:00').split(' ');
+        if (field === 'depart_date') pt.depart_at = `${val} ${curParts[1] || '08:00'}`;
+        if (field === 'depart_time') pt.depart_at = `${curParts[0] || '2026-10-18'} ${val}`;
+      } else if (pt.type === 'return') {
+        const curParts = (pt.arrive_at || '2026-10-22 18:00').split(' ');
+        if (field === 'arrive_date') pt.arrive_at = `${val} ${curParts[1] || '18:00'}`;
+        if (field === 'arrive_time') pt.arrive_at = `${curParts[0] || '2026-10-22'} ${val}`;
+      } else {
+        const arrParts = (pt.arrive_at || '2026-10-18 12:00').split(' ');
+        const depParts = (pt.depart_at || '2026-10-18 14:00').split(' ');
+        if (field === 'arrive_date') pt.arrive_at = `${val} ${arrParts[1] || '12:00'}`;
+        if (field === 'arrive_time') pt.arrive_at = `${arrParts[0] || '2026-10-18'} ${val}`;
+        if (field === 'depart_date') pt.depart_at = `${val} ${depParts[1] || '14:00'}`;
+        if (field === 'depart_time') pt.depart_at = `${depParts[0] || '2026-10-18'} ${val}`;
+      }
+      renderLiveSummary();
+    }
+
+    function renderLiveSummary() {
+      const cat = document.getElementById('route-vehicle-cat').value;
+      const legs = FleetStore.RouteEstimator.computeItineraryLegs(itineraryPoints, cat);
+      const timelineContainer = document.getElementById('summary-timeline-container');
+      timelineContainer.innerHTML = '';
+
+      let totalKm = 0;
+      let totalMins = 0;
+      let totalFuel = 0;
+      let totalCost = 0;
+
+      itineraryPoints.forEach((point, idx) => {
+        const isDep = point.type === 'departure';
+        const isRet = point.type === 'return';
+        let dotClass = isDep ? 'timeline-marker-dot' : (isRet ? 'timeline-marker-dot return-dot' : 'timeline-marker-dot stop-dot');
+        let nodeClass = `timeline-node ${isRet ? 'return-node' : ''}`;
+
+        const timeStr = isDep ? `Leaves at ${point.depart_at || ''}` : (isRet ? `Arrives back at ${point.arrive_at || ''}` : `Arrives ${point.arrive_at || ''}${point.depart_at ? ` · Leaves ${point.depart_at}` : ''}`);
+
+        const nodeEl = document.createElement('div');
+        nodeEl.className = nodeClass;
+        nodeEl.innerHTML = `
+          <div class="${dotClass}"></div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+            <div>
+              <strong style="color:var(--navy-800); font-size:14px;">${escapeHtml(point.place_name || 'Unnamed Point')}</strong>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:1px;">${timeStr}</div>
+            </div>
+            <span class="badge ${point.pinned ? 'badge-success' : 'badge-neutral'}" style="font-size:11px;">
+              ${point.pinned ? 'Pinned' : 'Not pinned'}
+            </span>
+          </div>
+        `;
+        timelineContainer.appendChild(nodeEl);
+
+        // Render leg between this point and the next
+        if (idx < itineraryPoints.length - 1 && legs[idx]) {
+          const leg = legs[idx];
+          totalKm += leg.distance_km;
+          totalMins += leg.drive_minutes;
+          totalFuel += leg.fuel_liters;
+          totalCost += leg.cost_egp;
+
+          const h = Math.floor(leg.drive_minutes / 60);
+          const m = leg.drive_minutes % 60;
+          const isReturnLeg = (idx === itineraryPoints.length - 2 && returnWithVehicle);
+
+          const legEl = document.createElement('div');
+          legEl.className = `leg-summary-card ${isReturnLeg ? 'return-leg' : ''}`;
+          legEl.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; color:var(--navy-800);">${leg.distance_km} km</span>
+              <span style="color:var(--text-muted); font-family:var(--font-mono);">${h}h ${m.toString().padStart(2, '0')}m driving (est.)</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted);">${leg.fuel_liters} L (${leg.cost_egp.toFixed(2)} EGP)</div>
+            ${leg.warning ? `
+              <div style="margin-top:4px; font-size:11.5px; color:#B91C1C; display:flex; align-items:center; gap:4px; font-weight:600;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>${leg.warning}</span>
+              </div>
+            ` : ''}
+          `;
+          timelineContainer.appendChild(legEl);
+        }
+      });
+
+      document.getElementById('summary-points-count').textContent = `${itineraryPoints.length} Waypoints`;
+      document.getElementById('summary-total-km').textContent = `${totalKm.toFixed(1)} km (est.)`;
+
+      const totH = Math.floor(totalMins / 60);
+      const totM = totalMins % 60;
+      document.getElementById('summary-total-drive').textContent = `${totH}h ${totM.toString().padStart(2, '0')}m (est.)`;
+
+      const sDate = document.getElementById('trip-start-date').value;
+      const eDate = document.getElementById('trip-end-date').value;
+      const daysCount = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
+      document.getElementById('summary-total-days').textContent = `${daysCount} day${daysCount > 1 ? 's' : ''} (${Math.max(0, daysCount - 1)} night${daysCount > 2 ? 's' : ''})`;
+
+      const catRate = FleetStore.RouteEstimator.CONSUMPTION_RATES ? FleetStore.RouteEstimator.CONSUMPTION_RATES[cat] : null;
+      const fuelType = (catRate && catRate.fuelType) || (cat === 'Sedan' ? 'Petrol 92' : 'Diesel');
+      document.getElementById('summary-total-fuel').textContent = `${totalFuel.toFixed(1)} L ${fuelType} (est.)`;
+      document.getElementById('summary-total-cost').textContent = `EGP ${totalCost.toFixed(2)}`;
+
+      // Hold window text
+      const firstPt = itineraryPoints[0];
+      const lastPt = itineraryPoints[itineraryPoints.length - 1];
+      const holdStart = firstPt && firstPt.depart_at ? firstPt.depart_at : `${sDate} 08:00`;
+      const holdEnd = lastPt && lastPt.arrive_at ? `${lastPt.arrive_at} (+45m buffer)` : `${eDate} 18:45`;
+      document.getElementById('summary-hold-window-text').textContent = `${holdStart} → ${holdEnd}`;
+
+      // Check daily driving rules for > 8h
+      const rules = FleetStore.RouteEstimator.checkDriverRules(itineraryPoints, legs);
+      const dutyNotice = document.getElementById('driver-daily-limit-notice');
+      if (rules.dayViolations && rules.dayViolations.length > 0) {
+        dutyNotice.style.display = 'block';
+        document.getElementById('driver-daily-limit-text').textContent = rules.dayViolations[0].notice;
+      } else {
+        dutyNotice.style.display = 'none';
+      }
+
+      // Render overview map
+      drawOverviewMap();
+    }
+
+    function drawOverviewMap() {
+      const svg = document.getElementById('overview-map-svg');
+      if (!svg) return;
+      svg.innerHTML = '';
+
+      if (itineraryPoints.length < 2) return;
+
+      const pts = itineraryPoints.map(p => {
+        let lat = p.lat || 30.0;
+        let lng = p.lng || 31.2;
+        return { ...p, lat, lng };
+      });
+
+      let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
+      pts.forEach(p => {
+        if (p.lat < minLat) minLat = p.lat;
+        if (p.lat > maxLat) maxLat = p.lat;
+        if (p.lng < minLng) minLng = p.lng;
+        if (p.lng > maxLng) maxLng = p.lng;
+      });
+
+      if (maxLat - minLat < 0.2) { minLat -= 0.2; maxLat += 0.2; }
+      if (maxLng - minLng < 0.2) { minLng -= 0.2; maxLng += 0.2; }
+
+      const pad = 24;
+      const width = svg.clientWidth || 300;
+      const height = svg.clientHeight || 180;
+
+      function project(lat, lng) {
+        const x = pad + ((lng - minLng) / (maxLng - minLng)) * (width - pad * 2);
+        const y = height - (pad + ((lat - minLat) / (maxLat - minLat)) * (height - pad * 2));
+        return { x: Math.round(x), y: Math.round(y) };
+      }
+
+      const coords = pts.map(p => project(p.lat, p.lng));
+
+      // Draw lines
+      for (let i = 0; i < coords.length - 1; i++) {
+        const c1 = coords[i];
+        const c2 = coords[i + 1];
+        const isReturn = (i === coords.length - 2 && returnWithVehicle);
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', c1.x);
+        line.setAttribute('y1', c1.y);
+        line.setAttribute('x2', c2.x);
+        line.setAttribute('y2', c2.y);
+        line.setAttribute('stroke', isReturn ? '#D4AF37' : '#0B2545');
+        line.setAttribute('stroke-width', '3.5');
+        line.setAttribute('stroke-linecap', 'round');
+        if (isReturn) {
+          line.setAttribute('stroke-dasharray', '6,6');
+        }
+        svg.appendChild(line);
+      }
+
+      // Draw pins
+      coords.forEach((c, idx) => {
+        const isDep = idx === 0;
+        const isRet = idx === coords.length - 1 && returnWithVehicle;
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', c.x);
+        circle.setAttribute('cy', c.y);
+        circle.setAttribute('r', '6');
+        circle.setAttribute('fill', isDep ? '#703845' : (isRet ? '#D4AF37' : '#1D4E89'));
+        circle.setAttribute('stroke', '#FFFFFF');
+        circle.setAttribute('stroke-width', '2');
+        svg.appendChild(circle);
+
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', c.x + 8);
+        text.setAttribute('y', c.y - 4);
+        text.setAttribute('font-size', '10');
+        text.setAttribute('font-weight', '700');
+        text.setAttribute('fill', '#0B2545');
+        text.textContent = isDep ? 'Departure' : (isRet ? 'Return' : `Stop #${idx}`);
+        svg.appendChild(text);
+      });
+    }
+
+    // Modal Map Picker Functions
+    function openMapModalForPoint(index) {
+      activeModalPointIndex = index;
+      const pt = itineraryPoints[index];
+      modalTempCoords.lat = pt.lat || 27.1809;
+      modalTempCoords.lng = pt.lng || 31.1837;
+      modalTempCoords.placeName = pt.place_name || 'Selected Point';
+
+      document.getElementById('modal-place-search').value = pt.place_name || '';
+      document.getElementById('modal-pin-label').textContent = pt.place_name || 'Selected Location';
+      document.getElementById('modal-coords-display').textContent = `${modalTempCoords.lat.toFixed(4)}° N, ${modalTempCoords.lng.toFixed(4)}° E`;
+
+      document.getElementById('map-modal').style.display = 'flex';
+    }
+
+    function closeMapModal() {
+      document.getElementById('map-modal').style.display = 'none';
+      activeModalPointIndex = null;
+    }
+
+    function renderModalLocationChips() {
+      const container = document.getElementById('modal-place-chips');
+      container.innerHTML = '';
+      FleetStore.RouteEstimator.locations.forEach(loc => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'role-pill-btn';
+        btn.style.color = 'var(--navy-800)';
+        btn.style.borderColor = 'var(--border)';
+        btn.style.background = 'var(--bg-page)';
+        btn.textContent = loc.name;
+        btn.onclick = () => {
+          modalTempCoords.lat = loc.lat;
+          modalTempCoords.lng = loc.lng;
+          modalTempCoords.placeName = loc.name;
+          document.getElementById('modal-place-search').value = loc.name;
+          document.getElementById('modal-pin-label').textContent = loc.name;
+          document.getElementById('modal-coords-display').textContent = `${loc.lat.toFixed(4)}° N, ${loc.lng.toFixed(4)}° E`;
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function filterModalSuggestions() {
+      const q = document.getElementById('modal-place-search').value.trim();
+      const loc = FleetStore.RouteEstimator.findLocation(q);
+      if (loc) {
+        modalTempCoords.lat = loc.lat;
+        modalTempCoords.lng = loc.lng;
+        modalTempCoords.placeName = loc.name;
+        document.getElementById('modal-pin-label').textContent = loc.name;
+        document.getElementById('modal-coords-display').textContent = `${loc.lat.toFixed(4)}° N, ${loc.lng.toFixed(4)}° E`;
+      }
+    }
+
+    function handleModalMapClick(event) {
+      const canvas = document.getElementById('modal-map-canvas');
+      const rect = canvas.getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      const clickY = event.clientY - rect.top;
+
+      // Project click into Egypt bounds: Lat ~24 to 32, Lng ~25 to 35
+      const pctX = Math.max(0, Math.min(1, clickX / rect.width));
+      const pctY = Math.max(0, Math.min(1, clickY / rect.height));
+
+      const lng = 25.0 + pctX * (35.0 - 25.0);
+      const lat = 32.0 - pctY * (32.0 - 24.0);
+
+      modalTempCoords.lat = Math.round(lat * 10000) / 10000;
+      modalTempCoords.lng = Math.round(lng * 10000) / 10000;
+
+      const marker = document.getElementById('modal-pin-marker');
+      marker.style.left = `${clickX}px`;
+      marker.style.top = `${clickY}px`;
+
+      document.getElementById('modal-coords-display').textContent = `${modalTempCoords.lat.toFixed(4)}° N, ${modalTempCoords.lng.toFixed(4)}° E`;
+    }
+
+    function confirmModalPin() {
+      if (activeModalPointIndex === null) return;
+      const pt = itineraryPoints[activeModalPointIndex];
+      pt.lat = modalTempCoords.lat;
+      pt.lng = modalTempCoords.lng;
+      pt.pinned = true;
+      if (modalTempCoords.placeName && !pt.place_name) {
+        pt.place_name = modalTempCoords.placeName;
+      }
+      closeMapModal();
+      renderPointsList();
+      renderLiveSummary();
+    }
+
+    // Validation & Submission
+    function validateItinerary() {
+      const errors = [];
+      const sDate = document.getElementById('trip-start-date').value;
+      const eDate = document.getElementById('trip-end-date').value;
+
+      if (!sDate || !eDate || eDate < sDate) {
+        errors.push('Trip start and end dates must be valid, with end date on or after start date.');
+      }
+
+      if (itineraryPoints.length < 2) {
+        errors.push('At least 1 departure point and 1 destination stop are required.');
+      }
+
+      const dep = itineraryPoints.find(p => p.type === 'departure');
+      if (!dep || !dep.place_name.trim()) {
+        errors.push('Departure place name is required.');
+      }
+
+      itineraryPoints.forEach((p, idx) => {
+        if (!p.place_name.trim()) {
+          errors.push(`Waypoint #${idx + 1} (${p.type}) is missing a place name.`);
+        }
+
+        const dateCheck = p.type === 'departure' ? (p.depart_at || '').split(' ')[0] : (p.arrive_at || '').split(' ')[0];
+        if (dateCheck && (dateCheck < sDate || dateCheck > eDate)) {
+          errors.push(`Waypoint #${idx + 1} date (${dateCheck}) falls outside the trip period (${sDate} → ${eDate}).`);
+        }
+
+        if (p.type === 'stop' && p.arrive_at && p.depart_at) {
+          const arrD = new Date(p.arrive_at.replace(' ', 'T'));
+          const depD = new Date(p.depart_at.replace(' ', 'T'));
+          if (depD < arrD) {
+            errors.push(`Stop #${idx} departure time (${p.depart_at}) must be after or equal to its arrival time (${p.arrive_at}).`);
+          }
+        }
+
+        // Sequential chronological check
+        if (idx > 0) {
+          const prev = itineraryPoints[idx - 1];
+          const prevDepStr = prev.depart_at || prev.arrive_at;
+          const curArrStr = p.arrive_at || p.depart_at;
+          if (prevDepStr && curArrStr) {
+            const prevTime = new Date(prevDepStr.replace(' ', 'T'));
+            const curTime = new Date(curArrStr.replace(' ', 'T'));
+            if (curTime < prevTime) {
+              errors.push(`Waypoint #${idx + 1} (${p.place_name || p.type}) scheduled time (${curArrStr}) cannot be earlier than previous point's departure (${prevDepStr}).`);
+            }
+          }
+        }
+      });
+
+      if (returnWithVehicle) {
+        const retPt = itineraryPoints.find(p => p.type === 'return');
+        if (!retPt || !retPt.arrive_at) {
+          errors.push('Return point date and time are required when "Return with vehicle" is enabled.');
+        }
+      }
+
+      return errors;
+    }
+
+    function validateAndSubmitBooking() {
+      const errors = validateItinerary();
+      const errBox = document.getElementById('itinerary-validation-errors');
+      const errList = document.getElementById('itinerary-validation-list');
+
+      if (errors.length > 0) {
+        errList.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+        errBox.style.display = 'block';
+        errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      errBox.style.display = 'none';
+
+      // Check if editing an approved booking
+      if (editingBookingId) {
+        const existing = FleetStore.getBooking(editingBookingId);
+        if (existing && (existing.status === 'Dispatched' || existing.status === 'Active' || existing.status === 'Approved')) {
+          document.getElementById('reapproval-confirm-modal').style.display = 'flex';
+          return;
+        }
+      }
+
+      executeBookingSubmit(false);
+    }
+
+    function executeBookingSubmit(isReapproval) {
+      const sDate = document.getElementById('trip-start-date').value;
+      const eDate = document.getElementById('trip-end-date').value;
+      const pax = document.getElementById('route-pax').value;
+      const cargo = document.getElementById('route-cargo').value;
+      const vehicleCat = document.getElementById('route-vehicle-cat').value;
+      const purpose = document.getElementById('route-purpose').value.trim();
+      const costCenter = document.getElementById('cost-center').value.trim();
+      const notes = document.getElementById('mission-notes').value.trim();
+      const overnightLocation = document.getElementById('driver-overnight-location').value.trim();
+
+      const user = Auth.getUser() || { name: 'Dr. Sarah Mansour', dept: 'Faculty of Pharmacy' };
+      const legs = FleetStore.RouteEstimator.computeItineraryLegs(itineraryPoints, vehicleCat);
+
+      const payload = {
+        start_date: sDate,
+        end_date: eDate,
+        return_with_vehicle: returnWithVehicle,
+        itinerary: itineraryPoints,
+        route_legs: legs,
+        passengers: pax,
+        cargo_kg: cargo,
+        purpose: purpose,
+        cost_center: costCenter,
+        dept: user.dept,
+        requesterName: user.name,
+        notes: notes,
+        driver_overnight_location: overnightLocation,
+        vehicleCategory: vehicleCat
+      };
+
+      let booking;
+      if (editingBookingId) {
+        booking = FleetStore.updateBookingItinerary(editingBookingId, payload);
+      } else {
+        booking = FleetStore.createBooking(payload);
+      }
+
+      alert(`Booking request ${booking.id} submitted successfully!\n\nMulti-Stop Route: ${booking.route}\nDates: ${booking.startDate} → ${booking.endDate} (${booking.daysCount} days)\nEstimated Distance: ${booking.distanceKm} km\nEstimated Fuel: ${booking.estFuelLiters} L (${booking.estCostEGP} EGP)\n\nCentral Operations Desk has received the requisition to review schedules and allocate vehicle/driver.`);
+      window.location.href = `booking-detail.html?id=${booking.id}`;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[m];
+      });
     }
   </script>
 </body>

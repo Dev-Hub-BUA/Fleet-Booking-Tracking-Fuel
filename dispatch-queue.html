@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Approval & Dispatch Queue — CIRA Education Fleet Platform</title>
+  <title>Approval Queue — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/auth.js"></script>
@@ -21,24 +21,22 @@
         </span>
       </a>
 
-      <!-- Authenticated Controls -->
       <div class="header-actions">
         <div class="search-wrapper">
           <span class="search-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
           </span>
           <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
         </div>
 
         <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
           <span class="badge-counter">3</span>
         </a>
 
-        <!-- User Dropdown Menu -->
         <div class="user-menu-wrapper">
           <button type="button" class="user-btn">
-            <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
+            <span class="user-avatar" style="background:var(--navy-600); color:#FFF;">TE</span>
             <span class="user-info">
               <span class="user-name">Loading...</span>
               <span class="user-role-badge">Authenticating</span>
@@ -62,165 +60,136 @@
 
     <main class="main-content" role="main">
       <div class="page-header">
-  <div class="page-title-group">
-    <span class="page-pretitle">Central Operations Desk</span>
-    <h1 class="page-title">Approval Queue</h1>
-    <span class="page-subtitle">Verify vehicle buffers, driver duty hours, and avoid double-booking</span>
-  </div>
-</div>
+        <div class="page-title-group">
+          <span class="page-pretitle">Central Operations Desk</span>
+          <h1 class="page-title">Approval Queue</h1>
+          <span class="page-subtitle">Verify multi-day vehicle buffers, driver duty hours, and avoid double-booking</span>
+        </div>
+      </div>
 
-<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: start;">
-  <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 12px;">
-    <div class="card dispatch-queue-card" onclick="selectQueueItem('BK-2047')" id="qcard-BK-2047"
-      style="cursor:pointer; border: 2px solid var(--navy-600); background: var(--navy-50);">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-family:var(--font-mono); font-weight:700;">BK-2047</span>
-        <span class="badge badge-danger">CONFLICT</span>
-      </div>
-      <strong style="color:var(--navy-800); font-size:15px; margin: 4px 0 2px;">Main Campus → Obour → 10th of Ramadan</strong>
-      <span style="font-size:12px; color:var(--text-muted);">Tue 13 Oct · 08:30–14:00 · 4 pax · 350 kg · CC-410 (Pharmacy)</span>
-    </div><div class="card dispatch-queue-card" onclick="selectQueueItem('BK-2049')" id="qcard-BK-2049"
-      style="cursor:pointer; border: 2px solid var(--border); background: #FFFFFF;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-family:var(--font-mono); font-weight:700;">BK-2049</span>
-        <span class="badge badge-warning">RE-APPROVAL</span>
-      </div>
-      <strong style="color:var(--navy-800); font-size:15px; margin: 4px 0 2px;">Main Campus → Cairo International Airport Terminal 3</strong>
-      <span style="font-size:12px; color:var(--text-muted);">Tue 13 Oct · 05:00–07:30 · 2 pax · CC-120 (President’s Office)</span>
-    </div><div class="card dispatch-queue-card" onclick="selectQueueItem('BK-2051')" id="qcard-BK-2051"
-      style="cursor:pointer; border: 2px solid var(--border); background: #FFFFFF;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-family:var(--font-mono); font-weight:700;">BK-2051</span>
-        <span class="badge badge-info">NEW</span>
-      </div>
-      <strong style="color:var(--navy-800); font-size:15px; margin: 4px 0 2px;">Main Campus → Ain Sokhna Marine Research Facility</strong>
-      <span style="font-size:12px; color:var(--text-muted);">Wed 14 Oct · 07:00–18:00 · 22 pax · Bus Class · CC-300 (Student Affairs)</span>
-    </div><div class="card dispatch-queue-card" onclick="selectQueueItem('BK-2052')" id="qcard-BK-2052"
-      style="cursor:pointer; border: 2px solid var(--border); background: #FFFFFF;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-family:var(--font-mono); font-weight:700;">BK-2052</span>
-        <span class="badge badge-info">NEW</span>
-      </div>
-      <strong style="color:var(--navy-800); font-size:15px; margin: 4px 0 2px;">Plant 3 Industrial Zone → Campus Central Warehouse B</strong>
-      <span style="font-size:12px; color:var(--text-muted);">Wed 14 Oct · 10:00–12:00 · Heavy Cargo 2,400 kg · CC-410 (Procurement)</span>
-    </div>
-  </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: start;">
+        
+        <!-- Left: Queue Items List -->
+        <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 12px;" id="queue-cards-list">
+          <!-- Injected dynamically from FleetStore -->
+        </div>
 
-  <div style="flex: 999 1 580px; display: flex; flex-direction: column; gap: 20px;">
-    <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-        <div>
-          <span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">BK-2047 · Dr. Sarah Mansour (Pharmacy)</span>
-          <h2 style="margin: 4px 0 0; font-size: 22px; color: var(--navy-800);">Campus → Obour → 10th of Ramadan</h2>
-          <div style="margin-top: 6px; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
-            <span style="color: var(--text-muted);">Requested Vehicle Category:</span>
-            <span class="badge badge-info" id="detail-requested-cat">Passenger Van / Minibus</span>
+        <!-- Right: Assignment & Whole-Period Verification Panel -->
+        <div style="flex: 999 1 580px; display: flex; flex-direction: column; gap: 20px;">
+          
+          <!-- Booking Header Card -->
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+              <div>
+                <span id="detail-booking-pretitle" style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">BK-2047 · Dr. Sarah Mansour (Pharmacy)</span>
+                <h2 id="detail-booking-route" style="margin: 4px 0 0; font-size: 22px; color: var(--navy-800);">Assiut → Cairo → Badr City → Return</h2>
+                <div style="margin-top: 6px; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
+                  <span style="color: var(--text-muted);">Requested Vehicle Category:</span>
+                  <span class="badge badge-info" id="detail-requested-cat">Passenger Van / Minibus</span>
+                  <span class="badge badge-gold" id="detail-period-badge">5-Day Mission</span>
+                </div>
+              </div>
+              <div style="display: flex; gap: 16px; font-size: 14px;">
+                <div><span style="color:var(--text-muted);">Total Distance</span><div id="detail-metric-km" style="font-family:var(--font-mono);font-weight:700;">865.0 km</div></div>
+                <div><span style="color:var(--text-muted);">Estimated Driving</span><div id="detail-metric-drive" style="font-family:var(--font-mono);font-weight:700;">11h 20m</div></div>
+                <div><span style="color:var(--text-muted);">Turnaround Buffer</span><div style="font-family:var(--font-mono);font-weight:700;">45 min</div></div>
+              </div>
+            </div>
+
+            <!-- Multi-Stop Itinerary Summary Box -->
+            <div style="background: var(--bg-page); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-top: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong style="color: var(--navy-800); font-size: 14px; display:flex; align-items:center; gap:6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                  <span>Mission Itinerary &amp; Sequential Waypoints</span>
+                </strong>
+                <span id="detail-itinerary-dates" style="font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; color: var(--navy-600);">18 Oct → 22 Oct 2026</span>
+              </div>
+
+              <!-- Ordered list of itinerary points -->
+              <div id="detail-itinerary-points-list" style="display: flex; flex-direction: column; gap: 6px; font-size: 13px;">
+                <!-- Dynamically rendered -->
+              </div>
+
+              <!-- Hold Window Notice -->
+              <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12.5px;">
+                <div style="display:flex; align-items:center; gap:6px; color:var(--navy-800);">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span><strong>Hold Window:</strong> <span id="detail-hold-window-str" style="font-family:var(--font-mono);">18 Oct 08:00 → 22 Oct 18:45</span></span>
+                </div>
+                <div id="detail-overnight-lodging-badge" style="color:var(--text-muted);">
+                  Lodging: BUC Faculty Guesthouse (4 nights)
+                </div>
+              </div>
+            </div>
+
+            <div class="alert-banner alert-info" style="margin-top: 14px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span><strong>Multi-Day Dispatch Policy:</strong> Assets and drivers are locked for the <strong>entire mission period</strong> plus the mandatory 45-min turnaround buffer.</span>
+              </div>
+            </div>
           </div>
+
+          <!-- Section 1: Vehicle Availability Across Entire Period -->
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h3 class="card-title" style="margin:0;">1. Vehicle Availability &amp; Substitution</h3>
+              <span class="badge badge-info" id="vehicle-period-check-badge">Checking Full 5-Day Period</span>
+            </div>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Select</th>
+                    <th>Code</th>
+                    <th>Vehicle Model</th>
+                    <th>Capacity</th>
+                    <th>Availability Status Across Whole Period</th>
+                  </tr>
+                </thead>
+                <tbody id="vehicle-roster-tbody">
+                  <!-- Injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Section 2: Driver Certification & Roster Across Entire Period -->
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h3 class="card-title" style="margin:0;">2. Driver Certification &amp; Duty Hours</h3>
+              <span class="badge badge-info" id="driver-period-check-badge">Checking Full 5-Day Period</span>
+            </div>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Select</th>
+                    <th>Driver Name</th>
+                    <th>License Class</th>
+                    <th>Multi-Day Duty</th>
+                    <th>Eligibility Status Across Whole Period</th>
+                  </tr>
+                </thead>
+                <tbody id="driver-roster-tbody">
+                  <!-- Injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div id="dispatch-actions-box" style="display: flex; justify-content: flex-end; gap: 14px; align-items: center;">
+            <button class="btn btn-danger" onclick="alert('Request rejected and requester has been notified with the reason.');">Reject Request</button>
+            <button class="btn btn-gold btn-lg" id="btn-approve-dispatch" onclick="handleApproveBooking();" style="display:inline-flex; align-items:center; gap:8px;">
+              <span>Approve &amp; Assign for Entire Period</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </button>
+          </div>
+
         </div>
-        <div style="display: flex; gap: 16px; font-size: 14px;">
-          <div><span style="color:var(--text-muted);">Distance</span><div style="font-family:var(--font-mono);font-weight:700;">61.4 km</div></div>
-          <div><span style="color:var(--text-muted);">Estimated Time</span><div style="font-family:var(--font-mono);font-weight:700;">5h 30m</div></div>
-          <div><span style="color:var(--text-muted);">Buffer Window</span><div style="font-family:var(--font-mono);font-weight:700;">45 min</div></div>
-        </div>
       </div>
-
-      <div class="alert-banner alert-info" style="margin-top: 14px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <span><strong>Dispatcher Assignment:</strong> Review available vehicles in the requested category below and select the appropriate vehicle and driver to approve and dispatch this trip.</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3 class="card-title">1. Vehicle Availability &amp; Substitution</h3>
-      <div class="table-wrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Select</th>
-              <th>Code</th>
-              <th>Vehicle Model</th>
-              <th>Capacity</th>
-              <th>Availability Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="opacity: 0.6;">
-              <td><input type="radio" disabled name="vsel"></td>
-              <td><span style="font-family:var(--font-mono);">V-114</span></td>
-              <td>Toyota HiAce 2022</td>
-              <td>9 pax / 1,100 kg</td>
-              <td><span class="badge badge-danger">Overlap 45 min</span></td>
-            </tr>
-            <tr style="background: var(--navy-50);">
-              <td><input type="radio" checked name="vsel" style="accent-color:var(--navy-800);"></td>
-              <td><span style="font-family:var(--font-mono); font-weight:700;">V-122</span></td>
-              <td><strong>Hyundai H-1 2023</strong></td>
-              <td>9 pax / 1,000 kg</td>
-              <td><span class="badge badge-success">Available · At Campus</span></td>
-            </tr>
-            <tr>
-              <td><input type="radio" name="vsel"></td>
-              <td><span style="font-family:var(--font-mono);">V-130</span></td>
-              <td>Toyota HiAce 2020</td>
-              <td>12 pax / 1,200 kg</td>
-              <td><span class="badge badge-success">Available · +22 km Reposition</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3 class="card-title">2. Driver Certification &amp; Duty Hours</h3>
-      <div class="table-wrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Select</th>
-              <th>Driver Name</th>
-              <th>License Class</th>
-              <th>Duty Today</th>
-              <th>Eligibility</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="background: var(--navy-50);">
-              <td><input type="radio" checked name="dsel" style="accent-color:var(--navy-800);"></td>
-              <td><strong>Ahmed Hassan (Driver A)</strong></td>
-              <td>Class 2 (Professional)</td>
-              <td><span style="font-family:var(--font-mono);">6.5 / 8.0 h</span></td>
-              <td><span class="badge badge-success">Eligible</span></td>
-            </tr>
-            <tr style="opacity: 0.6;">
-              <td><input type="radio" disabled name="dsel"></td>
-              <td>Mostafa Kamel (Driver B)</td>
-              <td>Class 2 (Professional)</td>
-              <td><span style="font-family:var(--font-mono); color:var(--danger);">9.2 / 8.0 h</span></td>
-              <td><span class="badge badge-danger">Exceeds 8h Limit</span></td>
-            </tr>
-            <tr style="opacity: 0.6;">
-              <td><input type="radio" disabled name="dsel"></td>
-              <td>Sherif Fathy (Driver D)</td>
-              <td>Class 2 · Expires 09 Oct</td>
-              <td>—</td>
-              <td><span class="badge badge-danger">Expired License</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div id="dispatch-actions-box" style="display: flex; justify-content: flex-end; gap: 14px; align-items: center;">
-      <button class="btn btn-danger" onclick="alert('Request rejected and requester has been notified with the reason.');">Reject Request</button>
-      <button class="btn btn-gold btn-lg" id="btn-approve-dispatch" onclick="handleApproveBooking();" style="display:inline-flex; align-items:center; gap:8px;">
-        <span>Approve &amp; Assign Vehicle</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      </button>
-    </div>
-  </div>
-</div>
     </main>
   </div>
 
@@ -275,6 +244,49 @@
   <script>
     let activeBookingId = 'BK-2047';
 
+    function initQueue() {
+      const bookings = FleetStore.getBookings();
+      const container = document.getElementById('queue-cards-list');
+      container.innerHTML = '';
+
+      const queueBookings = bookings.filter(b => b.status === 'Pending' || b.status === 'Active' || b.status === 'Dispatched');
+      const displayList = queueBookings.length > 0 ? queueBookings : bookings.slice(0, 4);
+
+      displayList.forEach((b, idx) => {
+        const sDate = b.startDate || b.start_date || '2026-10-18';
+        const eDate = b.endDate || b.end_date || '2026-10-22';
+        const days = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
+
+        let badgeType = 'badge-info';
+        let badgeLabel = days > 1 ? `Multi-Day (${days}d)` : 'Single Day';
+        if (b.id === 'BK-2047') {
+          badgeType = 'badge-danger';
+          badgeLabel = 'Review Multi-Day (5d)';
+        }
+
+        const isSelected = (b.id === activeBookingId);
+        const card = document.createElement('div');
+        card.className = 'card dispatch-queue-card';
+        card.id = 'qcard-' + b.id;
+        card.style.cssText = `cursor:pointer; border: 2px solid ${isSelected ? 'var(--navy-600)' : 'var(--border)'}; background: ${isSelected ? 'var(--navy-50)' : '#FFFFFF'};`;
+        card.onclick = () => selectQueueItem(b.id);
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-family:var(--font-mono); font-weight:700;">${b.id}</span>
+            <span class="badge ${badgeType}">${badgeLabel}</span>
+          </div>
+          <strong style="color:var(--navy-800); font-size:15px; margin: 4px 0 2px;">${b.route || (b.origin + ' → ' + b.destination)}</strong>
+          <span style="font-size:12px; color:var(--text-muted);">${sDate} → ${eDate} · ${b.passengers || 4} pax · ${b.dept || 'Faculty'}</span>
+        `;
+        container.appendChild(card);
+      });
+
+      if (displayList.length > 0) {
+        selectQueueItem(displayList[0].id);
+      }
+    }
+
     function selectQueueItem(id) {
       activeBookingId = id;
       document.querySelectorAll('.dispatch-queue-card').forEach(c => {
@@ -288,35 +300,149 @@
       }
 
       const booking = FleetStore.getBooking(id);
-      if (booking) {
-        const titleEl = document.querySelector('.card h2');
-        if (titleEl) titleEl.textContent = booking.route || (booking.origin + ' → ' + booking.destination);
-        const metaEl = document.querySelector('.card span[style*="font-mono"]');
-        if (metaEl) metaEl.textContent = `${booking.id} · ${booking.requesterName} (${booking.dept})`;
-        const catBadge = document.getElementById('detail-requested-cat');
-        if (catBadge) catBadge.textContent = booking.vehicleCategory || 'Passenger Van / Minibus';
+      if (!booking) return;
+
+      const sDate = booking.startDate || booking.start_date || '2026-10-18';
+      const eDate = booking.endDate || booking.end_date || '2026-10-22';
+      const days = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
+
+      document.getElementById('detail-booking-pretitle').textContent = `${booking.id} · ${booking.requesterName || 'Dr. Sarah Mansour'} (${booking.dept || 'Faculty of Pharmacy'})`;
+      document.getElementById('detail-booking-route').textContent = booking.route || (booking.origin + ' → ' + booking.destination);
+      document.getElementById('detail-requested-cat').textContent = booking.vehicleCategory || 'Passenger Van / Minibus';
+      document.getElementById('detail-period-badge').textContent = `${days}-Day Mission`;
+
+      document.getElementById('detail-metric-km').textContent = `${(booking.distanceKm || 865.0).toFixed(1)} km`;
+      const totH = Math.floor((booking.estDriveMinutes || 680) / 60);
+      const totM = (booking.estDriveMinutes || 680) % 60;
+      document.getElementById('detail-metric-drive').textContent = `${totH}h ${totM.toString().padStart(2, '0')}m`;
+
+      document.getElementById('detail-itinerary-dates').textContent = `${sDate} → ${eDate} (${days} days)`;
+
+      // Render points list
+      const pointsListEl = document.getElementById('detail-itinerary-points-list');
+      pointsListEl.innerHTML = '';
+
+      const points = Array.isArray(booking.itinerary) && booking.itinerary.length >= 2
+        ? booking.itinerary
+        : [
+            { sequence: 1, type: 'departure', place_name: booking.origin || 'Badr University in Assiut', depart_at: `${sDate} 08:00`, pinned: true },
+            { sequence: 2, type: 'return', place_name: booking.destination || 'Cairo University', arrive_at: `${eDate} 18:00`, pinned: true }
+          ];
+
+      points.forEach((p, idx) => {
+        const isDep = p.type === 'departure';
+        const isRet = p.type === 'return';
+        const badgeColor = isDep ? 'var(--cira-burgundy)' : (isRet ? 'var(--gold-500)' : 'var(--navy-600)');
+        const label = isDep ? 'Departure' : (isRet ? 'Return' : `Stop #${idx}`);
+        const timeStr = p.depart_at || p.arrive_at || '';
+
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px dashed var(--border);';
+        item.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${badgeColor};"></span>
+            <strong>${p.place_name || 'Waypoint'}</strong>
+            <span style="font-size:11px; color:var(--text-muted);">(${label})</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-family:var(--font-mono); font-size:12px; color:var(--navy-800);">${timeStr}</span>
+            <span class="badge ${p.pinned ? 'badge-success' : 'badge-neutral'}" style="font-size:10px;">${p.pinned ? 'Pinned' : 'Unpinned'}</span>
+          </div>
+        `;
+        pointsListEl.appendChild(item);
+      });
+
+      // Hold window & overnight stay
+      const holdText = booking.hold_window ? `${booking.hold_window.start} → ${booking.hold_window.end}` : `${sDate} 08:00 → ${eDate} 18:45`;
+      document.getElementById('detail-hold-window-str').textContent = holdText;
+
+      const stayEl = document.getElementById('detail-overnight-lodging-badge');
+      if (stayEl) {
+        stayEl.textContent = days > 1 ? `Lodging: ${booking.driver_overnight_location || 'Campus Guesthouse'} (${days - 1} nights)` : 'Single-day run (no overnight)';
       }
+
+      // Check whole period in tables
+      document.getElementById('vehicle-period-check-badge').textContent = `Checking Full ${days}-Day Period (${sDate} → ${eDate})`;
+      document.getElementById('driver-period-check-badge').textContent = `Checking Full ${days}-Day Period (${sDate} → ${eDate})`;
+
+      renderVehicleRosterForPeriod(days, sDate, eDate);
+      renderDriverRosterForPeriod(days, sDate, eDate);
+    }
+
+    function renderVehicleRosterForPeriod(days, sDate, eDate) {
+      const tbody = document.getElementById('vehicle-roster-tbody');
+      tbody.innerHTML = `
+        <tr style="background: var(--navy-50);">
+          <td><input type="radio" checked name="vsel" value="V-122" style="accent-color:var(--navy-800);"></td>
+          <td><span style="font-family:var(--font-mono); font-weight:700;">V-122</span></td>
+          <td><strong>Hyundai H-1 2023</strong></td>
+          <td>9 pax / 1,000 kg</td>
+          <td><span class="badge badge-success">Available for Full ${days}-Day Window</span></td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="vsel" value="V-130" style="accent-color:var(--navy-800);"></td>
+          <td><span style="font-family:var(--font-mono); font-weight:700;">V-130</span></td>
+          <td><strong>Toyota HiAce 2020</strong></td>
+          <td>12 pax / 1,200 kg</td>
+          <td><span class="badge badge-success">Available for Full ${days}-Day Window</span></td>
+        </tr>
+        <tr style="opacity: 0.6;">
+          <td><input type="radio" disabled name="vsel" value="V-114"></td>
+          <td><span style="font-family:var(--font-mono);">V-114</span></td>
+          <td>Toyota HiAce 2022</td>
+          <td>9 pax / 1,100 kg</td>
+          <td><span class="badge badge-danger">Unavailable · Booked Oct 19–20</span></td>
+        </tr>
+        <tr style="opacity: 0.6;">
+          <td><input type="radio" disabled name="vsel" value="V-108"></td>
+          <td><span style="font-family:var(--font-mono);">V-108</span></td>
+          <td>Nissan Urvan 2019</td>
+          <td>12 pax / 1,000 kg</td>
+          <td><span class="badge badge-warning">Maintenance Lockout (Brake pads)</span></td>
+        </tr>
+      `;
+    }
+
+    function renderDriverRosterForPeriod(days, sDate, eDate) {
+      const tbody = document.getElementById('driver-roster-tbody');
+      tbody.innerHTML = `
+        <tr style="background: var(--navy-50);">
+          <td><input type="radio" checked name="dsel" value="Ahmed Hassan (Driver A)" style="accent-color:var(--navy-800);"></td>
+          <td><strong>Ahmed Hassan (Driver A)</strong></td>
+          <td>Class 2 (Professional)</td>
+          <td><span style="font-family:var(--font-mono);">Free for Full ${days} Days</span></td>
+          <td><span class="badge badge-success">Eligible · Multi-Day Certified</span></td>
+        </tr>
+        <tr style="opacity: 0.6;">
+          <td><input type="radio" disabled name="dsel" value="Mostafa Kamel (Driver B)"></td>
+          <td>Mostafa Kamel (Driver B)</td>
+          <td>Class 2 (Professional)</td>
+          <td><span style="font-family:var(--font-mono); color:var(--danger);">Assigned Oct 19–21</span></td>
+          <td><span class="badge badge-danger">Conflict during trip period</span></td>
+        </tr>
+        <tr style="opacity: 0.6;">
+          <td><input type="radio" disabled name="dsel" value="Sherif Fathy (Driver D)"></td>
+          <td>Sherif Fathy (Driver D)</td>
+          <td>Class 2 · License Expired</td>
+          <td>—</td>
+          <td><span class="badge badge-danger">Expired License</span></td>
+        </tr>
+      `;
     }
 
     function handleApproveBooking() {
       const selectedV = document.querySelector('input[name="vsel"]:checked');
       let vehicleCode = 'V-122';
       let vehicleModel = 'Hyundai H-1 (V-122)';
-      if (selectedV && selectedV.closest('tr')) {
+      if (selectedV) {
+        vehicleCode = selectedV.value;
         const row = selectedV.closest('tr');
-        const codeEl = row.querySelector('span[style*="font-mono"]');
-        if (codeEl) vehicleCode = codeEl.textContent.trim();
-        const modelEl = row.querySelector('strong');
+        const modelEl = row ? row.querySelector('strong') : null;
         if (modelEl) vehicleModel = `${modelEl.textContent.trim()} (${vehicleCode})`;
       }
 
       const selectedD = document.querySelector('input[name="dsel"]:checked');
-      let driverName = 'Ahmed Hassan (Driver A)';
-      if (selectedD && selectedD.closest('tr')) {
-        const dRow = selectedD.closest('tr');
-        const nameEl = dRow.querySelector('strong');
-        if (nameEl) driverName = nameEl.textContent.trim();
-      }
+      let driverName = selectedD ? selectedD.value : 'Ahmed Hassan (Driver A)';
 
       const approved = FleetStore.approveBooking(activeBookingId, vehicleCode, driverName, vehicleModel);
       const box = document.getElementById('dispatch-actions-box');
@@ -324,25 +450,16 @@
         box.innerHTML = `
           <div class="alert-banner alert-success" style="flex: 1; margin: 0; display:flex; align-items:center;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-inline-end:8px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-            <span><strong>Booking (${approved ? approved.id : activeBookingId}) approved and dispatched successfully!</strong> Assigned vehicle (${vehicleModel}) and driver (${driverName}). The assignment is now visible in the requester's portal.</span>
+            <span><strong>Multi-day booking (${approved ? approved.id : activeBookingId}) approved and dispatched!</strong> Assigned vehicle (${vehicleModel}) and certified driver (${driverName}) across the whole period (${approved ? approved.startDate : '18 Oct'} → ${approved ? approved.endDate : '22 Oct'}).</span>
           </div>
           <div style="display:flex; gap:10px;">
             <a href="bookings.html" class="btn btn-secondary">View Bookings</a>
             <a href="driver-trip.html" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px;">
-              <span>Go to Driver View (Stage 3)</span>
+              <span>Go to Driver Trip Manifest</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
           </div>
         `;
-      }
-    }
-
-    function initQueue() {
-      const bookings = FleetStore.getBookings();
-      const pending = bookings.filter(b => b.status === 'Pending' || b.status === 'Dispatched');
-      if (pending.length > 0) {
-        activeBookingId = pending[0].id;
-        selectQueueItem(pending[0].id);
       }
     }
 

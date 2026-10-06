@@ -3,10 +3,58 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vehicle Schedule & Gantt Timeline — CIRA Education Fleet Platform</title>
+  <title>Vehicle Timeline &amp; Gantt Schedule — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/auth.js"></script>
+  <style>
+    .timeline-view-toggle {
+      display: inline-flex;
+      background: var(--bg-page);
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      gap: 4px;
+    }
+    .timeline-toggle-btn {
+      border: none;
+      background: transparent;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .timeline-toggle-btn.active {
+      background: var(--navy-800);
+      color: #FFFFFF;
+    }
+    .week-header-days {
+      display: grid;
+      grid-template-columns: 200px repeat(7, 1fr);
+      background: var(--navy-50);
+      border-bottom: 2px solid var(--border);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--navy-800);
+      text-align: center;
+      padding: 10px 0;
+    }
+    .week-timeline-row {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      border-bottom: 1px solid var(--border);
+      min-height: 52px;
+    }
+    .week-timeline-track {
+      position: relative;
+      background: repeating-linear-gradient(to right, transparent, transparent calc(100% / 7 - 1px), var(--border) calc(100% / 7 - 1px), var(--border) calc(100% / 7));
+      height: 100%;
+      min-height: 52px;
+    }
+  </style>
 </head>
 <body>
 
@@ -21,24 +69,22 @@
         </span>
       </a>
 
-      <!-- Authenticated Controls -->
       <div class="header-actions">
         <div class="search-wrapper">
           <span class="search-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
           </span>
           <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
         </div>
 
         <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
           <span class="badge-counter">3</span>
         </a>
 
-        <!-- User Dropdown Menu -->
         <div class="user-menu-wrapper">
           <button type="button" class="user-btn">
-            <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
+            <span class="user-avatar" style="background:var(--navy-600); color:#FFF;">TE</span>
             <span class="user-info">
               <span class="user-name">Loading...</span>
               <span class="user-role-badge">Authenticating</span>
@@ -62,106 +108,269 @@
 
     <main class="main-content" role="main">
       <div class="page-header">
-  <div class="page-title-group">
-    <span class="page-pretitle">Daily Operations Schedule</span>
-    <h1 class="page-title">Vehicle Timeline &amp; Gantt Schedule</h1>
-    <span class="page-subtitle">Track trips, cleaning buffers, maintenance lockouts, and clash detection</span>
-  </div>
-  <div style="display: flex; gap: 8px;">
-    <a href="dispatch-queue.html" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <span>Approval Queue</span>
-    </a>
-    <a href="dispatch-map.html" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-      <span>Live Map</span>
-    </a>
-  </div>
-</div>
+        <div class="page-title-group">
+          <span class="page-pretitle">Daily &amp; Multi-Day Operations Schedule</span>
+          <h1 class="page-title">Vehicle Timeline &amp; Gantt Schedule</h1>
+          <span class="page-subtitle" id="timeline-subtitle-text">Multi-day missions span several days · Track cleaning buffers, maintenance, and clash detection</span>
+        </div>
+        
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <!-- Day vs Week View Toggle -->
+          <div class="timeline-view-toggle">
+            <button type="button" class="timeline-toggle-btn active" id="btn-view-week" onclick="switchTimelineView('week');">Week View (Multi-Day)</button>
+            <button type="button" class="timeline-toggle-btn" id="btn-view-day" onclick="switchTimelineView('day');">Day View (Hourly)</button>
+          </div>
 
-<div class="timeline-card" style="margin-top: 14px;">
-  <div class="timeline-header-hours">
-    <div style="text-align: left; padding-left: 8px;">Vehicle Asset</div>
-    <div>06:00</div><div>07:00</div><div>08:00</div><div>09:00</div><div>10:00</div><div>11:00</div>
-    <div>12:00</div><div>13:00</div><div>14:00</div><div>15:00</div><div>16:00</div><div>17:00</div><div>18:00</div>
+          <div style="display: flex; gap: 8px;">
+            <a href="dispatch-queue.html" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <span>Approval Queue</span>
+            </a>
+            <a href="dispatch-map.html" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+              <span>Live Map</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Week View Container (Multi-Day Spans) -->
+      <div id="week-view-container" class="timeline-card" style="margin-top: 14px;">
+        <div class="week-header-days">
+          <div style="text-align: left; padding-left: 14px;">Vehicle Asset</div>
+          <div>Sun 18 Oct</div>
+          <div>Mon 19 Oct</div>
+          <div>Tue 20 Oct</div>
+          <div>Wed 21 Oct</div>
+          <div>Thu 22 Oct</div>
+          <div>Fri 23 Oct</div>
+          <div>Sat 24 Oct</div>
+        </div>
+
+        <div style="display: flex; flex-direction: column;">
+          
+          <!-- V-122: Multi-Day Span 18-22 Oct -->
+          <div class="week-timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">V-122</span>
+              <span class="timeline-veh-sub">Hyundai H-1 (9-Seat Van)</span>
+            </div>
+            <div class="week-timeline-track">
+              <!-- Spans 5 days from Sun 18 to Thu 22: left 0%, width 71.4% (5 of 7 days) -->
+              <div class="timeline-block block-trip" style="left: 0.5%; width: 70.4%; background: var(--navy-800); border: 1px solid var(--gold-500); cursor:pointer;" onclick="showMultiDayTripModal('BK-2047');">
+                <div style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:0 8px;">
+                  <span><strong>BK-2047 (Multi-Day 5d):</strong> Assiut → Cairo → Badr City → Assiut (Driver Ahmed Hassan)</span>
+                  <span class="badge badge-gold" style="font-size:10.5px;">18 Oct 08:00 → 22 Oct 18:45</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- V-114: Single day trips -->
+          <div class="week-timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">V-114</span>
+              <span class="timeline-veh-sub">Toyota HiAce (9-Seat Van)</span>
+            </div>
+            <div class="week-timeline-track">
+              <div class="timeline-block block-trip" style="left: 14.7%; width: 13.5%;" onclick="alert('BK-2048 Downtown Transit\n19 Oct 08:00–16:00');">
+                BK-2048 (19 Oct)
+              </div>
+              <div class="timeline-block block-trip" style="left: 29.0%; width: 13.5%;" onclick="alert('BK-2049 Airport Run\n20 Oct 06:00–14:00');">
+                BK-2049 (20 Oct)
+              </div>
+              <div class="timeline-block block-idle" style="left: 43.3%; width: 42.0%;" onclick="alert('Available at Campus Garage (21-23 Oct)');">
+                Standby / Available (21–23 Oct)
+              </div>
+            </div>
+          </div>
+
+          <!-- V-130: 2-day conference shuttle -->
+          <div class="week-timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">V-130</span>
+              <span class="timeline-veh-sub">Toyota HiAce (12-Seat Van)</span>
+            </div>
+            <div class="week-timeline-track">
+              <div class="timeline-block block-trip" style="left: 14.7%; width: 27.8%;" onclick="alert('BK-2053 Conference Shuttle (2 Days: 19–20 Oct)\nDriver Mostafa Kamel');">
+                BK-2053 Conference Shuttle (19–20 Oct · 2 Days)
+              </div>
+              <div class="timeline-block block-idle" style="left: 43.0%; width: 56.0%;" onclick="alert('Available at Depot (21–24 Oct)');">
+                Standby at Depot
+              </div>
+            </div>
+          </div>
+
+          <!-- S-11: Executive sedan -->
+          <div class="week-timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">S-11</span>
+              <span class="timeline-veh-sub">Hyundai Elantra (Executive Sedan)</span>
+            </div>
+            <div class="week-timeline-track">
+              <div class="timeline-block block-trip" style="left: 29.0%; width: 13.5%;" onclick="alert('BK-2050 Dean Travel\n20 Oct 09:30–13:30');">
+                BK-2050 (20 Oct)
+              </div>
+              <div class="timeline-block block-idle" style="left: 43.0%; width: 56.0%;" onclick="alert('Available at Campus');">
+                Available on Campus
+              </div>
+            </div>
+          </div>
+
+          <!-- V-205: Sedan -->
+          <div class="week-timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">V-205</span>
+              <span class="timeline-veh-sub">Toyota Corolla (Sedan)</span>
+            </div>
+            <div class="week-timeline-track">
+              <div class="timeline-block block-trip" style="left: 0.5%; width: 13.5%;" onclick="alert('BK-2045 Airport Guest Reception\n18 Oct 05:00–12:00');">
+                BK-2045 (18 Oct)
+              </div>
+              <div class="timeline-block block-trip" style="left: 43.3%; width: 13.5%;" onclick="alert('University Board Transit\n21 Oct 11:00–16:00');">
+                Board Transit (21 Oct)
+              </div>
+            </div>
+          </div>
+
+          <!-- B-07: Bus -->
+          <div class="week-timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">B-07</span>
+              <span class="timeline-veh-sub">MCV 500 (45-Seat Bus)</span>
+            </div>
+            <div class="week-timeline-track">
+              <div class="timeline-block block-trip" style="left: 43.3%; width: 13.5%;" onclick="alert('BK-2051 Ain Sokhna Marine Research Excursion\n21 Oct Full Day (22 pax)');">
+                BK-2051 Marine Excursion (21 Oct)
+              </div>
+              <div class="timeline-block block-idle" style="left: 0.5%; width: 42.0%;" onclick="alert('Bus Depot Standby');">
+                Standby Pool
+              </div>
+            </div>
+          </div>
+
+          <!-- V-108: Maintenance Lockout Whole Week -->
+          <div class="week-timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">V-108</span>
+              <span class="timeline-veh-sub">Nissan Urvan (Van)</span>
+            </div>
+            <div class="week-timeline-track">
+              <div class="timeline-block block-lockout" style="left: 0.5%; width: 99.0%;" onclick="alert('Scheduled Preventive Maintenance (Brakes & Clutch)\nFull Week Service Lockout at Obour Central Workshop');">
+                SCHEDULED PREVENTIVE MAINTENANCE LOCKOUT (FULL WEEK)
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Day View Container (Hourly Schedule) -->
+      <div id="day-view-container" class="timeline-card" style="margin-top: 14px; display: none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; background: var(--bg-page); border-bottom: 1px solid var(--border);">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-weight:700; color:var(--navy-800); font-size:14px;">Select Schedule Date:</span>
+            <input type="date" id="day-view-picker" value="2026-10-18" class="form-input" style="width: auto; padding: 4px 10px; font-size: 13px;" onchange="renderDaySchedule();">
+          </div>
+          <span class="badge badge-info" id="day-view-date-label">Showing Sunday, 18 Oct 2026</span>
+        </div>
+
+        <div class="timeline-header-hours">
+          <div style="text-align: left; padding-left: 8px;">Vehicle Asset</div>
+          <div>06:00</div><div>07:00</div><div>08:00</div><div>09:00</div><div>10:00</div><div>11:00</div>
+          <div>12:00</div><div>13:00</div><div>14:00</div><div>15:00</div><div>16:00</div><div>17:00</div><div>18:00</div>
+        </div>
+
+        <div style="display: flex; flex-direction: column;">
+          <div class="timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">V-122</span>
+              <span class="timeline-veh-sub">Hyundai H-1 (9-Seat Van)</span>
+            </div>
+            <div class="timeline-track">
+              <div class="timeline-block block-buffer" style="left: 14.58%; width: 6.25%;" title="Pre-Trip Inspection Buffer (07:45–08:30 Prep)">07:45–08:30 Prep</div>
+              <div class="timeline-block block-trip" style="left: 20.83%; width: 79.0%; background: var(--navy-800); border: 1px solid var(--gold-500);" onclick="showMultiDayTripModal('BK-2047');">
+                BK-2047 (Multi-Day Mission Day 1: Assiut → Cairo University · Dep 08:00)
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">V-114</span>
+              <span class="timeline-veh-sub">Toyota HiAce (9-Seat Van)</span>
+            </div>
+            <div class="timeline-track">
+              <div class="timeline-block block-trip" style="left: 0.0%; width: 20.83%;" title="BK-2041 Airport Run (06:00–08:30 Trip)">06:00–08:30 Trip</div>
+              <div class="timeline-block block-buffer" style="left: 20.83%; width: 6.25%;">08:30–09:15 Buffer</div>
+              <div class="timeline-block block-trip" style="left: 33.33%; width: 33.33%;">10:00–14:00 Trip</div>
+              <div class="timeline-block block-buffer" style="left: 66.66%; width: 6.25%;">Buffer</div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">V-130</span>
+              <span class="timeline-veh-sub">Toyota HiAce (12-Seat Van)</span>
+            </div>
+            <div class="timeline-track">
+              <div class="timeline-block block-trip" style="left: 8.33%; width: 16.66%;">07:00–09:00 Shuttle</div>
+              <div class="timeline-block block-idle" style="left: 25.0%; width: 70.0%;">Standby / Free at Depot</div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">S-11</span>
+              <span class="timeline-veh-sub">Hyundai Elantra (Executive Sedan)</span>
+            </div>
+            <div class="timeline-track">
+              <div class="timeline-block block-idle" style="left: 0.0%; width: 100.0%;">Available at Campus Gate 1</div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-veh-label">
+              <span class="timeline-veh-code">V-108</span>
+              <span class="timeline-veh-sub">Nissan Urvan (Van)</span>
+            </div>
+            <div class="timeline-track">
+              <div class="timeline-block block-lockout" style="left: 0.0%; width: 100.0%;">MAINTENANCE LOCKOUT</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
   </div>
-  <div style="display: flex; flex-direction: column;">
-    <div class="timeline-row">
-      <div class="timeline-veh-label">
-        <span class="timeline-veh-code">V-114</span>
-        <span class="timeline-veh-sub">Toyota HiAce (9-Seat Van)</span>
+
+  <!-- Multi-Day Trip Modal -->
+  <div id="multi-day-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #FFFFFF; border-radius: 12px; max-width: 580px; width: 100%; padding: 24px; box-shadow: var(--shadow-xl); position: relative;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">
+        <div>
+          <span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);" id="md-modal-pretitle">BK-2047 · Multi-Day Mission</span>
+          <h3 style="margin: 4px 0 0; color: var(--navy-800); font-size: 18px;" id="md-modal-title">Assiut → Cairo → Badr City → Assiut</h3>
+        </div>
+        <button type="button" onclick="document.getElementById('multi-day-modal').style.display='none';" style="background:none; border:none; cursor:pointer; color:var(--text-muted); padding:4px;" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
-      <div class="timeline-track">
-        <div class="timeline-block block-trip" style="left: 0.0%; width: 20.833333333333336%;" title="BK-2041 Airport Run (06:00–08:30 Trip)" onclick="alert('BK-2041 Airport Run\n06:00–08:30 Trip');">06:00–08:30 Trip</div><div class="timeline-block block-buffer" style="left: 20.833333333333336%; width: 6.25%;" title="Cleaning & Fuel Buffer (08:30–09:15 Buffer)" onclick="alert('Cleaning & Fuel Buffer\n08:30–09:15 Buffer');">08:30–09:15 Buffer</div><div class="timeline-block block-clash" style="left: 20.833333333333336%; width: 6.25%;" title="BK-2047 Clash (Overlap 45m) (CLASH 45m)" onclick="alert('BK-2047 Clash (Overlap 45m)\nCLASH 45m');">CLASH 45m</div><div class="timeline-block block-trip" style="left: 33.33333333333333%; width: 33.33333333333333%;" title="BK-2048 Downtown Transit (10:00–14:00 Trip)" onclick="alert('BK-2048 Downtown Transit\n10:00–14:00 Trip');">10:00–14:00 Trip</div><div class="timeline-block block-buffer" style="left: 66.66666666666666%; width: 6.25%;" title="Return Buffer (Buffer)" onclick="alert('Return Buffer\nBuffer');">Buffer</div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; line-height: 1.6;">
+        <div style="display: flex; justify-content: space-between;"><span>Assigned Vehicle:</span><strong id="md-modal-vehicle">Hyundai H-1 (V-122)</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Assigned Driver:</span><strong id="md-modal-driver">Ahmed Hassan (Driver A)</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Total Distance:</span><strong id="md-modal-km">865.0 km (est.)</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Mission Period:</span><strong id="md-modal-dates">18 Oct → 22 Oct 2026 (5 days)</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Hold Window:</span><strong id="md-modal-hold" style="font-family:var(--font-mono); color:var(--navy-800);">18 Oct 08:00 → 22 Oct 18:45</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Driver Lodging:</span><strong id="md-modal-lodging">BUC Faculty Guesthouse (4 nights)</strong></div>
       </div>
-    </div><div class="timeline-row">
-      <div class="timeline-veh-label">
-        <span class="timeline-veh-code">V-122</span>
-        <span class="timeline-veh-sub">Hyundai H-1 (9-Seat Van)</span>
-      </div>
-      <div class="timeline-track">
-        <div class="timeline-block block-buffer" style="left: 14.583333333333334%; width: 6.25%;" title="Pre-Trip Inspection Buffer (07:45–08:30 Prep)" onclick="alert('Pre-Trip Inspection Buffer\n07:45–08:30 Prep');">07:45–08:30 Prep</div><div class="timeline-block block-trip" style="left: 20.833333333333336%; width: 45.83333333333333%;" title="BK-2047 Pharmacy Run (08:30–14:00 Active)" onclick="alert('BK-2047 Pharmacy Run\n08:30–14:00 Active');">08:30–14:00 Active</div><div class="timeline-block block-buffer" style="left: 66.66666666666666%; width: 8.333333333333332%;" title="Post-Trip Buffer (14:00–15:00 Buffer)" onclick="alert('Post-Trip Buffer\n14:00–15:00 Buffer');">14:00–15:00 Buffer</div>
-      </div>
-    </div><div class="timeline-row">
-      <div class="timeline-veh-label">
-        <span class="timeline-veh-code">V-130</span>
-        <span class="timeline-veh-sub">Toyota HiAce (12-Seat Van)</span>
-      </div>
-      <div class="timeline-track">
-        <div class="timeline-block block-trip" style="left: 8.333333333333332%; width: 16.666666666666664%;" title="Staff Shuttle Routine (07:00–09:00 Shuttle)" onclick="alert('Staff Shuttle Routine\n07:00–09:00 Shuttle');">07:00–09:00 Shuttle</div><div class="timeline-block block-idle" style="left: 25.0%; width: 50.0%;" title="Available at Depot (Standby / Free)" onclick="alert('Available at Depot\nStandby / Free');">Standby / Free</div>
-      </div>
-    </div><div class="timeline-row">
-      <div class="timeline-veh-label">
-        <span class="timeline-veh-code">S-11</span>
-        <span class="timeline-veh-sub">Hyundai Elantra (Executive Sedan)</span>
-      </div>
-      <div class="timeline-track">
-        <div class="timeline-block block-trip" style="left: 29.166666666666668%; width: 33.33333333333333%;" title="BK-2050 Dean Travel (09:30–13:30 Trip)" onclick="alert('BK-2050 Dean Travel\n09:30–13:30 Trip');">09:30–13:30 Trip</div><div class="timeline-block block-buffer" style="left: 62.5%; width: 6.25%;" title="Return Buffer (Buffer)" onclick="alert('Return Buffer\nBuffer');">Buffer</div>
-      </div>
-    </div><div class="timeline-row">
-      <div class="timeline-veh-label">
-        <span class="timeline-veh-code">V-205</span>
-        <span class="timeline-veh-sub">Toyota Corolla (Sedan)</span>
-      </div>
-      <div class="timeline-track">
-        <div class="timeline-block block-trip" style="left: -8.333333333333332%; width: 25.0%;" title="BK-2049 Airport Guest Reception (05:00–08:00 Trip)" onclick="alert('BK-2049 Airport Guest Reception\n05:00–08:00 Trip');">05:00–08:00 Trip</div><div class="timeline-block block-buffer" style="left: 16.666666666666664%; width: 6.25%;" title="Buffer (Buffer)" onclick="alert('Buffer\nBuffer');">Buffer</div><div class="timeline-block block-trip" style="left: 41.66666666666667%; width: 41.66666666666667%;" title="University Board Transit (11:00–16:00 Trip)" onclick="alert('University Board Transit\n11:00–16:00 Trip');">11:00–16:00 Trip</div>
-      </div>
-    </div><div class="timeline-row">
-      <div class="timeline-veh-label">
-        <span class="timeline-veh-code">C-04</span>
-        <span class="timeline-veh-sub">Hyundai Accent (CNG Eco Sedan)</span>
-      </div>
-      <div class="timeline-track">
-        <div class="timeline-block block-trip" style="left: 16.666666666666664%; width: 25.0%;" title="Inter-Campus Mail Run (08:00–11:00 Mail Run)" onclick="alert('Inter-Campus Mail Run\n08:00–11:00 Mail Run');">08:00–11:00 Mail Run</div><div class="timeline-block block-idle" style="left: 41.66666666666667%; width: 50.0%;" title="Standby on Campus (Available)" onclick="alert('Standby on Campus\nAvailable');">Available</div>
-      </div>
-    </div><div class="timeline-row">
-      <div class="timeline-veh-label">
-        <span class="timeline-veh-code">B-07</span>
-        <span class="timeline-veh-sub">MCV 500 (45-Seat Bus)</span>
-      </div>
-      <div class="timeline-track">
-        <div class="timeline-block block-trip" style="left: 4.166666666666666%; width: 16.666666666666664%;" title="Morning Faculty Route #4 (06:30–08:30 Route)" onclick="alert('Morning Faculty Route #4\n06:30–08:30 Route');">06:30–08:30 Route</div><div class="timeline-block block-idle" style="left: 20.833333333333336%; width: 58.333333333333336%;" title="Bus Depot Standby (Standby)" onclick="alert('Bus Depot Standby\nStandby');">Standby</div><div class="timeline-block block-trip" style="left: 79.16666666666666%; width: 16.666666666666664%;" title="Evening Return Route #4 (15:30–17:30 Route)" onclick="alert('Evening Return Route #4\n15:30–17:30 Route');">15:30–17:30 Route</div>
-      </div>
-    </div><div class="timeline-row">
-      <div class="timeline-veh-label">
-        <span class="timeline-veh-code">T-02</span>
-        <span class="timeline-veh-sub">Isuzu NPR Box Truck (4.5t Cargo)</span>
-      </div>
-      <div class="timeline-track">
-        <div class="timeline-block block-trip" style="left: 16.666666666666664%; width: 33.33333333333333%;" title="Lab Chemical Supplies Transfer (08:00–12:00 Cargo)" onclick="alert('Lab Chemical Supplies Transfer\n08:00–12:00 Cargo');">08:00–12:00 Cargo</div><div class="timeline-block block-buffer" style="left: 50.0%; width: 8.333333333333332%;" title="Unloading & Wash (Buffer)" onclick="alert('Unloading & Wash\nBuffer');">Buffer</div>
-      </div>
-    </div><div class="timeline-row">
-      <div class="timeline-veh-label">
-        <span class="timeline-veh-code">V-108</span>
-        <span class="timeline-veh-sub">Nissan Urvan (Van)</span>
-      </div>
-      <div class="timeline-track">
-        <div class="timeline-block block-lockout" style="left: 0.0%; width: 100.0%;" title="Scheduled Preventive Maintenance (Brakes & Clutch) (MAINTENANCE LOCKOUT)" onclick="alert('Scheduled Preventive Maintenance (Brakes & Clutch)\nMAINTENANCE LOCKOUT');">MAINTENANCE LOCKOUT</div>
+
+      <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); padding-top: 14px;">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('multi-day-modal').style.display='none';">Close</button>
+        <a href="booking-detail.html?id=BK-2047" class="btn btn-primary" id="md-modal-detail-link">Open Booking Details</a>
       </div>
     </div>
-  </div>
-</div>
-    </main>
   </div>
 
   <!-- Master Footer -->
@@ -210,12 +419,61 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
+    let currentView = 'week';
+
+    function switchTimelineView(view) {
+      currentView = view;
+      const btnWeek = document.getElementById('btn-view-week');
+      const btnDay = document.getElementById('btn-view-day');
+      const weekContainer = document.getElementById('week-view-container');
+      const dayContainer = document.getElementById('day-view-container');
+      const subtitle = document.getElementById('timeline-subtitle-text');
+
+      if (view === 'week') {
+        btnWeek.className = 'timeline-toggle-btn active';
+        btnDay.className = 'timeline-toggle-btn';
+        weekContainer.style.display = 'block';
+        dayContainer.style.display = 'none';
+        subtitle.textContent = 'Multi-day missions span several days · Track cleaning buffers, maintenance, and clash detection across the week';
+      } else {
+        btnWeek.className = 'timeline-toggle-btn';
+        btnDay.className = 'timeline-toggle-btn active';
+        weekContainer.style.display = 'none';
+        dayContainer.style.display = 'block';
+        subtitle.textContent = 'Hourly vehicle utilization and turnaround buffer inspection for selected date';
+        renderDaySchedule();
+      }
+    }
+
+    function renderDaySchedule() {
+      const picker = document.getElementById('day-view-picker');
+      const val = picker.value || '2026-10-18';
+      const label = document.getElementById('day-view-date-label');
+      label.textContent = `Schedule for ${val}`;
+    }
+
+    function showMultiDayTripModal(id) {
+      const booking = FleetStore.getBooking(id);
+      if (booking) {
+        document.getElementById('md-modal-pretitle').textContent = `${booking.id} · Multi-Day Mission`;
+        document.getElementById('md-modal-title').textContent = booking.route;
+        document.getElementById('md-modal-vehicle').textContent = booking.vehicle || 'Hyundai H-1 (V-122)';
+        document.getElementById('md-modal-driver').textContent = booking.driver || 'Ahmed Hassan';
+        document.getElementById('md-modal-km').textContent = `${(booking.distanceKm || 865.0).toFixed(1)} km (est.)`;
+        document.getElementById('md-modal-dates').textContent = `${booking.startDate || '18 Oct'} → ${booking.endDate || '22 Oct 2026'} (${booking.daysCount || 5} days)`;
+        document.getElementById('md-modal-hold').textContent = booking.hold_window ? `${booking.hold_window.start} → ${booking.hold_window.end}` : '18 Oct 08:00 → 22 Oct 18:45';
+        document.getElementById('md-modal-lodging').textContent = `${booking.driver_overnight_location || 'Campus Guesthouse'} (${(booking.daysCount || 5) - 1} nights)`;
+        document.getElementById('md-modal-detail-link').href = `booking-detail.html?id=${booking.id}`;
+      }
+      document.getElementById('multi-day-modal').style.display = 'flex';
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Dispatcher"])) return;
       Auth.renderAppShell('timeline');
-      
     });
   </script>
 </body>

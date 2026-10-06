@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Active Trip Manifest & Roll Call — CIRA Education Fleet Platform</title>
+  <title>Stop-by-Stop Waypoints — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/auth.js"></script>
@@ -21,24 +21,22 @@
         </span>
       </a>
 
-      <!-- Authenticated Controls -->
       <div class="header-actions">
         <div class="search-wrapper">
           <span class="search-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
           </span>
           <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
         </div>
 
         <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
-          <span class="badge-counter">3</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <span class="badge-counter">2</span>
         </a>
 
-        <!-- User Dropdown Menu -->
         <div class="user-menu-wrapper">
           <button type="button" class="user-btn">
-            <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
+            <span class="user-avatar" style="background:var(--cira-gold); color:var(--navy-800);">AH</span>
             <span class="user-info">
               <span class="user-name">Loading...</span>
               <span class="user-role-badge">Authenticating</span>
@@ -62,90 +60,32 @@
 
     <main class="main-content" role="main">
       <div class="page-header">
-  <div class="page-title-group">
-    <span class="page-pretitle">BK-2047 · Active Manifest</span>
-    <h1 class="page-title">Stop-by-Stop Waypoints</h1>
-    <span class="page-subtitle">V-122 (Hyundai H-1) · Lead: Dr. Sarah Mansour (+20 10 2233 4455)</span>
-  </div>
-  <a href="driver-run.html" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px;">
-    <span>Open Live Navigation &amp; Run</span>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-  </a>
-</div>
+        <div class="page-title-group">
+          <span class="page-pretitle" id="trip-header-pretitle">BK-2047 · Active Manifest</span>
+          <h1 class="page-title">Stop-by-Stop Waypoints</h1>
+          <span class="page-subtitle" id="trip-header-subtitle">V-122 (Hyundai H-1) · Lead: Dr. Sarah Mansour (+20 10 2233 4455)</span>
+        </div>
+        <a href="driver-run.html" class="btn btn-gold" id="btn-start-run" style="display:inline-flex; align-items:center; gap:6px;">
+          <span>Open Live Navigation &amp; Run</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        </a>
+      </div>
 
-<div class="card">
-  <div style="display: flex; flex-direction: column; gap: 16px;">
-    <div style="border: 1px solid var(--border); border-radius: 10px; padding: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; background: #FFFFFF;">
-        <div style="display: flex; gap: 14px; align-items: center;">
-          <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--success); color: #FFFFFF; display: flex; align-items: center; justify-content: center;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div style="font-weight: 700; color: var(--navy-800); font-size: 15px; display:flex; align-items:center; gap:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span>Live Mission Route Waypoints</span>
           </div>
-          <div>
-            <h3 style="margin: 0; font-size: 17px; color: var(--navy-800);">Badr University Main Campus · Gate 2</h3>
-            <div style="font-size: 13px; color: var(--text-muted);">Boarding 4 passengers and loading 2 equipment crates.</div>
-            <div style="font-size: 12px; color: var(--navy-600); margin-top: 2px; display:flex; align-items:center; gap:4px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              <span>Campus Security Desk · Ext. 101</span>
-            </div>
+          <div id="trip-summary-pill" class="badge badge-info" style="font-size: 12.5px;">
+            Loading Waypoints...
           </div>
         </div>
-        <div>
-          <span class="badge badge-success">Completed</span>
-        </div>
-      </div><div style="border: 1px solid var(--border); border-radius: 10px; padding: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; background: #FFFFFF;">
-        <div style="display: flex; gap: 14px; align-items: center;">
-          <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--success); color: #FFFFFF; display: flex; align-items: center; justify-content: center;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div>
-            <h3 style="margin: 0; font-size: 17px; color: var(--navy-800);">Supplier Depot · Obour City Industrial Zone</h3>
-            <div style="font-size: 13px; color: var(--text-muted);">Collected 350 kg lab reagent supplies and pallet straps.</div>
-            <div style="font-size: 12px; color: var(--navy-600); margin-top: 2px; display:flex; align-items:center; gap:4px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              <span>Depot Warehouse Manager · +20 12 3344 5566</span>
-            </div>
-          </div>
-        </div>
-        <div>
-          <span class="badge badge-success">Completed</span>
-        </div>
-      </div><div style="border: 1px solid var(--border); border-radius: 10px; padding: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; background: var(--navy-50);">
-        <div style="display: flex; gap: 14px; align-items: center;">
-          <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--gold-500); color: var(--navy-800); display: flex; align-items: center; justify-content: center; font-weight: 700;">
-            3
-          </div>
-          <div>
-            <h3 style="margin: 0; font-size: 17px; color: var(--navy-800);">Plant 3 Industrial Facility · 10th of Ramadan City</h3>
-            <div style="font-size: 13px; color: var(--text-muted);">Unload cargo at Bay 4; escort faculty delegates to main conference hall.</div>
-            <div style="font-size: 12px; color: var(--navy-600); margin-top: 2px; display:flex; align-items:center; gap:4px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              <span>Plant 3 Receiving Bureau · +20 11 9988 7766</span>
-            </div>
-          </div>
-        </div>
-        <div>
-          <button class="btn btn-primary btn-sm" onclick="this.className='badge badge-success'; this.textContent='Arrived'; alert('Arrival registered');">Mark Arrived</button>
-        </div>
-      </div><div style="border: 1px solid var(--border); border-radius: 10px; padding: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; background: #FFFFFF;">
-        <div style="display: flex; gap: 14px; align-items: center;">
-          <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--border); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700;">
-            4
-          </div>
-          <div>
-            <h3 style="margin: 0; font-size: 17px; color: var(--navy-800);">Return to Badr University Main Campus Depot</h3>
-            <div style="font-size: 13px; color: var(--text-muted);">Disembark passengers, return cargo straps, complete closeout log.</div>
-            <div style="font-size: 12px; color: var(--navy-600); margin-top: 2px; display:flex; align-items:center; gap:4px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              <span>Fleet Services Gate 2</span>
-            </div>
-          </div>
-        </div>
-        <div>
-          <span class="badge badge-neutral">Scheduled</span>
+
+        <div id="driver-stops-list" style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Dynamically populated from booking.itinerary -->
         </div>
       </div>
-  </div>
-</div>
     </main>
   </div>
 
@@ -205,21 +145,126 @@
       window.location.href = 'driver-run.html';
     }
 
+    function renderDriverWaypoints(trip) {
+      const container = document.getElementById('driver-stops-list');
+      container.innerHTML = '';
+
+      const points = Array.isArray(trip.itinerary) && trip.itinerary.length >= 2
+        ? trip.itinerary
+        : [
+            { sequence: 1, type: 'departure', place_name: trip.origin || 'Main Campus', depart_at: `${trip.startDate || '2026-10-18'} 08:00`, notes: 'Departure base point', pinned: true },
+            { sequence: 2, type: 'stop', place_name: 'Cairo University', arrive_at: `${trip.startDate || '2026-10-18'} 14:30`, depart_at: `${trip.startDate || '2026-10-18'} 17:00`, notes: 'Faculty Meeting', pinned: true },
+            { sequence: 3, type: 'return', place_name: trip.destination || 'Assiut Campus', arrive_at: `${trip.endDate || '2026-10-22'} 18:00`, notes: 'Return vehicle', pinned: true }
+          ];
+
+      const sDate = trip.startDate || trip.start_date || '2026-10-18';
+      const eDate = trip.endDate || trip.end_date || '2026-10-22';
+      const days = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
+
+      document.getElementById('trip-summary-pill').textContent = `${points.length} Stops · ${days} Days (${sDate} → ${eDate})`;
+
+      points.forEach((point, idx) => {
+        const isDep = point.type === 'departure';
+        const isRet = point.type === 'return';
+
+        // Simulation state for waypoints
+        let status = 'Scheduled';
+        let statusClass = 'badge-neutral';
+        let cardBg = '#FFFFFF';
+        let iconHtml = '';
+
+        if (idx === 0) {
+          status = 'Departed';
+          statusClass = 'badge-success';
+          iconHtml = `<div style="width: 32px; height: 32px; border-radius: 50%; background: var(--success); color: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>`;
+        } else if (idx === 1) {
+          status = 'Completed';
+          statusClass = 'badge-success';
+          iconHtml = `<div style="width: 32px; height: 32px; border-radius: 50%; background: var(--success); color: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>`;
+        } else if (idx === 2) {
+          status = 'Current Stop';
+          statusClass = 'badge-warning';
+          cardBg = 'var(--navy-50)';
+          iconHtml = `<div style="width: 32px; height: 32px; border-radius: 50%; background: var(--gold-500); color: var(--navy-800); display: flex; align-items: center; justify-content: center; font-weight: 700;">${idx + 1}</div>`;
+        } else {
+          status = 'Scheduled';
+          statusClass = 'badge-neutral';
+          iconHtml = `<div style="width: 32px; height: 32px; border-radius: 50%; background: var(--border); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700;">${idx + 1}</div>`;
+        }
+
+        const timeStr = isDep ? `Leaves at: ${point.depart_at || ''}` : (isRet ? `Arrives back: ${point.arrive_at || ''}` : `Arrive: ${point.arrive_at || ''}${point.depart_at ? ` · Leave: ${point.depart_at}` : ''}`);
+
+        const row = document.createElement('div');
+        row.style.cssText = `border: 1px solid var(--border); border-radius: 10px; padding: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; background: ${cardBg};`;
+
+        row.innerHTML = `
+          <div style="display: flex; gap: 14px; align-items: center;">
+            ${iconHtml}
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <h3 style="margin: 0; font-size: 17px; color: var(--navy-800);">${escapeHtml(point.place_name || 'Waypoint')}</h3>
+                ${point.pinned ? `<span class="badge badge-success" style="font-size:10.5px;">Pinned</span>` : ''}
+              </div>
+              <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+                <strong>${timeStr}</strong>
+              </div>
+              ${point.notes ? `
+                <div style="font-size: 12.5px; color: var(--text-main); margin-top: 4px;">
+                  ${escapeHtml(point.notes)}
+                </div>
+              ` : ''}
+              <div style="font-size: 12px; color: var(--navy-600); margin-top: 4px; display:flex; align-items:center; gap:4px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span>Lead: ${escapeHtml(trip.requesterName || 'Dr. Sarah Mansour')} (${escapeHtml(trip.dept || 'Pharmacy')})</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            ${idx === 2 ? `
+              <button type="button" class="btn btn-primary btn-sm" onclick="this.className='badge badge-success'; this.textContent='Arrived'; alert('Arrival registered for waypoint #${idx + 1}');">Mark Arrived</button>
+            ` : `
+              <span class="badge ${statusClass}">${status}</span>
+            `}
+          </div>
+        `;
+
+        container.appendChild(row);
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[m];
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Driver"])) return;
       Auth.renderAppShell('trip');
 
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqTripId = urlParams.get('id');
       const bookings = FleetStore.getBookings();
-      const myTrip = bookings.find(b => b.status === 'Dispatched' || b.status === 'Active') || bookings[0];
+
+      const myTrip = (reqTripId ? FleetStore.getBooking(reqTripId) : null) ||
+                     bookings.find(b => b.status === 'Dispatched' || b.status === 'Active') ||
+                     bookings[0];
+
       if (myTrip) {
         currentTripId = myTrip.id;
-        const pretitle = document.querySelector('.page-pretitle');
-        if (pretitle) pretitle.textContent = `${myTrip.id} · Active Manifest (${myTrip.statusAr || myTrip.status})`;
-        const subtitle = document.querySelector('.page-subtitle');
-        if (subtitle) subtitle.textContent = `${myTrip.vehicleCode || 'V-122'} (${myTrip.vehicle || 'Hyundai H-1'}) · Lead: ${myTrip.requesterName} (${myTrip.dept})`;
+        document.getElementById('trip-header-pretitle').textContent = `${myTrip.id} · Active Manifest (${myTrip.status})`;
+        document.getElementById('trip-header-subtitle').textContent = `${myTrip.vehicleCode || 'V-122'} (${myTrip.vehicle || 'Hyundai H-1'}) · Lead: ${myTrip.requesterName || 'Dr. Sarah Mansour'} (${myTrip.dept || 'Pharmacy'})`;
+        renderDriverWaypoints(myTrip);
       }
 
-      const runBtn = document.querySelector('a[href="driver-run.html"]');
+      const runBtn = document.getElementById('btn-start-run');
       if (runBtn) {
         runBtn.removeAttribute('href');
         runBtn.style.cursor = 'pointer';
