@@ -67,7 +67,6 @@
   const NAV_LINKS = {
     'Requester': [
       { href: 'home.html', label: 'Home Dashboard', icon: 'home' },
-      { href: 'vehicles.html', label: 'Vehicle Catalog', icon: 'catalog' },
       { href: 'booking-new.html', label: 'New Booking', icon: 'booking-new' },
       { href: 'bookings.html', label: 'My Bookings', icon: 'bookings' },
       { href: 'booking-track.html', label: 'Track Active Trip', icon: 'track' },
@@ -76,6 +75,7 @@
     'Dispatcher': [
       { href: 'home.html', label: 'Operations Desk', icon: 'home' },
       { href: 'dispatch-queue.html', label: 'Approval Queue', icon: 'dispatch', badge: '4' },
+      { href: 'vehicles.html', label: 'Fleet Inventory', icon: 'catalog' },
       { href: 'dispatch-timeline.html', label: 'Vehicle Timeline', icon: 'timeline' },
       { href: 'dispatch-map.html', label: 'Telemetry Map Hub', icon: 'map' },
       { href: 'incident.html', label: 'Incident Triage', icon: 'incident', badge: '1' },
