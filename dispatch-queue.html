@@ -3,10 +3,298 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Approval Queue — CIRA Education Fleet Platform</title>
+  <title>Approval &amp; Vehicle Assignment Queue — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="js/auth.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <style>
+    .queue-layout {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      margin-top: 18px;
+    }
+    .queue-left-col {
+      flex: 0 0 380px;
+      width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .queue-right-col {
+      flex: 1 1 500px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    @media (max-width: 960px) {
+      .queue-layout {
+        flex-direction: column;
+      }
+      .queue-left-col {
+        width: 100%;
+        flex: 1 1 auto;
+      }
+      .queue-right-col {
+        width: 100%;
+      }
+    }
+    .queue-tab-btn {
+      flex: 1;
+      padding: 9px 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .queue-tab-btn:hover {
+      background: var(--navy-50);
+      color: var(--navy-800);
+    }
+    .queue-tab-btn.active {
+      background: var(--navy-800);
+      color: #FFFFFF;
+      border-color: var(--navy-800);
+    }
+    .queue-tab-count {
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.06);
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .queue-tab-btn.active .queue-tab-count {
+      background: rgba(255,255,255,0.25);
+      color: #FFFFFF;
+    }
+    .queue-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      position: relative;
+    }
+    .queue-card:hover {
+      border-color: var(--navy-400);
+      box-shadow: 0 3px 12px rgba(11, 37, 69, 0.08);
+      transform: translateY(-1px);
+    }
+    .queue-card.selected {
+      border: 2px solid var(--navy-800);
+      background: #F8FAFC;
+      box-shadow: 0 4px 14px rgba(11, 37, 69, 0.12);
+    }
+    .queue-card.selected::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 12px;
+      right: 12px;
+      height: 3px;
+      background: var(--cira-gold);
+      border-radius: 2px 2px 0 0;
+    }
+    .badge-amber-age {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FCD34D;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge-muted-age {
+      background: #F1F5F9;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chip-warning {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #FCA5A5;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chip-info {
+      background: #E0F2FE;
+      color: #0369A1;
+      border: 1px solid #BAE6FD;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .roster-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .roster-table th {
+      background: #F8FAFC;
+      color: var(--navy-800);
+      font-weight: 700;
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--border);
+      text-align: left;
+    }
+    .roster-table td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .roster-row-eligible {
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .roster-row-eligible:hover {
+      background: var(--navy-50);
+    }
+    .roster-row-selected {
+      background: #EFF6FF !important;
+    }
+    .roster-row-ineligible {
+      opacity: 0.65;
+      background: #FAFAFA;
+      cursor: not-allowed;
+    }
+    .decision-sticky-footer {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg-card);
+      border-top: 2px solid var(--navy-800);
+      padding: 16px 20px;
+      box-shadow: 0 -4px 18px rgba(0,0,0,0.08);
+      z-index: 100;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .btn-danger-outline {
+      border: 1.5px solid #EF4444;
+      color: #DC2626;
+      background: #FFFFFF;
+      font-weight: 600;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-danger-outline:hover {
+      background: #FEF2F2;
+      border-color: #DC2626;
+    }
+    .btn-warning-outline {
+      border: 1.5px solid #F59E0B;
+      color: #D97706;
+      background: #FFFFFF;
+      font-weight: 600;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-warning-outline:hover {
+      background: #FFFBEB;
+      border-color: #B45309;
+    }
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(11, 37, 69, 0.65);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-box {
+      background: #FFFFFF;
+      border-radius: var(--radius-md);
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.22);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      padding: 16px 20px;
+      background: var(--navy-800);
+      color: #FFFFFF;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .modal-footer {
+      padding: 14px 20px;
+      background: #F8FAFC;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .itinerary-map-container {
+      height: 290px;
+      width: 100%;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      position: relative;
+      background: #E5E7EB;
+    }
+  </style>
 </head>
 <body>
 
@@ -26,20 +314,20 @@
           <span class="search-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
           </span>
-          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
+          <input type="search" class="search-input" id="top-global-search" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
         </div>
 
         <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
-          <span class="badge-counter">3</span>
+          <span class="badge-counter" id="top-notif-counter">3</span>
         </a>
 
         <div class="user-menu-wrapper">
           <button type="button" class="user-btn">
-            <span class="user-avatar" style="background:var(--navy-600); color:#FFF;">TE</span>
+            <span class="user-avatar" style="background:var(--navy-600); color:#FFF;">KI</span>
             <span class="user-info">
               <span class="user-name">Loading...</span>
-              <span class="user-role-badge">Authenticating</span>
+              <span class="user-role-badge">Dispatcher</span>
             </span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
           </button>
@@ -59,219 +347,74 @@
     </aside>
 
     <main class="main-content" role="main">
-      <div class="page-header">
+      <div class="page-header" style="margin-bottom: 14px;">
         <div class="page-title-group">
-          <span class="page-pretitle">Central Operations Desk</span>
-          <h1 class="page-title">Approval Queue</h1>
+          <span class="page-pretitle">Central Logistics Operations Desk</span>
+          <h1 class="page-title">Operations Approval &amp; Allocation Queue</h1>
           <span class="page-subtitle">Verify multi-day vehicle buffers, driver duty hours, and avoid double-booking</span>
         </div>
       </div>
 
-      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: start;">
+      <div class="queue-layout">
         
-        <!-- Left: Queue Items List -->
-        <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 12px;" id="queue-cards-list">
-          <!-- Injected dynamically from FleetStore -->
-        </div>
-
-        <!-- Right: Assignment & Whole-Period Verification Panel -->
-        <div style="flex: 999 1 580px; display: flex; flex-direction: column; gap: 20px;">
+        <!-- Left: Request List Column -->
+        <div class="queue-left-col">
           
-          <!-- Booking Header Card -->
-          <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-              <div>
-                <span id="detail-booking-pretitle" style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">BK-2047 · Dr. Sarah Mansour (Pharmacy)</span>
-                <h2 id="detail-booking-route" style="margin: 4px 0 0; font-size: 22px; color: var(--navy-800);">Assiut → Cairo → Badr City → Return</h2>
-                <div style="margin-top: 6px; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
-                  <span style="color: var(--text-muted);">Vehicle Allocation:</span>
-                  <span class="badge badge-gold" id="detail-requested-cat">Pending Operations Choice</span>
-                  <span class="badge badge-neutral" id="detail-period-badge">5-Day Mission</span>
-                </div>
-              </div>
-              <div style="display: flex; gap: 16px; font-size: 14px;">
-                <div><span style="color:var(--text-muted);">Total Distance</span><div id="detail-metric-km" style="font-family:var(--font-mono);font-weight:700;">865.0 km</div></div>
-                <div><span style="color:var(--text-muted);">Estimated Driving</span><div id="detail-metric-drive" style="font-family:var(--font-mono);font-weight:700;">11h 20m</div></div>
-                <div><span style="color:var(--text-muted);">Turnaround Buffer</span><div style="font-family:var(--font-mono);font-weight:700;">45 min</div></div>
-              </div>
-            </div>
-
-            <!-- Multi-Stop Itinerary Summary Box -->
-            <div style="background: var(--bg-page); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-top: 16px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <strong style="color: var(--navy-800); font-size: 14px; display:flex; align-items:center; gap:6px;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-                  <span>Mission Itinerary &amp; Sequential Waypoints</span>
-                </strong>
-                <span id="detail-itinerary-dates" style="font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; color: var(--navy-600);">18 Oct → 22 Oct 2026</span>
-              </div>
-
-              <!-- Ordered list of itinerary points -->
-              <div id="detail-itinerary-points-list" style="display: flex; flex-direction: column; gap: 6px; font-size: 13px;">
-                <!-- Dynamically rendered -->
-              </div>
-
-              <!-- Hold Window Notice -->
-              <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12.5px;">
-                <div style="display:flex; align-items:center; gap:6px; color:var(--navy-800);">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  <span><strong>Hold Window:</strong> <span id="detail-hold-window-str" style="font-family:var(--font-mono);">18 Oct 08:00 → 22 Oct 18:45</span></span>
-                </div>
-                <div id="detail-overnight-lodging-badge" style="color:var(--text-muted);">
-                  Lodging: BUC Faculty Guesthouse (4 nights)
-                </div>
-              </div>
-            </div>
-
-            <!-- Load & Cargo Manifest Panel -->
-            <div id="dispatch-load-cargo-panel" style="background: var(--bg-page); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-top: 14px;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <strong style="color: var(--navy-800); font-size: 14px; display:flex; align-items:center; gap:6px;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  <span>Load &amp; Cargo Manifest</span>
-                </strong>
-                <span id="dispatch-passenger-info" style="font-size: 13px; font-weight: 700; color: var(--navy-800);">4 passengers (personal luggage)</span>
-              </div>
-              <div id="dispatch-cargo-details" style="display: none; padding-top: 10px; margin-top: 10px; border-top: 1px dashed var(--border); font-size: 13px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <span style="font-weight: 700; color: var(--navy-800); display:flex; align-items:center; gap:6px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                    <span>Extra Cargo Declared:</span>
-                  </span>
-                  <span class="badge badge-gold" id="dispatch-cargo-weight" style="font-family: var(--font-mono); font-size: 12px;">350 kg</span>
-                </div>
-                <div id="dispatch-cargo-description" style="color: var(--text-main); margin-bottom: 8px;">6 boxes of lab equipment, 2 projectors, fragile</div>
-                <div id="dispatch-cargo-flags" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
-              </div>
-              <div id="dispatch-no-cargo-note" style="font-size: 12.5px; color: var(--text-muted); padding-top: 8px; margin-top: 8px; border-top: 1px dashed var(--border);">
-                No extra cargo declared. Personal luggage only.
-              </div>
-            </div>
-
-            <div class="alert-banner alert-info" style="margin-top: 14px;">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                <span><strong>Multi-Day Dispatch Policy:</strong> Assets and drivers are locked for the <strong>entire mission period</strong> plus the mandatory 45-min turnaround buffer.</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 1: Vehicle Availability Across Entire Period -->
-          <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <h3 class="card-title" style="margin:0;">1. Vehicle Availability &amp; Substitution</h3>
-              <span class="badge badge-info" id="vehicle-period-check-badge">Checking Full 5-Day Period</span>
-            </div>
-            <div class="table-wrapper">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Select</th>
-                    <th>Code</th>
-                    <th>Vehicle Model</th>
-                    <th>Capacity</th>
-                    <th>Availability Status Across Whole Period</th>
-                  </tr>
-                </thead>
-                <tbody id="vehicle-roster-tbody">
-                  <!-- Injected dynamically -->
-                </tbody>
-              </table>
-            </div>
-            <div id="dispatch-vehicle-recalc-box" style="margin-top: 14px; background: var(--bg-page); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-              <div>
-                <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Operational Fuel &amp; Cost Recalculation</div>
-                <div style="font-size: 14px; font-weight: 700; color: var(--navy-800);" id="recalc-vehicle-name">—</div>
-                <div style="font-size: 12px; color: var(--text-muted);" id="recalc-vehicle-spec">Rate: — L/100km · Load adjustment: —</div>
-              </div>
-              <div style="display: flex; gap: 24px; align-items: center;">
-                <div>
-                  <span style="font-size: 11.5px; color: var(--text-muted);">Recomputed Fuel:</span>
-                  <div id="recalc-fuel-liters" style="font-family: var(--font-mono); font-weight: 700; color: var(--navy-800); font-size: 15px;">— L</div>
-                </div>
-                <div>
-                  <span style="font-size: 11.5px; color: var(--text-muted);">Recomputed Cost:</span>
-                  <div id="recalc-fuel-cost" style="font-family: var(--font-mono); font-weight: 700; color: var(--gold-600); font-size: 15px;">— EGP</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 2: Driver Certification & Roster Across Entire Period -->
-          <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <h3 class="card-title" style="margin:0;">2. Driver Certification &amp; Duty Hours</h3>
-              <span class="badge badge-info" id="driver-period-check-badge">Checking Full 5-Day Period</span>
-            </div>
-            <div class="table-wrapper">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Select</th>
-                    <th>Driver Name</th>
-                    <th>License Class</th>
-                    <th>Multi-Day Duty</th>
-                    <th>Eligibility Status Across Whole Period</th>
-                  </tr>
-                </thead>
-                <tbody id="driver-roster-tbody">
-                  <!-- Injected dynamically -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <div id="dispatch-actions-box" style="display: flex; justify-content: flex-end; gap: 14px; align-items: center;">
-            <button class="btn btn-danger" onclick="alert('Request rejected and requester has been notified with the reason.');">Reject Request</button>
-            <button class="btn btn-gold btn-lg" id="btn-approve-dispatch" onclick="handleApproveBooking();" style="display:inline-flex; align-items:center; gap:8px;">
-              <span>Approve &amp; Assign for Entire Period</span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <!-- Tabs with Counts -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;" id="queue-tabs-bar">
+            <button type="button" class="queue-tab-btn active" data-tab="pending" onclick="switchQueueTab('pending')">
+              <span>Pending</span>
+              <span class="queue-tab-count" id="count-pending">0</span>
+            </button>
+            <button type="button" class="queue-tab-btn" data-tab="changes" onclick="switchQueueTab('changes')">
+              <span>Changes</span>
+              <span class="queue-tab-count" id="count-changes">0</span>
+            </button>
+            <button type="button" class="queue-tab-btn" data-tab="approved" onclick="switchQueueTab('approved')">
+              <span>Approved</span>
+              <span class="queue-tab-count" id="count-approved">0</span>
+            </button>
+            <button type="button" class="queue-tab-btn" data-tab="rejected" onclick="switchQueueTab('rejected')">
+              <span>Rejected</span>
+              <span class="queue-tab-count" id="count-rejected">0</span>
             </button>
           </div>
 
+          <!-- Search and Sort Controls -->
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div style="position: relative; flex: 1;">
+              <input type="text" id="queue-search-input" class="search-input" placeholder="Search ID, requester, place..." style="width: 100%; padding-left: 32px; font-size: 13px;" oninput="handleQueueFilterChanged()">
+              <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+              </span>
+            </div>
+            <select id="queue-sort-select" style="padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12.5px; background: #FFF; color: var(--navy-800); font-weight: 600;" onchange="handleQueueFilterChanged()">
+              <option value="trip_start">Sort: Trip Start</option>
+              <option value="submitted">Sort: Submitted Time</option>
+            </select>
+          </div>
+
+          <!-- Cards List -->
+          <div id="queue-cards-container" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Dynamically populated -->
+          </div>
+
         </div>
+
+        <!-- Right: Selected Request Details & Assignment Panel -->
+        <div class="queue-right-col" id="selected-request-panel">
+          <!-- Rendered dynamically -->
+        </div>
+
       </div>
     </main>
   </div>
 
-  <!-- Master Footer -->
+  <!-- Footer -->
   <footer class="app-footer">
     <div class="footer-inner">
-      <div class="footer-grid">
-        <div class="footer-col" style="flex: 1 1 280px;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="logo-badge" style="width: 36px; height: 36px; font-size: 11px; font-weight:900; background:var(--cira-gold); color:var(--cira-burgundy);">CIRA</div>
-            <div class="logo-text">
-              <span class="univ-name" style="color: #FFFFFF; font-size: 17px; font-weight:800;">CIRA EDUCATION</span>
-              <span class="portal-title" style="color: var(--cira-gold); font-size: 10px;">Fleet &amp; Logistics Directorate</span>
-            </div>
-          </div>
-          <p style="margin: 8px 0 0; font-size: 13px; color: #DCE4EF; line-height: 1.6;">
-            Enterprise fleet logistics, vehicle booking, live GPS tracking and algorithmic fuel chargeback across CIRA Education universities and institutions.
-          </p>
-        </div>
-
-        <div class="footer-col">
-          <h4>Portal Services</h4>
-          <a href="booking-new.html" class="footer-link">Book a Vehicle</a>
-          <a href="policies.html" class="footer-link">Fleet Logistics Policies</a>
-          <a href="booking-track.html" class="footer-link">Track Active Trip</a>
-          <a href="bookings.html" class="footer-link">My Bookings</a>
-        </div>
-
-        <div class="footer-col">
-          <h4>Fleet Operations Center</h4>
-          <span>CIRA Education HQ · Central Logistics Operations</span>
-          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
-          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
-          <span>Email: fleet.operations@cira.com.eg</span>
-          <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
-        </div>
-      </div>
-
       <div class="footer-bottom">
-        <span>© 2026 CIRA Education (Cairo for Investment and Real Estate Development S.A.E.)</span>
+        <span>&copy; 2026 CIRA Education (Cairo for Investment and Real Estate Development S.A.E.)</span>
         <div style="display: flex; gap: 20px;">
           <a href="policies.html" class="footer-link">Policies &amp; Rules</a>
           <a href="help.html" class="footer-link">Fleet Help Desk</a>
@@ -280,436 +423,882 @@
     </div>
   </footer>
 
+  <!-- Modals -->
+  <!-- Reject Modal -->
+  <div class="modal-backdrop" id="reject-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <strong style="display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <span>Reject Booking Requisition</span>
+        </strong>
+        <button type="button" onclick="closeRejectModal()" style="background:none; border:none; color:#FFF; font-size:18px; cursor:pointer;">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <label style="display:block; font-size:13px; font-weight:700; color:var(--navy-800); margin-bottom:6px;">Rejection Reason Category *</label>
+          <select id="reject-reason-code" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px;">
+            <option value="No vehicle available">No vehicle available</option>
+            <option value="No driver available">No driver available</option>
+            <option value="Outside policy">Outside policy</option>
+            <option value="Duplicate">Duplicate request</option>
+            <option value="Other">Other institutional operational reason</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block; font-size:13px; font-weight:700; color:var(--navy-800); margin-bottom:6px;">Required Explanation Note for Requester *</label>
+          <textarea id="reject-reason-text" rows="4" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px;" placeholder="Explain clearly why this requisition cannot be fulfilled..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeRejectModal()">Cancel</button>
+        <button type="button" class="btn btn-danger-outline" style="background:#EF4444; color:#FFF;" onclick="submitRejectBooking()">Confirm Rejection</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Request Changes Modal -->
+  <div class="modal-backdrop" id="changes-modal">
+    <div class="modal-box">
+      <div class="modal-header" style="background: #92400E;">
+        <strong style="display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span>Request Mission Changes</span>
+        </strong>
+        <button type="button" onclick="closeChangesModal()" style="background:none; border:none; color:#FFF; font-size:18px; cursor:pointer;">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px; color:var(--text-muted); margin:0;">
+          This request will be moved to <strong>Changes requested</strong> status. The requester will be notified to modify their itinerary and resubmit to Pending review.
+        </p>
+        <div>
+          <label style="display:block; font-size:13px; font-weight:700; color:var(--navy-800); margin-bottom:6px;">Message for Requester *</label>
+          <textarea id="changes-message-text" rows="4" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px;" placeholder="e.g. Please move departure to 07:00, or reduce passenger count to 4 for van availability..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeChangesModal()">Cancel</button>
+        <button type="button" class="btn btn-gold" onclick="submitRequestChanges()">Send Change Request</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Requester Modal -->
+  <div class="modal-backdrop" id="message-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <strong style="display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span id="message-modal-title">Message Requester</span>
+        </strong>
+        <button type="button" onclick="closeMessageModal()" style="background:none; border:none; color:#FFF; font-size:18px; cursor:pointer;">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="font-size:13px; color:var(--text-muted);" id="message-modal-subtext"></div>
+        <textarea id="direct-message-content" rows="4" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px;" placeholder="Type your institutional message..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeMessageModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="submitDirectMessage()">Send Message</button>
+      </div>
+    </div>
+  </div>
+
   <script src="data/data.js"></script>
+  <script src="js/geo.js"></script>
   <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
-    let activeBookingId = 'BK-2047';
-    let currentActiveBooking = null;
-    let currentSelectedVehicle = null;
-    let currentFuelLiters = null;
-    let currentCostEGP = null;
-
-    const FLEET_VEHICLES = [
-      {
-        code: 'V-122',
-        model: 'Hyundai H-1 2023',
-        category: 'Passenger Van',
-        seats: 9,
-        payloadKg: 1000,
-        ratePer100Km: 9.5,
-        fuelPrice: 20.50,
-        fuelType: 'Diesel',
-        isFreeWholePeriod: true,
-        conflictReason: null
-      },
-      {
-        code: 'V-130',
-        model: 'Toyota HiAce 2020',
-        category: 'Passenger Van',
-        seats: 12,
-        payloadKg: 1200,
-        ratePer100Km: 10.5,
-        fuelPrice: 20.50,
-        fuelType: 'Diesel',
-        isFreeWholePeriod: true,
-        conflictReason: null
-      },
-      {
-        code: 'V-105',
-        model: 'Toyota Corolla 2022',
-        category: 'Sedan',
-        seats: 4,
-        payloadKg: 400,
-        ratePer100Km: 7.0,
-        fuelPrice: 22.25,
-        fuelType: 'Petrol 92',
-        isFreeWholePeriod: true,
-        conflictReason: null
-      },
-      {
-        code: 'V-145',
-        model: 'Mercedes-Benz MCV 28-Seat',
-        category: 'Bus',
-        seats: 28,
-        payloadKg: 4000,
-        ratePer100Km: 26.0,
-        fuelPrice: 20.50,
-        fuelType: 'Diesel',
-        isFreeWholePeriod: true,
-        conflictReason: null
-      },
-      {
-        code: 'V-114',
-        model: 'Toyota HiAce 2022',
-        category: 'Passenger Van',
-        seats: 9,
-        payloadKg: 1100,
-        ratePer100Km: 10.0,
-        fuelPrice: 20.50,
-        fuelType: 'Diesel',
-        isFreeWholePeriod: false,
-        conflictReason: 'Booked on Oct 19–20'
-      },
-      {
-        code: 'V-108',
-        model: 'Nissan Urvan 2019',
-        category: 'Passenger Van',
-        seats: 12,
-        payloadKg: 1000,
-        ratePer100Km: 11.0,
-        fuelPrice: 20.50,
-        fuelType: 'Diesel',
-        isFreeWholePeriod: false,
-        conflictReason: 'Maintenance lockout (Brake pads)'
-      }
-    ];
+    let currentTab = 'pending';
+    let currentSelectedId = null;
+    let selectedVehicleCode = null;
+    let selectedDriverIds = [];
+    let currentItineraryMapInstance = null;
 
     function escapeHtml(str) {
       if (!str) return '';
-      return String(str).replace(/[&<>"']/g, function(m) {
-        return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;'
-        }[m];
+      return String(str).replace(/[&<>"']/g, function (m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
       });
     }
 
-    function initQueue() {
-      const bookings = FleetStore.getBookings();
-      const container = document.getElementById('queue-cards-list');
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    function setQueryParam(id) {
+      if (!id) return;
+      const url = new URL(window.location);
+      url.searchParams.set('id', id);
+      window.history.replaceState({}, '', url);
+    }
+
+    function switchQueueTab(tabName) {
+      currentTab = tabName;
+      document.querySelectorAll('.queue-tab-btn').forEach(btn => {
+        if (btn.dataset.tab === tabName) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      refreshQueue(true);
+    }
+
+    function handleQueueFilterChanged() {
+      refreshQueue(false);
+    }
+
+    function refreshQueue(selectFirstIfCurrentMissing = false) {
+      const search = document.getElementById('queue-search-input').value;
+      const sort = document.getElementById('queue-sort-select').value;
+      const queueData = FleetStore.listQueue(currentTab, search, sort);
+
+      document.getElementById('count-pending').textContent = queueData.counts.pending;
+      document.getElementById('count-changes').textContent = queueData.counts.changes;
+      document.getElementById('count-approved').textContent = queueData.counts.approved;
+      document.getElementById('count-rejected').textContent = queueData.counts.rejected;
+
+      const container = document.getElementById('queue-cards-container');
       container.innerHTML = '';
 
-      const queueBookings = bookings.filter(b => b.status === 'Pending' || b.status === 'Active' || b.status === 'Dispatched');
-      const displayList = queueBookings.length > 0 ? queueBookings : bookings.slice(0, 4);
+      if (queueData.items.length === 0) {
+        let emptyMsg = 'No pending requests in this queue.';
+        if (currentTab === 'changes') emptyMsg = 'No requests currently marked as Changes requested.';
+        if (currentTab === 'approved') emptyMsg = 'No approved requests pending dispatch.';
+        if (currentTab === 'rejected') emptyMsg = 'No rejected requests recorded.';
 
-      displayList.forEach((b, idx) => {
-        const sDate = b.startDate || b.start_date || '2026-10-18';
-        const eDate = b.endDate || b.end_date || '2026-10-22';
-        const days = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
+        container.innerHTML = `
+          <div style="background:var(--bg-card); border:1px dashed var(--border); border-radius:var(--radius-md); padding:32px 18px; text-align:center; color:var(--text-muted);">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px;"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <div style="font-weight:700; color:var(--navy-800); font-size:14px; margin-bottom:4px;">${emptyMsg}</div>
+            <div style="font-size:12.5px;">Switch tabs or adjust your search filter above.</div>
+          </div>
+        `;
+        renderEmptyPanel();
+        return;
+      }
 
-        let badgeType = 'badge-info';
-        let badgeLabel = days > 1 ? `Multi-Day (${days}d)` : 'Single Day';
-        if (b.id === 'BK-2047') {
-          badgeType = 'badge-danger';
-          badgeLabel = 'Review Multi-Day (5d)';
-        }
+      const hasCurrent = queueData.items.some(item => item.id === currentSelectedId);
+      if (!hasCurrent && selectFirstIfCurrentMissing) {
+        currentSelectedId = queueData.items[0].id;
+      } else if (!hasCurrent && !selectFirstIfCurrentMissing) {
+        currentSelectedId = queueData.items[0].id;
+      }
 
-        const isSelected = (b.id === activeBookingId);
+      queueData.items.forEach(item => {
+        const isSelected = item.id === currentSelectedId;
         const card = document.createElement('div');
-        card.className = 'card dispatch-queue-card';
-        card.id = 'qcard-' + b.id;
-        card.style.cssText = `cursor:pointer; border: 2px solid ${isSelected ? 'var(--navy-600)' : 'var(--border)'}; background: ${isSelected ? 'var(--navy-50)' : '#FFFFFF'};`;
-        card.onclick = () => selectQueueItem(b.id);
+        card.className = `queue-card ${isSelected ? 'selected' : ''}`;
+        card.onclick = () => selectBooking(item.id);
+
+        let statusBadgeClass = 'badge-warning';
+        if (item.booking.status === 'Approved') statusBadgeClass = 'badge-success';
+        if (item.booking.status === 'Changes requested') statusBadgeClass = 'badge-warning';
+        if (item.booking.status === 'Rejected') statusBadgeClass = 'badge-danger';
+        if (item.booking.status === 'Dispatched') statusBadgeClass = 'badge-info';
+
+        const ageClass = item.isAmberAge ? 'badge-amber-age' : 'badge-muted-age';
+
+        let warningChipsHtml = '';
+        item.warningChips.forEach(chip => {
+          const cls = chip.type === 'danger' ? 'chip-warning' : (chip.type === 'warning' ? 'chip-warning' : 'chip-info');
+          warningChipsHtml += `<span class="${cls}">${escapeHtml(chip.label)}</span>`;
+        });
+
+        const cargoChipHtml = item.hasCargo
+          ? `<span class="badge badge-neutral" style="font-size:11px; background:#EEF2F6; color:var(--navy-800); font-weight:700;">Cargo ${item.cargoWeight} kg</span>`
+          : '';
 
         card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-family:var(--font-mono); font-weight:700;">${b.id}</span>
-            <span class="badge ${badgeType}">${badgeLabel}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <strong style="font-family: var(--font-mono); font-size: 14px; color: var(--navy-800);">${item.id}</strong>
+            <span class="badge ${statusBadgeClass}" style="font-size:11px;">${item.booking.status}</span>
           </div>
-          <strong style="color:var(--navy-800); font-size:15px; margin: 4px 0 2px;">${b.route || (b.origin + ' → ' + b.destination)}</strong>
-          <span style="font-size:12px; color:var(--text-muted);">${sDate} → ${eDate} · ${b.passengers || 4} pax · ${b.dept || 'Faculty'}</span>
+
+          <div style="font-size: 13.5px; font-weight: 700; color: var(--navy-800); line-height: 1.35; margin-bottom: 2px;">
+            ${escapeHtml(item.requesterName)}
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+            ${escapeHtml(item.dept)}
+          </div>
+
+          <div style="font-size: 12.5px; color: var(--navy-800); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <strong>${escapeHtml(item.periodStr)}</strong>
+          </div>
+
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.35;">
+            ${escapeHtml(item.routeSummary)}
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; padding-top: 8px; border-top: 1px solid var(--border);">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted);">
+              <span>${item.passengers} pax</span>
+              ${cargoChipHtml}
+            </div>
+            <div class="${ageClass}">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>${item.ageStr}</span>
+            </div>
+          </div>
+
+          ${warningChipsHtml ? `
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;">
+              ${warningChipsHtml}
+            </div>
+          ` : ''}
         `;
+
         container.appendChild(card);
       });
 
-      if (displayList.length > 0) {
-        selectQueueItem(displayList[0].id);
+      if (currentSelectedId) {
+        renderSelectedRequestPanel(currentSelectedId);
       }
     }
 
-    function selectQueueItem(id) {
-      activeBookingId = id;
-      document.querySelectorAll('.dispatch-queue-card').forEach(c => {
-        c.style.borderColor = 'var(--border)';
-        c.style.background = '#FFFFFF';
-      });
-      const sel = document.getElementById('qcard-' + id);
-      if (sel) {
-        sel.style.borderColor = 'var(--navy-600)';
-        sel.style.background = 'var(--navy-50)';
-      }
+    function selectBooking(id) {
+      currentSelectedId = id;
+      setQueryParam(id);
+      selectedVehicleCode = null;
+      selectedDriverIds = [];
 
-      const booking = FleetStore.getBooking(id);
-      if (!booking) return;
-      currentActiveBooking = booking;
-
-      const sDate = booking.startDate || booking.start_date || '2026-10-18';
-      const eDate = booking.endDate || booking.end_date || '2026-10-22';
-      const days = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
-
-      document.getElementById('detail-booking-pretitle').textContent = `${booking.id} · ${booking.requesterName || 'Dr. Sarah Mansour'} (${booking.dept || 'Faculty of Pharmacy'})`;
-      document.getElementById('detail-booking-route').textContent = booking.route || (booking.origin + ' → ' + booking.destination);
-      document.getElementById('detail-requested-cat').textContent = booking.vehicleCategory || 'Pending Operations Choice';
-      document.getElementById('detail-period-badge').textContent = `${days}-Day Mission`;
-
-      document.getElementById('detail-metric-km').textContent = `${(booking.distanceKm || 865.0).toFixed(1)} km`;
-      const totH = Math.floor((booking.estDriveMinutes || 680) / 60);
-      const totM = (booking.estDriveMinutes || 680) % 60;
-      document.getElementById('detail-metric-drive').textContent = `${totH}h ${totM.toString().padStart(2, '0')}m`;
-
-      document.getElementById('detail-itinerary-dates').textContent = `${sDate} → ${eDate} (${days} days)`;
-
-      // Render points list
-      const pointsListEl = document.getElementById('detail-itinerary-points-list');
-      pointsListEl.innerHTML = '';
-
-      const points = Array.isArray(booking.itinerary) && booking.itinerary.length >= 2
-        ? booking.itinerary
-        : [
-            { sequence: 1, type: 'departure', place_name: booking.origin || 'Badr University in Assiut', depart_at: `${sDate} 08:00`, pinned: true },
-            { sequence: 2, type: 'return', place_name: booking.destination || 'Cairo University', arrive_at: `${eDate} 18:00`, pinned: true }
-          ];
-
-      points.forEach((p, idx) => {
-        const isDep = p.type === 'departure';
-        const isRet = p.type === 'return';
-        const badgeColor = isDep ? 'var(--cira-burgundy)' : (isRet ? 'var(--gold-500)' : 'var(--navy-600)');
-        const label = isDep ? 'Departure' : (isRet ? 'Return' : `Stop #${idx}`);
-        const timeStr = p.depart_at || p.arrive_at || '';
-
-        const item = document.createElement('div');
-        item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px dashed var(--border);';
-        item.innerHTML = `
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${badgeColor};"></span>
-            <strong>${p.place_name || 'Waypoint'}</strong>
-            <span style="font-size:11px; color:var(--text-muted);">(${label})</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-family:var(--font-mono); font-size:12px; color:var(--navy-800);">${timeStr}</span>
-            <span class="badge ${p.pinned ? 'badge-success' : 'badge-neutral'}" style="font-size:10px;">${p.pinned ? 'Pinned' : 'Unpinned'}</span>
-          </div>
-        `;
-        pointsListEl.appendChild(item);
-      });
-
-      // Hold window & overnight stay
-      const holdText = booking.hold_window ? `${booking.hold_window.start} → ${booking.hold_window.end}` : `${sDate} 08:00 → ${eDate} 18:45`;
-      document.getElementById('detail-hold-window-str').textContent = holdText;
-
-      const stayEl = document.getElementById('detail-overnight-lodging-badge');
-      if (stayEl) {
-        stayEl.textContent = days > 1 ? `Lodging: ${booking.driver_overnight_location || 'Campus Guesthouse'} (${days - 1} nights)` : 'Single-day run (no overnight)';
-      }
-
-      const passInfoEl = document.getElementById('dispatch-passenger-info');
-      const paxCount = booking.passengers || 4;
-      if (passInfoEl) passInfoEl.textContent = `${paxCount} passengers (personal luggage)`;
-
-      const cargoDetailsEl = document.getElementById('dispatch-cargo-details');
-      const noCargoNoteEl = document.getElementById('dispatch-no-cargo-note');
-      const hasCargo = Boolean(booking.has_extra_cargo || (booking.cargo_kg && booking.cargo_kg > 0));
-
-      if (hasCargo) {
-        if (cargoDetailsEl) cargoDetailsEl.style.display = 'block';
-        if (noCargoNoteEl) noCargoNoteEl.style.display = 'none';
-
-        const weightEl = document.getElementById('dispatch-cargo-weight');
-        if (weightEl) weightEl.textContent = `${booking.cargo_kg || booking.cargoWeightKg || 0} kg`;
-
-        const descEl = document.getElementById('dispatch-cargo-description');
-        if (descEl) descEl.textContent = booking.cargo_description || 'Cargo manifest declared';
-
-        const flagsEl = document.getElementById('dispatch-cargo-flags');
-        if (flagsEl) {
-          flagsEl.innerHTML = '';
-          const flags = booking.cargo_flags || {};
-          if (flags.fragile) flagsEl.innerHTML += '<span class="badge badge-danger" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Fragile</span></span>';
-          if (flags.strap) flagsEl.innerHTML += '<span class="badge badge-warning" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Needs strapped</span></span>';
-          if (flags.loading_help) flagsEl.innerHTML += '<span class="badge badge-info" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Needs loading help</span></span>';
-        }
-      } else {
-        if (cargoDetailsEl) cargoDetailsEl.style.display = 'none';
-        if (noCargoNoteEl) noCargoNoteEl.style.display = 'block';
-      }
-
-      // Check whole period in tables
-      document.getElementById('vehicle-period-check-badge').textContent = `Checking Full ${days}-Day Period (${sDate} → ${eDate})`;
-      document.getElementById('driver-period-check-badge').textContent = `Checking Full ${days}-Day Period (${sDate} → ${eDate})`;
-
-      renderVehicleRosterForPeriod(days, sDate, eDate);
-      renderDriverRosterForPeriod(days, sDate, eDate);
-    }
-
-    function renderVehicleRosterForPeriod(days, sDate, eDate) {
-      const tbody = document.getElementById('vehicle-roster-tbody');
-      tbody.innerHTML = '';
-
-      const paxCount = currentActiveBooking ? (currentActiveBooking.passengers || 4) : 4;
-      const cargoWeight = currentActiveBooking ? ((currentActiveBooking.has_extra_cargo || currentActiveBooking.cargo_kg) ? (currentActiveBooking.cargo_kg || currentActiveBooking.cargoWeightKg || 0) : 0) : 0;
-
-      let firstEligibleCode = null;
-
-      FLEET_VEHICLES.forEach(v => {
-        const seatsOk = v.seats >= paxCount;
-        const payloadOk = cargoWeight === 0 || v.payloadKg >= cargoWeight;
-        const periodOk = v.isFreeWholePeriod;
-        const isEligible = seatsOk && payloadOk && periodOk;
-
-        if (isEligible && !firstEligibleCode) {
-          firstEligibleCode = v.code;
-        }
-
-        let badgeHtml = '';
-        if (isEligible) {
-          badgeHtml = `<span class="badge badge-success">Recommended · Meets Capacity &amp; Free Whole Period</span>`;
-        } else if (!periodOk) {
-          badgeHtml = `<span class="badge badge-danger">Unavailable · ${escapeHtml(v.conflictReason)}</span>`;
-        } else if (!seatsOk && !payloadOk) {
-          badgeHtml = `<span class="badge badge-danger">Capacity Deficit (${v.seats} seats &lt; ${paxCount}, ${v.payloadKg.toLocaleString()} kg &lt; ${cargoWeight} kg)</span>`;
-        } else if (!seatsOk) {
-          badgeHtml = `<span class="badge badge-danger">Capacity Deficit (${v.seats} seats &lt; ${paxCount} pax)</span>`;
+      document.querySelectorAll('.queue-card').forEach(card => {
+        const idElem = card.querySelector('strong');
+        if (idElem && idElem.textContent === id) {
+          card.classList.add('selected');
         } else {
-          badgeHtml = `<span class="badge badge-danger">Payload Deficit (${v.payloadKg.toLocaleString()} kg &lt; ${cargoWeight} kg cargo)</span>`;
-        }
-
-        const isChecked = isEligible && (v.code === firstEligibleCode);
-        const isDisabled = !isEligible;
-        const rowStyle = isChecked ? 'background: var(--navy-50);' : (isDisabled ? 'opacity: 0.65;' : '');
-
-        const tr = document.createElement('tr');
-        tr.style.cssText = rowStyle;
-        tr.innerHTML = `
-          <td>
-            <input type="radio" name="vsel" value="${v.code}" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''} onchange="handleVehicleSelected('${v.code}');" style="accent-color:var(--navy-800);">
-          </td>
-          <td><span style="font-family:var(--font-mono); font-weight:700;">${v.code}</span></td>
-          <td><strong>${v.model}</strong> <span style="font-size:11.5px; color:var(--text-muted);">(${v.category})</span></td>
-          <td>${v.seats} pax / ${v.payloadKg.toLocaleString()} kg</td>
-          <td>${badgeHtml}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      if (firstEligibleCode) {
-        handleVehicleSelected(firstEligibleCode);
-      } else {
-        handleVehicleSelected(FLEET_VEHICLES[0].code);
-      }
-    }
-
-    function handleVehicleSelected(code) {
-      const v = FLEET_VEHICLES.find(item => item.code === code) || FLEET_VEHICLES[0];
-      currentSelectedVehicle = v;
-
-      document.querySelectorAll('#vehicle-roster-tbody tr').forEach(row => {
-        const radio = row.querySelector('input[type="radio"]');
-        if (radio && radio.checked) {
-          row.style.background = 'var(--navy-50)';
-        } else if (radio && radio.disabled) {
-          row.style.background = '';
-        } else {
-          row.style.background = '';
+          card.classList.remove('selected');
         }
       });
 
-      const cargoWeight = currentActiveBooking ? ((currentActiveBooking.has_extra_cargo || currentActiveBooking.cargo_kg) ? (currentActiveBooking.cargo_kg || currentActiveBooking.cargoWeightKg || 0) : 0) : 0;
-      const loadFactor = (cargoWeight > 0 && v.payloadKg > 0) ? (1.0 + Math.min(0.5, (cargoWeight / v.payloadKg) * 0.25)) : 1.0;
-
-      const dist = currentActiveBooking && typeof currentActiveBooking.distanceKm === 'number' ? currentActiveBooking.distanceKm : 865.0;
-      const fuelLiters = Math.round((dist * (v.ratePer100Km / 100) * loadFactor) * 10) / 10;
-      const costEGP = Math.round(fuelLiters * v.fuelPrice * 100) / 100;
-
-      currentFuelLiters = fuelLiters;
-      currentCostEGP = costEGP;
-
-      const nameEl = document.getElementById('recalc-vehicle-name');
-      if (nameEl) nameEl.textContent = `${v.model} (${v.code}) · ${v.category}`;
-
-      const specEl = document.getElementById('recalc-vehicle-spec');
-      if (specEl) {
-        const extraNote = (cargoWeight > 0) ? ` · Cargo load factor: +${Math.round((loadFactor - 1) * 100)}% fuel` : ' · Standard passenger load';
-        specEl.textContent = `Nominal rate: ${v.ratePer100Km} L/100km (${v.fuelType} @ ${v.fuelPrice.toFixed(2)} EGP/L)${extraNote}`;
-      }
-
-      const litersEl = document.getElementById('recalc-fuel-liters');
-      if (litersEl) litersEl.textContent = `${fuelLiters.toFixed(1)} L (${v.fuelType})`;
-
-      const costEl = document.getElementById('recalc-fuel-cost');
-      if (costEl) costEl.textContent = `EGP ${costEGP.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-      const badgeEl = document.getElementById('detail-requested-cat');
-      if (badgeEl) {
-        badgeEl.textContent = `${v.category} (${v.code})`;
-        badgeEl.className = 'badge badge-success';
-      }
+      renderSelectedRequestPanel(id);
     }
 
-    function renderDriverRosterForPeriod(days, sDate, eDate) {
-      const tbody = document.getElementById('driver-roster-tbody');
-      tbody.innerHTML = `
-        <tr style="background: var(--navy-50);">
-          <td><input type="radio" checked name="dsel" value="Ahmed Hassan (Driver A)" style="accent-color:var(--navy-800);"></td>
-          <td><strong>Ahmed Hassan (Driver A)</strong></td>
-          <td>Class 2 (Professional)</td>
-          <td><span style="font-family:var(--font-mono);">Free for Full ${days} Days</span></td>
-          <td><span class="badge badge-success">Eligible · Multi-Day Certified</span></td>
-        </tr>
-        <tr style="opacity: 0.6;">
-          <td><input type="radio" disabled name="dsel" value="Mostafa Kamel (Driver B)"></td>
-          <td>Mostafa Kamel (Driver B)</td>
-          <td>Class 2 (Professional)</td>
-          <td><span style="font-family:var(--font-mono); color:var(--danger);">Assigned Oct 19–21</span></td>
-          <td><span class="badge badge-danger">Conflict during trip period</span></td>
-        </tr>
-        <tr style="opacity: 0.6;">
-          <td><input type="radio" disabled name="dsel" value="Sherif Fathy (Driver D)"></td>
-          <td>Sherif Fathy (Driver D)</td>
-          <td>Class 2 · License Expired</td>
-          <td>—</td>
-          <td><span class="badge badge-danger">Expired License</span></td>
-        </tr>
+    function renderEmptyPanel() {
+      const panel = document.getElementById('selected-request-panel');
+      panel.innerHTML = `
+        <div class="card" style="padding: 48px 24px; text-align: center; color: var(--text-muted);">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 12px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <h3 style="margin: 0 0 6px; color: var(--navy-800);">No Request Selected</h3>
+          <p style="margin: 0; font-size: 13.5px;">Choose a requisition card on the left to review itinerary waypoints and allocate fleet resources.</p>
+        </div>
       `;
     }
 
-    function handleApproveBooking() {
-      if (!currentSelectedVehicle) {
-        const selectedV = document.querySelector('input[name="vsel"]:checked');
-        const code = selectedV ? selectedV.value : 'V-122';
-        currentSelectedVehicle = FLEET_VEHICLES.find(item => item.code === code) || FLEET_VEHICLES[0];
+    function renderSelectedRequestPanel(bookingId) {
+      const booking = FleetStore.getBooking(bookingId);
+      const panel = document.getElementById('selected-request-panel');
+      if (!booking) {
+        renderEmptyPanel();
+        return;
       }
 
-      const selectedD = document.querySelector('input[name="dsel"]:checked');
-      const driverName = selectedD ? selectedD.value : 'Ahmed Hassan (Driver A)';
-      const v = currentSelectedVehicle;
-      const vehicleModel = `${v.model} (${v.code})`;
+      const hold = FleetStore.getHoldWindow(booking);
+      const points = Array.isArray(booking.itinerary) && booking.itinerary.length >= 2
+        ? booking.itinerary
+        : [
+            { sequence: 1, type: 'departure', place_name: booking.origin || 'Assiut Campus', depart_at: `${booking.startDate || '2026-10-18'} 08:00`, pinned: true },
+            { sequence: 2, type: 'return', place_name: booking.destination || 'Cairo Campus', arrive_at: `${booking.endDate || '2026-10-22'} 18:00`, pinned: true }
+          ];
 
-      const approved = FleetStore.approveBooking(
-        activeBookingId,
-        v.code,
-        driverName,
-        vehicleModel,
-        v.category,
-        currentFuelLiters,
-        currentCostEGP
-      );
+      const days = booking.daysCount || FleetStore.RouteEstimator.calculateDaysCount(booking.startDate, booking.endDate);
+      const sDate = booking.startDate || '2026-10-18';
+      const eDate = booking.endDate || '2026-10-22';
 
-      const box = document.getElementById('dispatch-actions-box');
-      if (box) {
-        box.innerHTML = `
-          <div class="alert-banner alert-success" style="flex: 1; margin: 0; display:flex; align-items:center;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-inline-end:8px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-            <span><strong>Multi-day booking (${approved ? approved.id : activeBookingId}) approved and dispatched!</strong> Assigned vehicle (${vehicleModel}) and certified driver (${driverName}) across the whole period (${approved ? approved.startDate : '18 Oct'} → ${approved ? approved.endDate : '22 Oct'}). Recomputed operational fuel: <strong>${(currentFuelLiters || 0).toFixed(1)} L</strong> (EGP ${(currentCostEGP || 0).toFixed(2)}).</span>
-          </div>
-          <div style="display:flex; gap:10px;">
-            <a href="bookings.html" class="btn btn-secondary">View Bookings</a>
-            <a href="driver-trip.html" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px;">
-              <span>Go to Driver Trip Manifest</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </a>
-          </div>
-        `;
+      const vehicleEligList = FleetStore.getVehicleEligibility(booking);
+      if (!selectedVehicleCode) {
+        const firstElig = vehicleEligList.find(v => v.eligible);
+        selectedVehicleCode = firstElig ? firstElig.vehicle.code : vehicleEligList[0].vehicle.code;
       }
+
+      const driverEligList = FleetStore.getDriverEligibility(booking, selectedVehicleCode);
+      const requiresSecondDriver = driverEligList[0] && driverEligList[0].requiresSecondDriver;
+
+      if (selectedDriverIds.length === 0) {
+        const firstEligD = driverEligList.find(d => d.eligible);
+        if (firstEligD) {
+          selectedDriverIds = [firstEligD.driver.id];
+          if (requiresSecondDriver) {
+            const secondEligD = driverEligList.find(d => d.eligible && d.driver.id !== firstEligD.driver.id);
+            if (secondEligD) selectedDriverIds.push(secondEligD.driver.id);
+          }
+        }
+      }
+
+      const chosenVehicleItem = vehicleEligList.find(v => v.vehicle.code === selectedVehicleCode) || vehicleEligList[0];
+      const primaryDriverItem = driverEligList.find(d => d.driver.id === selectedDriverIds[0]) || driverEligList[0];
+      const secondDriverItem = selectedDriverIds[1] ? driverEligList.find(d => d.driver.id === selectedDriverIds[1]) : null;
+
+      const dailySummary = FleetStore.computeDailyDrivingSummary(booking);
+      const legs = Array.isArray(booking.route_legs) && booking.route_legs.length > 0
+        ? booking.route_legs
+        : FleetStore.RouteEstimator.computeItineraryLegs(points, chosenVehicleItem.vehicle.category);
+
+      let statusBadge = '<span class="badge badge-warning">Pending Review</span>';
+      if (booking.status === 'Approved') statusBadge = '<span class="badge badge-success">Approved</span>';
+      if (booking.status === 'Changes requested') statusBadge = '<span class="badge badge-warning" style="background:#FEF3C7;color:#92400E;">Changes Requested</span>';
+      if (booking.status === 'Rejected') statusBadge = '<span class="badge badge-danger">Rejected</span>';
+      if (booking.status === 'Dispatched') statusBadge = '<span class="badge badge-info">Dispatched</span>';
+
+      panel.innerHTML = `
+        <!-- Section 3.1: Header -->
+        <div class="card" style="padding: 18px 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+                <h2 style="margin:0; font-size:22px; color:var(--navy-800); font-family:var(--font-mono);">${booking.id}</h2>
+                ${statusBadge}
+              </div>
+              <div style="font-size:14px; color:var(--navy-800); font-weight:700;">
+                ${escapeHtml(booking.requesterName)} · <span style="font-weight:400; color:var(--text-muted);">${escapeHtml(booking.dept)}</span>
+              </div>
+              <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">
+                Submitted ${booking.createdAt ? new Date(booking.createdAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : 'Today'}
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-secondary" onclick="openMessageModal('${escapeHtml(booking.requesterName)}')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Message Requester</span>
+              </button>
+              <a href="booking-detail.html?id=${booking.id}" class="btn btn-secondary" target="_blank" style="text-decoration:none;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <span>Open Full Details</span>
+              </a>
+            </div>
+          </div>
+
+          ${booking.status === 'Changes requested' ? `
+            <div class="alert-banner alert-warning" style="margin-top:14px;">
+              <strong>Changes Requested:</strong> ${escapeHtml(booking.changesRequestedMessage || 'Requester notified to adjust itinerary.')}
+            </div>
+          ` : ''}
+
+          ${booking.status === 'Rejected' ? `
+            <div class="alert-banner alert-danger" style="margin-top:14px;">
+              <strong>Requisition Rejected:</strong> ${escapeHtml(booking.rejectionReason || 'Outside policy')} — ${escapeHtml(booking.rejectionText || 'No details provided.')}
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Section 3.2: Itinerary & Real Map -->
+        <div class="card" style="padding: 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <h3 style="margin:0; font-size:16px; color:var(--navy-800); display:flex; align-items:center; gap:8px;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              <span>Itinerary Route &amp; Waypoints</span>
+            </h3>
+            <span class="badge badge-neutral" style="font-family:var(--font-mono);">${days} Days (${sDate} → ${eDate})</span>
+          </div>
+
+          <!-- Real Map Container -->
+          <div id="dispatch-itinerary-map" class="itinerary-map-container" style="margin-bottom:14px;"></div>
+
+          <!-- Sequential Waypoints List -->
+          <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+            ${points.map((p, idx) => {
+              const num = p.sequence || (idx + 1);
+              const isDep = p.type === 'departure';
+              const isRet = p.type === 'return';
+              const typeLabel = isDep ? 'Departure' : (isRet ? 'Return' : `Stop #${num}`);
+              const timeStr = isDep ? `Leaves: ${p.depart_at || ''}` : (isRet ? `Arrives: ${p.arrive_at || ''}` : `Arrive: ${p.arrive_at || ''}${p.depart_at ? ' · Leave: ' + p.depart_at : ''}`);
+
+              let stayDurationStr = '';
+              if (p.arrive_at && p.depart_at) {
+                const arr = new Date(p.arrive_at.replace(' ', 'T'));
+                const dep = new Date(p.depart_at.replace(' ', 'T'));
+                const diffMs = dep - arr;
+                if (!isNaN(diffMs) && diffMs > 0) {
+                  const hours = Math.floor(diffMs / 3600000);
+                  const mins = Math.round((diffMs % 3600000) / 60000);
+                  stayDurationStr = ` · Stay: ${hours}h ${mins.toString().padStart(2, '0')}m`;
+                }
+              }
+
+              const isPinned = Boolean(p.pinned);
+
+              return `
+                <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:#F8FAFC; border:1px solid var(--border); border-radius:var(--radius-sm);">
+                  <div style="background:${isDep ? 'var(--navy-800)' : (isRet ? 'var(--cira-gold)' : 'var(--navy-600)')}; color:${isRet ? 'var(--navy-800)' : '#FFF'}; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; flex-shrink:0;">
+                    ${num}
+                  </div>
+                  <div style="flex:1; min-width:0;">
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                      <strong style="color:var(--navy-800); font-size:13.5px;">${escapeHtml(p.place_name || 'Waypoint')}</strong>
+                      <span class="badge ${isPinned ? 'badge-success' : 'badge-warning'}" style="font-size:10.5px;">${isPinned ? 'Pinned' : 'Location not pinned'}</span>
+                      <span style="font-size:11.5px; color:var(--text-muted);">(${typeLabel})</span>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+                      ${timeStr}${stayDurationStr}
+                    </div>
+                    ${p.notes ? `<div style="font-size:11.5px; color:var(--text-main); margin-top:3px; background:#FFF; padding:3px 8px; border-radius:4px; border:1px dashed var(--border);">Note: ${escapeHtml(p.notes)}</div>` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Legs Summary -->
+          <div style="background:#FFF; border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 12px; margin-bottom:14px; font-size:12.5px;">
+            <div style="font-weight:700; color:var(--navy-800); margin-bottom:6px;">Calculated Transit Legs:</div>
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              ${legs.map(leg => `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="color:var(--navy-800);">${escapeHtml(leg.from_place || 'Point A')} → ${escapeHtml(leg.to_place || 'Point B')}</span>
+                  <strong style="font-family:var(--font-mono);">${leg.distance_km} km · ${Math.floor(leg.drive_minutes / 60)}h ${(leg.drive_minutes % 60).toString().padStart(2, '0')}m (est.)</strong>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Daily Driving Summary Table -->
+          <div style="margin-top:14px;">
+            <div style="font-weight:700; color:var(--navy-800); font-size:13px; margin-bottom:6px;">Daily Driving Duty Verification:</div>
+            <table class="roster-table" style="font-size:12.5px;">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Date</th>
+                  <th>Driving Duration</th>
+                  <th>Daily Limit Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${dailySummary.map(d => `
+                  <tr style="${d.exceedsLimit ? 'background:#FEF2F2;' : ''}">
+                    <td><strong>Day ${d.dayIndex}</strong></td>
+                    <td>${d.dateFormatted}</td>
+                    <td style="font-family:var(--font-mono); font-weight:700; ${d.exceedsLimit ? 'color:#B91C1C;' : ''}">${d.driveHoursFormatted}</td>
+                    <td>
+                      ${d.exceedsLimit
+                        ? `<span class="badge badge-danger">Exceeds 8h Limit · Second Driver Required</span>`
+                        : `<span class="badge badge-success">Within Safe Limit (&lt;8h)</span>`
+                      }
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 3.3: Passengers, Cargo, Notes -->
+        <div class="card" style="padding: 18px 20px;">
+          <h3 style="margin:0 0 12px; font-size:15px; color:var(--navy-800);">Passengers, Cargo Manifest &amp; Overnight Lodging</h3>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; font-size:13px;">
+            
+            <div style="background:#F8FAFC; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border);">
+              <span style="color:var(--text-muted); display:block; margin-bottom:4px;">Passenger Manifest:</span>
+              <strong style="color:var(--navy-800); font-size:14px;">${booking.passengers || 4} Passengers</strong>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Standard personal luggage declared</div>
+            </div>
+
+            <div style="background:#F8FAFC; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border);">
+              <span style="color:var(--text-muted); display:block; margin-bottom:4px;">Extra Cargo Payload:</span>
+              ${booking.has_extra_cargo || (booking.cargo_kg && booking.cargo_kg > 0) ? `
+                <strong style="color:var(--navy-800); font-size:14px;">${booking.cargo_kg || booking.cargoWeightKg || 0} kg Cargo</strong>
+                <div style="font-size:12px; color:var(--navy-800); margin-top:2px;">${escapeHtml(booking.cargo_description || 'General Cargo')}</div>
+                <div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:6px;">
+                  ${booking.cargo_flags && booking.cargo_flags.fragile ? '<span class="chip-warning">Fragile</span>' : ''}
+                  ${booking.cargo_flags && booking.cargo_flags.strap ? '<span class="chip-info">Needs strapped</span>' : ''}
+                  ${booking.cargo_flags && booking.cargo_flags.loading_help ? '<span class="chip-info">Needs loading help</span>' : ''}
+                </div>
+              ` : `
+                <span style="color:var(--text-muted);">Standard luggage only; no freight or cargo declared.</span>
+              `}
+            </div>
+
+            <div style="background:#F8FAFC; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border);">
+              <span style="color:var(--text-muted); display:block; margin-bottom:4px;">Driver Accommodation:</span>
+              <strong style="color:var(--navy-800); font-size:13.5px;">${escapeHtml(booking.driver_overnight_location || 'Not specified')}</strong>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Driver accommodation needed: ${Math.max(0, days - 1)} nights</div>
+            </div>
+
+            <div style="background:#F8FAFC; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border); grid-column:1 / -1;">
+              <span style="color:var(--text-muted); display:block; margin-bottom:4px;">Notes for Dispatch Desk:</span>
+              <div style="color:var(--navy-800); font-size:13px; font-style:italic;">
+                ${booking.notes ? escapeHtml(booking.notes) : 'No special operational dispatch notes submitted.'}
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 3.4: Vehicle Assignment -->
+        <div class="card" style="padding: 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+            <div>
+              <h3 style="margin:0; font-size:16px; color:var(--navy-800);">Vehicle Allocation &amp; Turnaround Lockout</h3>
+              <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">
+                <strong>Hold Window:</strong> <span style="font-family:var(--font-mono); color:var(--navy-800);">${hold.formattedWithBuffer}</span>
+              </div>
+            </div>
+            <span class="badge badge-primary" style="font-size:11px;">Best Fit Sorted</span>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="roster-table">
+              <thead>
+                <tr>
+                  <th style="width:36px;">Select</th>
+                  <th>Code</th>
+                  <th>Model &amp; Category</th>
+                  <th>Capacity</th>
+                  <th>Nominal Fuel</th>
+                  <th>Current Location &amp; Repositioning</th>
+                  <th>Est. Consumption</th>
+                  <th>Eligibility Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${vehicleEligList.map(item => {
+                  const v = item.vehicle;
+                  const est = item.estimate;
+                  const isChecked = v.code === selectedVehicleCode;
+                  const trClass = item.eligible ? (isChecked ? 'roster-row-eligible roster-row-selected' : 'roster-row-eligible') : 'roster-row-ineligible';
+
+                  let badgeHtml = '<span class="badge badge-success">Eligible · Best Fit</span>';
+                  if (!item.eligible) {
+                    badgeHtml = `<span class="badge badge-danger">${escapeHtml(item.reasons.join(', '))}</span>`;
+                  }
+
+                  const repositionText = est.repositioningKm > 0
+                    ? `<span style="color:#B45309; font-weight:600;">+${est.repositioningKm} km repositioning</span>`
+                    : '<span style="color:#047857;">On Site (0 km)</span>';
+
+                  return `
+                    <tr class="${trClass}" onclick="${item.eligible ? `handleSelectVehicle('${v.code}')` : ''}">
+                      <td>
+                        <input type="radio" name="v_choice" value="${v.code}" ${isChecked ? 'checked' : ''} ${item.eligible ? '' : 'disabled'} onchange="handleSelectVehicle('${v.code}')" style="accent-color:var(--navy-800);">
+                      </td>
+                      <td><strong style="font-family:var(--font-mono);">${v.code}</strong></td>
+                      <td>
+                        <strong>${escapeHtml(v.model)}</strong>
+                        <div style="font-size:11.5px; color:var(--text-muted);">${escapeHtml(v.category)}</div>
+                      </td>
+                      <td>${v.seats} seats · ${v.payloadKg.toLocaleString()} kg</td>
+                      <td>${v.fuelType} · ${v.ratePer100Km} L/100km</td>
+                      <td>
+                        <div>${escapeHtml(v.location)}</div>
+                        <div style="font-size:11px;">${repositionText}</div>
+                      </td>
+                      <td>
+                        <strong style="font-family:var(--font-mono);">${est.fuelLiters} L</strong>
+                        <div style="font-size:11.5px; color:var(--cira-burgundy); font-weight:700;">EGP ${est.costEGP.toLocaleString()}</div>
+                      </td>
+                      <td>${badgeHtml}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 3.5: Driver Assignment -->
+        <div class="card" style="padding: 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+            <div>
+              <h3 style="margin:0; font-size:16px; color:var(--navy-800);">Driver Roster &amp; License Compatibility</h3>
+              <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">
+                Checking against hold window and selected vehicle (${chosenVehicleItem.vehicle.model})
+              </div>
+            </div>
+            ${requiresSecondDriver ? `
+              <span class="chip-warning" style="font-size:11.5px;">Over 8h daily limit: 2 Drivers Required</span>
+            ` : ''}
+          </div>
+
+          ${requiresSecondDriver ? `
+            <div class="alert-banner alert-warning" style="margin-bottom:12px;">
+              <strong>Duty Alert:</strong> Day 1 exceeds 8 hours of driving. Single-driver assignment is blocked by safety policy. Please assign both a primary and relief driver.
+            </div>
+          ` : ''}
+
+          <div style="overflow-x:auto;">
+            <table class="roster-table">
+              <thead>
+                <tr>
+                  <th style="width:36px;">Select</th>
+                  <th>Driver Name</th>
+                  <th>License Class &amp; Expiry</th>
+                  <th>Availability &amp; Schedule</th>
+                  <th>Experience</th>
+                  <th>Eligibility Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${driverEligList.map(item => {
+                  const d = item.driver;
+                  const isChecked = selectedDriverIds.includes(d.id);
+                  const trClass = item.eligible ? (isChecked ? 'roster-row-eligible roster-row-selected' : 'roster-row-eligible') : 'roster-row-ineligible';
+
+                  let badgeHtml = '<span class="badge badge-success">Eligible</span>';
+                  if (!item.eligible) {
+                    badgeHtml = `<span class="badge badge-danger">${escapeHtml(item.reasons.join(', '))}</span>`;
+                  }
+
+                  const inputType = requiresSecondDriver ? 'checkbox' : 'radio';
+
+                  return `
+                    <tr class="${trClass}" onclick="${item.eligible ? `handleSelectDriver('${d.id}')` : ''}">
+                      <td>
+                        <input type="${inputType}" name="d_choice" value="${d.id}" ${isChecked ? 'checked' : ''} ${item.eligible ? '' : 'disabled'} onchange="handleSelectDriver('${d.id}')" style="accent-color:var(--navy-800);">
+                      </td>
+                      <td>
+                        <strong>${escapeHtml(d.name)}</strong>
+                        <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">${d.licenseNo}</div>
+                      </td>
+                      <td>
+                        <div>${escapeHtml(d.licenseClass)}</div>
+                        <div style="font-size:11.5px; color:var(--text-muted);">Expires: ${d.expires}</div>
+                      </td>
+                      <td>
+                        <div>${escapeHtml(d.status)}</div>
+                        <div style="font-size:11.5px; color:var(--text-muted);">Free for full ${days} days</div>
+                      </td>
+                      <td>${d.totalTrips} missions completed</td>
+                      <td>${badgeHtml}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 3.6: Sticky Decision Area -->
+        <div class="decision-sticky-footer">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="font-size:13.5px; color:var(--navy-800);">
+              <span style="color:var(--text-muted);">Allocation Proposal:</span>
+              <strong id="decision-summary-text" style="font-size:14px; margin-left:4px;">
+                ${chosenVehicleItem.vehicle.code} + ${primaryDriverItem ? primaryDriverItem.driver.name : 'Pending Driver'} ${secondDriverItem ? ' & ' + secondDriverItem.driver.name : ''} · ${hold.formatted} · ${chosenVehicleItem.estimate.fuelLiters} L · EGP ${chosenVehicleItem.estimate.costEGP.toLocaleString()}
+              </strong>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted);">
+              Price Book: ${FleetStore.getSettings().fuelPrices.activeVersion || 'v3'}
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input type="text" id="dispatch-note-input" placeholder="Optional approval note for requester (e.g. Driver will meet at Gate 2)..." style="flex:1; min-width:240px; padding:9px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px;">
+
+            ${booking.status === 'Approved' ? `
+              <button type="button" class="btn btn-gold" style="padding:10px 20px; font-weight:700;" onclick="handleDispatchTrip('${booking.id}')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                <span>Dispatch Trip to Field</span>
+              </button>
+            ` : `
+              <button type="button" class="btn btn-gold" id="btn-approve-assign" style="padding:10px 20px; font-weight:700;" onclick="handleApproveBooking('${booking.id}')" ${canApprove(booking, chosenVehicleItem, requiresSecondDriver) ? '' : 'disabled'}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Approve &amp; Assign</span>
+              </button>
+            `}
+
+            <button type="button" class="btn-warning-outline" onclick="openChangesModal()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span>Request Changes</span>
+            </button>
+
+            <button type="button" class="btn-danger-outline" onclick="openRejectModal()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <span>Reject</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      setTimeout(() => {
+        initItineraryMap(points, booking.return_with_vehicle);
+      }, 50);
+    }
+
+    function canApprove(booking, chosenVehicleItem, requiresSecondDriver) {
+      if (!chosenVehicleItem || !chosenVehicleItem.eligible) return false;
+      if (selectedDriverIds.length === 0) return false;
+      if (requiresSecondDriver && selectedDriverIds.length < 2) return false;
+      return true;
+    }
+
+    function initItineraryMap(points, returnWithVehicle) {
+      const container = document.getElementById('dispatch-itinerary-map');
+      if (!container) return;
+
+      if (typeof drawItineraryMap === 'function') {
+        currentItineraryMapInstance = drawItineraryMap('dispatch-itinerary-map', points, {
+          returnWithVehicle: Boolean(returnWithVehicle),
+          height: '290px'
+        });
+      } else if (window.GeoService && typeof window.GeoService.drawItineraryMap === 'function') {
+        currentItineraryMapInstance = window.GeoService.drawItineraryMap('dispatch-itinerary-map', points, {
+          returnWithVehicle: Boolean(returnWithVehicle),
+          height: '290px'
+        });
+      }
+    }
+
+    function handleSelectVehicle(code) {
+      selectedVehicleCode = code;
+      renderSelectedRequestPanel(currentSelectedId);
+    }
+
+    function handleSelectDriver(driverId) {
+      const booking = FleetStore.getBooking(currentSelectedId);
+      const driverEligList = FleetStore.getDriverEligibility(booking, selectedVehicleCode);
+      const requiresSecondDriver = driverEligList[0] && driverEligList[0].requiresSecondDriver;
+
+      if (requiresSecondDriver) {
+        if (selectedDriverIds.includes(driverId)) {
+          selectedDriverIds = selectedDriverIds.filter(id => id !== driverId);
+        } else {
+          if (selectedDriverIds.length >= 2) {
+            selectedDriverIds[1] = driverId;
+          } else {
+            selectedDriverIds.push(driverId);
+          }
+        }
+      } else {
+        selectedDriverIds = [driverId];
+      }
+
+      renderSelectedRequestPanel(currentSelectedId);
+    }
+
+    function handleApproveBooking(bookingId) {
+      const note = document.getElementById('dispatch-note-input').value;
+      const result = FleetStore.approveBooking(bookingId, selectedVehicleCode, selectedDriverIds, note);
+
+      if (!result.success) {
+        if (result.conflict) {
+          alert(`Assignment conflict detected:\n\n${result.error}`);
+          renderSelectedRequestPanel(bookingId);
+        } else {
+          alert(`Cannot approve booking:\n\n${result.error}`);
+        }
+        return;
+      }
+
+      alert(`Booking ${bookingId} approved successfully!\n\nAssigned Vehicle: ${result.booking.vehicle}\nAssigned Driver(s): ${result.booking.driver}\nHold Window: ${result.booking.hold_window.formatted}\nRecomputed Fuel: ${result.booking.estFuelLiters} L (EGP ${result.booking.estCostEGP.toLocaleString()})`);
+      switchQueueTab('approved');
+      selectBooking(bookingId);
+    }
+
+    function handleDispatchTrip(bookingId) {
+      const confirmed = confirm(`Are you ready to dispatch trip ${bookingId} to the field?\n\nThe driver will receive real-time access on their mobile trip manifest.`);
+      if (!confirmed) return;
+
+      const res = FleetStore.dispatchBooking(bookingId);
+      if (res.success) {
+        alert(`Trip ${bookingId} dispatched! Driver can now start trip route.`);
+        refreshQueue(false);
+      } else {
+        alert(res.error || 'Failed to dispatch trip');
+      }
+    }
+
+    function openRejectModal() {
+      document.getElementById('reject-modal').classList.add('open');
+    }
+
+    function closeRejectModal() {
+      document.getElementById('reject-modal').classList.remove('open');
+    }
+
+    function submitRejectBooking() {
+      const reasonCode = document.getElementById('reject-reason-code').value;
+      const reasonText = document.getElementById('reject-reason-text').value.trim();
+
+      if (!reasonText) {
+        alert('Please enter an explanation note for the requester.');
+        return;
+      }
+
+      const res = FleetStore.rejectBooking(currentSelectedId, reasonCode, reasonText);
+      closeRejectModal();
+
+      if (res.success) {
+        alert(`Booking ${currentSelectedId} has been rejected.`);
+        switchQueueTab('rejected');
+        selectBooking(currentSelectedId);
+      } else {
+        alert(res.error || 'Error rejecting booking.');
+      }
+    }
+
+    function openChangesModal() {
+      document.getElementById('changes-modal').classList.add('open');
+    }
+
+    function closeChangesModal() {
+      document.getElementById('changes-modal').classList.remove('open');
+    }
+
+    function submitRequestChanges() {
+      const msg = document.getElementById('changes-message-text').value.trim();
+      if (!msg) {
+        alert('Please enter your specific requested adjustments for the requester.');
+        return;
+      }
+
+      const res = FleetStore.requestChanges(currentSelectedId, msg);
+      closeChangesModal();
+
+      if (res.success) {
+        alert(`Change request sent to requester for ${currentSelectedId}.`);
+        switchQueueTab('changes');
+        selectBooking(currentSelectedId);
+      } else {
+        alert(res.error || 'Error sending change request.');
+      }
+    }
+
+    function openMessageModal(requesterName) {
+      document.getElementById('message-modal-title').textContent = `Message ${requesterName}`;
+      document.getElementById('message-modal-subtext').textContent = `Direct message regarding ${currentSelectedId}.`;
+      document.getElementById('direct-message-content').value = '';
+      document.getElementById('message-modal').classList.add('open');
+    }
+
+    function closeMessageModal() {
+      document.getElementById('message-modal').classList.remove('open');
+    }
+
+    function submitDirectMessage() {
+      const msg = document.getElementById('direct-message-content').value.trim();
+      if (!msg) {
+        alert('Please enter a message before sending.');
+        return;
+      }
+      closeMessageModal();
+      alert(`Message dispatched to requester:\n\n"${msg}"`);
     }
 
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Dispatcher"])) return;
       Auth.renderAppShell('dispatch');
-      initQueue();
+
+      const deepLinkId = getQueryParam('id');
+      if (deepLinkId) {
+        currentSelectedId = deepLinkId;
+        const b = FleetStore.getBooking(deepLinkId);
+        if (b) {
+          if (b.status === 'Changes requested') currentTab = 'changes';
+          else if (b.status === 'Approved') currentTab = 'approved';
+          else if (b.status === 'Rejected') currentTab = 'rejected';
+          else currentTab = 'pending';
+
+          document.querySelectorAll('.queue-tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === currentTab);
+          });
+        }
+      }
+
+      refreshQueue(true);
     });
   </script>
 </body>

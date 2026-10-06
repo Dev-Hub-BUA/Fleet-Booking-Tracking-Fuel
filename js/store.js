@@ -1,7 +1,44 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'cira_fleet_live_store_v2';
+  const STORAGE_KEY = 'cira_fleet_live_store_v3';
+
+  const DEFAULT_SETTINGS = {
+    system: {
+      organization: 'CIRA Education',
+      portalName: 'Fleet Logistics & Dispatch Platform',
+      version: '3.2.0',
+      timezone: 'Africa/Cairo',
+      currency: 'EGP'
+    },
+    rules: {
+      bookingLeadTimeHours: 4,
+      selfCancelWindowHours: 2,
+      prepBufferMin: 30,
+      turnaroundBufferMin: 45,
+      maxDrivingHoursPerDay: 8.0,
+      fuelVarianceThresholdPct: 10.0,
+      agingThresholdHours: 4,
+      staleSignalThresholdMin: 5,
+      maxIdleMinutesAlert: 15
+    },
+    contacts: {
+      office: 'CIRA Central Logistics Directorate, Campus Admin Bldg, G-14',
+      dispatchDesk: 'Ext. 4108 / 4109',
+      emergencyHotline: '+20 10 2233 4455',
+      email: 'fleet.operations@cira.com.eg',
+      hours: '24/7 Operations Command & Dispatch'
+    },
+    fuelPrices: {
+      activeVersion: 'v3 (Effective 01 Aug 2026)',
+      rates: {
+        petrol92: 22.25,
+        petrol95: 24.00,
+        diesel: 20.50,
+        cng: 6.50
+      }
+    }
+  };
 
   const KNOWN_LOCATIONS = [
     { name: 'Badr University in Assiut', lat: 27.1809, lng: 31.1837, type: 'Campus' },
@@ -43,6 +80,31 @@
     'Heavy Cargo Truck': { ratePer100Km: 18.0, fuelPrice: 20.50, fuelType: 'Diesel' }
   };
 
+  const DEFAULT_VEHICLES = [
+    { code: 'V-122', plate: 'BDR 3307', model: 'Hyundai H-1', year: 2023, category: 'Passenger Van', type: 'Van', seats: 9, payloadKg: 1000, fuelType: 'Diesel', ratePer100Km: 9.2, status: 'Available', location: 'Badr University in Assiut', odo: 48276 },
+    { code: 'V-130', plate: 'BDR 4182', model: 'Toyota HiAce', year: 2020, category: 'Passenger Van', type: 'Van', seats: 12, payloadKg: 1200, fuelType: 'Diesel', ratePer100Km: 10.1, status: 'Available', location: 'Badr University in Cairo', odo: 84150 },
+    { code: 'V-114', plate: 'BDR 2019', model: 'Toyota HiAce', year: 2022, category: 'Passenger Van', type: 'Van', seats: 9, payloadKg: 1100, fuelType: 'Diesel', ratePer100Km: 9.8, status: 'On trip', location: 'Transit to Obour', odo: 62400 },
+    { code: 'S-11', plate: 'BDR 1044', model: 'Hyundai Elantra', year: 2024, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'Petrol 92', ratePer100Km: 7.1, status: 'Available', location: 'Badr University in Assiut', odo: 18300 },
+    { code: 'V-205', plate: 'BDR 5580', model: 'Toyota Corolla', year: 2023, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'Petrol 95', ratePer100Km: 6.8, status: 'On trip', location: 'Cairo Airport T3', odo: 32100 },
+    { code: 'C-04', plate: 'BDR 7712', model: 'Hyundai Accent', year: 2022, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'CNG', ratePer100Km: 7.4, status: 'Available', location: 'Cairo University', odo: 51900 },
+    { code: 'B-07', plate: 'BDR 9901', model: 'MCV 500 Coach', year: 2021, category: 'Bus', type: 'Bus', seats: 45, payloadKg: 4000, fuelType: 'Diesel', ratePer100Km: 27.5, status: 'Available', location: 'Badr University in Cairo', odo: 112000 },
+    { code: 'T-02', plate: 'BDR 6623', model: 'Isuzu NPR Box Truck', year: 2021, category: 'Heavy Cargo Truck', type: 'Truck', seats: 3, payloadKg: 4500, fuelType: 'Diesel', ratePer100Km: 18.0, status: 'On trip', location: 'Plant 3 — 10th of Ramadan', odo: 95800 },
+    { code: 'V-108', plate: 'BDR 1198', model: 'Nissan Urvan', year: 2019, category: 'Passenger Van', type: 'Van', seats: 12, payloadKg: 1150, fuelType: 'Diesel', ratePer100Km: 10.4, status: 'Maintenance', location: 'Central Workshop', odo: 143200 }
+  ];
+
+  const DEFAULT_DRIVERS = [
+    { id: 'D-101', name: 'Ahmed Hassan (Driver A)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-CAI-84920', expires: '2028-03-15', status: 'On Shift', totalTrips: 412, allowedVehicles: ['Sedan', 'Van', 'Pickup'] },
+    { id: 'D-102', name: 'Mostafa Kamel (Driver B)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-GIZ-39102', expires: '2027-11-20', status: 'On Shift', totalTrips: 345, allowedVehicles: ['Sedan', 'Van'] },
+    { id: 'D-103', name: 'Hany Mahmoud (Driver C)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-CAI-12948', expires: '2027-08-10', status: 'On Shift', totalTrips: 520, allowedVehicles: ['Sedan', 'Van'] },
+    { id: 'D-104', name: 'Sherif Fathy (Driver D)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-SHR-77291', expires: '2026-10-09', status: 'Off Duty (Expired)', totalTrips: 288, allowedVehicles: ['Sedan', 'Van'] },
+    { id: 'D-105', name: 'Sameh Adel (Driver E)', licenseClass: 'Class 3 (Private)', licenseNo: 'EG-CAI-99201', expires: '2029-01-18', status: 'On Shift', totalTrips: 180, allowedVehicles: ['Sedan only'] },
+    { id: 'D-106', name: 'Khaled Soliman (Driver F)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-CAI-66419', expires: '2027-05-30', status: 'On Shift', totalTrips: 390, allowedVehicles: ['Sedan', 'Van'] },
+    { id: 'D-107', name: 'Walid Saad (Driver G)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-CAI-33820', expires: '2028-09-12', status: 'On Standby', totalTrips: 210, allowedVehicles: ['Sedan', 'Van', 'CNG'] },
+    { id: 'D-108', name: 'Hassan Metwally (Driver H)', licenseClass: 'Class 1 (Heavy / Bus)', licenseNo: 'EG-CAI-00192', expires: '2027-12-05', status: 'On Shift', totalTrips: 640, allowedVehicles: ['Bus', 'Heavy Coach', 'Van'] },
+    { id: 'D-109', name: 'Ibrahim Gamal (Driver I)', licenseClass: 'Class 1 (Heavy / Truck)', licenseNo: 'EG-SHR-44109', expires: '2028-04-22', status: 'On Shift', totalTrips: 480, allowedVehicles: ['Truck', 'Van', 'Heavy Cargo'] },
+    { id: 'D-110', name: 'Mahmoud Reda (Driver K)', licenseClass: 'Class 1 (Heavy / Bus)', licenseNo: 'EG-CAI-55219', expires: '2028-07-14', status: 'Incident Triage', totalTrips: 310, allowedVehicles: ['Bus', 'Van'] }
+  ];
+
   function calculateHaversineKm(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -61,6 +123,36 @@
       const name = loc.name.toLowerCase();
       return name === clean || name.includes(clean) || clean.includes(name);
     }) || null;
+  }
+
+  function formatShortDate(dateStr) {
+    if (!dateStr) return '';
+    const clean = dateStr.includes(' ') ? dateStr.split(' ')[0] : (dateStr.includes('T') ? dateStr.split('T')[0] : dateStr);
+    const d = new Date(clean + 'T12:00:00');
+    if (isNaN(d)) return dateStr;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${d.getDate()} ${months[d.getMonth()]}`;
+  }
+
+  function formatShortRange(startStr, endStr) {
+    if (!startStr) return '';
+    const s = formatShortDate(startStr);
+    const e = formatShortDate(endStr);
+    if (!e || s === e) return s;
+    const sParts = s.split(' ');
+    const eParts = e.split(' ');
+    if (sParts[1] === eParts[1]) {
+      return `${sParts[0]}–${eParts[0]} ${sParts[1]}`;
+    }
+    return `${s}–${e}`;
+  }
+
+  function parseDateTimeSafe(str, fallbackTime = '08:00') {
+    if (!str) return new Date();
+    const clean = str.trim().replace(' ', 'T');
+    const withTime = clean.includes('T') ? clean : `${clean}T${fallbackTime}`;
+    const d = new Date(withTime);
+    return isNaN(d) ? new Date() : d;
   }
 
   const RouteEstimator = {
@@ -184,11 +276,15 @@
   };
 
   function getInitialData() {
-    if (window.CIRA_DATA) {
-      return JSON.parse(JSON.stringify(window.CIRA_DATA));
-    }
+    const twoHoursAgo = new Date(Date.now() - 2 * 3600 * 1000).toISOString();
+    const fiveHoursAgo = new Date(Date.now() - 5 * 3600 * 1000).toISOString();
+    const sixHoursAgo = new Date(Date.now() - 6 * 3600 * 1000).toISOString();
+    const oneDayAgo = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+
     return {
-      vehicles: [],
+      settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
+      vehicles: JSON.parse(JSON.stringify(DEFAULT_VEHICLES)),
+      drivers: JSON.parse(JSON.stringify(DEFAULT_DRIVERS)),
       bookings: [
         {
           id: 'BK-2047',
@@ -207,9 +303,9 @@
           returnDate: '2026-10-22',
           returnTime: '18:00',
           vehicleCategory: 'Passenger Van',
-          vehicle: 'Hyundai H-1 (V-122)',
-          vehicleCode: 'V-122',
-          driver: 'Ahmed Hassan (Driver A)',
+          vehicle: 'Pending Allocation',
+          vehicleCode: 'TBD',
+          driver: 'Pending Assignment',
           passengers: 4,
           has_extra_cargo: true,
           cargo_kg: 350,
@@ -229,10 +325,20 @@
           distanceKm: 865.0,
           estDriveMinutes: 680,
           estFuelLiters: 82.2,
-          estCostEGP: 1828.95,
+          estCostEGP: 1685.10,
           holdAmountEGP: 2200.0,
-          status: 'Active',
-          statusAr: 'Active',
+          status: 'Pending',
+          statusAr: 'Pending',
+          createdAt: twoHoursAgo,
+          history: [
+            {
+              status: 'Submitted',
+              at: '18 Oct 2026, 07:15',
+              by: 'Dr. Sarah Mansour (Requester)',
+              note: 'Initial booking request submitted'
+            }
+          ],
+          messages: [],
           hold_window: {
             start: '2026-10-18 08:00',
             end: '2026-10-22 18:45',
@@ -316,13 +422,127 @@
               cost_egp: 817.95,
               warning: null
             }
-          ],
-          actualOdoStart: 84210,
-          actualOdoEnd: null,
-          actualFuelLitres: null,
-          actualFuelCostEGP: null,
-          fuelVariancePct: null,
-          createdAt: new Date().toISOString()
+          ]
+        },
+        {
+          id: 'BK-2048',
+          route: 'Cairo University → Alexandria University / Borg El Arab',
+          origin: 'Cairo University',
+          destination: 'Alexandria University / Borg El Arab',
+          startDate: '2026-10-24',
+          endDate: '2026-10-25',
+          start_date: '2026-10-24',
+          end_date: '2026-10-25',
+          departureTime: '06:00',
+          expectedEnd: '16:00',
+          return_with_vehicle: false,
+          vehicleCategory: 'Sedan',
+          vehicle: 'Pending Allocation',
+          vehicleCode: 'TBD',
+          driver: 'Pending Assignment',
+          passengers: 3,
+          has_extra_cargo: false,
+          cargo_kg: 0,
+          cargoWeightKg: 0,
+          purpose: 'Academic Accreditation Review',
+          dept: 'Faculty of Engineering',
+          requesterName: 'Dr. Tarek Hegazy',
+          distanceKm: 218.0,
+          estDriveMinutes: 160,
+          estFuelLiters: 15.3,
+          estCostEGP: 340.45,
+          status: 'Changes requested',
+          statusAr: 'Changes requested',
+          changesRequestedMessage: 'Please move departure time from 06:00 to 07:30 to match driver shift availability.',
+          changesRequestedBy: 'Khaled Ibrahim (Dispatcher)',
+          createdAt: fiveHoursAgo,
+          itinerary: [
+            { sequence: 1, type: 'departure', place_name: 'Cairo University', lat: 30.0276, lng: 31.2089, pinned: true, depart_at: '2026-10-24 06:00' },
+            { sequence: 2, type: 'stop', place_name: 'Alexandria University / Borg El Arab', lat: 31.2001, lng: 29.9187, pinned: true, arrive_at: '2026-10-25 16:00' }
+          ]
+        },
+        {
+          id: 'BK-2050',
+          route: 'Badr University in Cairo → Ain Sokhna Marine Research Facility',
+          origin: 'Badr University in Cairo',
+          destination: 'Ain Sokhna Marine Research Facility',
+          startDate: '2026-10-19',
+          endDate: '2026-10-20',
+          start_date: '2026-10-19',
+          end_date: '2026-10-20',
+          departureTime: '07:00',
+          expectedEnd: '18:00',
+          return_with_vehicle: true,
+          vehicleCategory: 'Passenger Van',
+          vehicle: 'Toyota HiAce (V-130)',
+          vehicleCode: 'V-130',
+          driver: 'Mostafa Kamel (Driver B)',
+          assignedDriverIds: ['D-102'],
+          passengers: 12,
+          has_extra_cargo: false,
+          cargo_kg: 0,
+          cargoWeightKg: 0,
+          purpose: 'Marine Biology Field Study',
+          dept: 'Faculty of Science',
+          requesterName: 'Dr. Mahmoud Zaki',
+          distanceKm: 220.0,
+          estDriveMinutes: 170,
+          estFuelLiters: 22.2,
+          estCostEGP: 455.10,
+          status: 'Approved',
+          statusAr: 'Approved',
+          approved_by: 'Khaled Ibrahim (Dispatcher)',
+          approved_at: oneDayAgo,
+          createdAt: oneDayAgo,
+          hold_window: {
+            start: '2026-10-19 07:00',
+            end: '2026-10-20 18:45',
+            bufferMinutes: 45
+          },
+          itinerary: [
+            { sequence: 1, type: 'departure', place_name: 'Badr University in Cairo', lat: 30.1378, lng: 31.7456, pinned: true, depart_at: '2026-10-19 07:00' },
+            { sequence: 2, type: 'stop', place_name: 'Ain Sokhna Marine Research Facility', lat: 29.6012, lng: 32.3211, pinned: true, arrive_at: '2026-10-19 09:30', depart_at: '2026-10-20 15:30' },
+            { sequence: 3, type: 'return', place_name: 'Badr University in Cairo', lat: 30.1378, lng: 31.7456, pinned: true, arrive_at: '2026-10-20 18:00' }
+          ]
+        },
+        {
+          id: 'BK-2049',
+          route: 'Plant 3 — 10th of Ramadan → Supplier Depot — Obour City',
+          origin: 'Plant 3 — 10th of Ramadan',
+          destination: 'Supplier Depot — Obour City',
+          startDate: '2026-10-28',
+          endDate: '2026-10-28',
+          start_date: '2026-10-28',
+          end_date: '2026-10-28',
+          departureTime: '09:00',
+          expectedEnd: '14:00',
+          return_with_vehicle: false,
+          vehicleCategory: 'Sedan',
+          vehicle: 'None',
+          vehicleCode: 'None',
+          driver: 'None',
+          passengers: 2,
+          has_extra_cargo: true,
+          cargo_kg: 600,
+          cargoWeightKg: 600,
+          purpose: 'Courier Cargo Transport',
+          dept: 'General Administration',
+          requesterName: 'Hossam Nabil',
+          distanceKm: 29.4,
+          estDriveMinutes: 30,
+          estFuelLiters: 2.1,
+          estCostEGP: 46.75,
+          status: 'Rejected',
+          statusAr: 'Rejected',
+          rejectionReason: 'Outside policy',
+          rejectionText: 'Cargo exceeds standard courier limit and non-official transport is not approved for this cost center.',
+          rejected_by: 'Khaled Ibrahim (Dispatcher)',
+          rejected_at: sixHoursAgo,
+          createdAt: sixHoursAgo,
+          itinerary: [
+            { sequence: 1, type: 'departure', place_name: 'Plant 3 — 10th of Ramadan', lat: 30.3012, lng: 31.7432, pinned: true, depart_at: '2026-10-28 09:00' },
+            { sequence: 2, type: 'stop', place_name: 'Supplier Depot — Obour City', lat: 30.2241, lng: 31.4589, pinned: true, arrive_at: '2026-10-28 14:00' }
+          ]
         },
         {
           id: 'BK-2045',
@@ -345,12 +565,6 @@
           has_extra_cargo: false,
           cargo_kg: 0,
           cargoWeightKg: 0,
-          cargo_description: '',
-          cargo_flags: {
-            fragile: false,
-            strap: false,
-            loading_help: false
-          },
           purpose: 'Visiting External Accreditation Delegation Pickup',
           dept: 'Faculty of Pharmacy',
           requesterName: 'Dr. Sarah Mansour',
@@ -360,67 +574,7 @@
           status: 'Completed',
           statusAr: 'Completed',
           holdAmountEGP: 250.0,
-          itinerary: [
-            {
-              sequence: 1,
-              type: 'departure',
-              place_name: 'BUC Admin Building',
-              lat: 30.1378,
-              lng: 31.7456,
-              pinned: true,
-              depart_at: '2026-10-12 14:00'
-            },
-            {
-              sequence: 2,
-              type: 'return',
-              place_name: 'Cairo Airport Terminal 3',
-              lat: 30.1114,
-              lng: 31.4065,
-              pinned: true,
-              arrive_at: '2026-10-12 17:30'
-            }
-          ],
-          route_legs: [
-            {
-              from_seq: 1,
-              to_seq: 2,
-              from_place: 'BUC Admin Building',
-              to_place: 'Cairo Airport Terminal 3',
-              distance_km: 42.0,
-              drive_minutes: 45,
-              fuel_liters: 9.2,
-              cost_egp: 204.7
-            }
-          ],
-          actualOdoStart: 51200,
-          actualOdoEnd: 51242,
-          actualFuelLitres: 9.4,
-          actualFuelCostEGP: 209.15,
-          fuelVariancePct: 2.2,
-          createdAt: new Date(Date.now() - 86400000).toISOString()
-        }
-      ],
-      dispatchQueue: [
-        {
-          id: 'BK-2047',
-          route: 'Assiut → Cairo → BUC → Assiut (5 days)',
-          flag: 'Multi-Day Itinerary (5d)',
-          kind: 'info',
-          meta: '18 Oct 08:00 → 22 Oct 18:00 · Faculty of Pharmacy'
-        },
-        {
-          id: 'BK-2049',
-          route: 'Main Campus → Cairo International Airport T3',
-          flag: 'Re-Approval',
-          kind: 'warn',
-          meta: '13 Oct 05:00–07:30 · President’s Office'
-        },
-        {
-          id: 'BK-2051',
-          route: 'BUC Badr → Ain Sokhna Marine Station',
-          flag: 'Long Haul (>200km)',
-          kind: 'warn',
-          meta: '14 Oct 07:00–18:00 · Student Affairs'
+          createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString()
         }
       ],
       auditTrail: [
@@ -429,16 +583,19 @@
           time: 'Today · 08:35',
           user: 'Khaled Ibrahim (Dispatcher)',
           action: 'Approve Multi-Day Itinerary',
-          ref: 'BK-2047',
-          details: 'Assigned Hyundai H-1 (V-122) with Driver Ahmed Hassan. Verified 5-day hold window (18–22 Oct) and rest buffers.'
-        },
+          ref: 'BK-2050',
+          details: 'Assigned Toyota HiAce (V-130) with Driver Mostafa Kamel for Marine Field Trip.'
+        }
+      ],
+      notifications: [
         {
-          id: 'AUD-8798',
-          time: 'Yesterday · 17:45',
-          user: 'Mona Adel (Auditor)',
-          action: 'Fuel Settle & Reconcile',
-          ref: 'BK-2045',
-          details: 'Verified fuel receipt EGP 209.15 (+2.2% variance within ±10% threshold). Cleared.'
+          id: 'NOTIF-1',
+          targetRole: 'Dispatcher',
+          title: 'New Booking Awaiting Operations Review',
+          message: 'Dr. Sarah Mansour submitted 5-day itinerary BK-2047 (Assiut → Cairo → BUC).',
+          time: '2 hours ago',
+          read: false,
+          link: 'dispatch-queue.html?id=BK-2047'
         }
       ]
     };
@@ -452,15 +609,9 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
-          const b2047 = (parsed.bookings || []).find(b => b.id === 'BK-2047');
-          if (b2047 && b2047.has_extra_cargo === undefined) {
-            b2047.has_extra_cargo = true;
-            b2047.cargo_kg = 350;
-            b2047.cargoWeightKg = 350;
-            b2047.cargo_description = '6 boxes of lab equipment, 2 projectors, fragile';
-            b2047.cargo_flags = { fragile: true, strap: true, loading_help: false };
-            this.save(parsed);
-          }
+          if (!parsed.settings) parsed.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+          if (!parsed.vehicles || parsed.vehicles.length === 0) parsed.vehicles = JSON.parse(JSON.stringify(DEFAULT_VEHICLES));
+          if (!parsed.drivers || parsed.drivers.length === 0) parsed.drivers = JSON.parse(JSON.stringify(DEFAULT_DRIVERS));
           return parsed;
         }
       } catch (e) {}
@@ -482,7 +633,14 @@
     },
 
     clearAll: function () {
-      const empty = { vehicles: [], bookings: [], dispatchQueue: [], auditTrail: [] };
+      const empty = {
+        settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
+        vehicles: JSON.parse(JSON.stringify(DEFAULT_VEHICLES)),
+        drivers: JSON.parse(JSON.stringify(DEFAULT_DRIVERS)),
+        bookings: [],
+        auditTrail: [],
+        notifications: []
+      };
       this.save(empty);
       return empty;
     },
@@ -494,20 +652,680 @@
       return init;
     },
 
+    getSettings: function () {
+      const data = this.load();
+      return data.settings || DEFAULT_SETTINGS;
+    },
+
+    getVehicles: function () {
+      const data = this.load();
+      return (data.vehicles && data.vehicles.length > 0) ? data.vehicles : DEFAULT_VEHICLES;
+    },
+
+    getDrivers: function () {
+      const data = this.load();
+      return (data.drivers && data.drivers.length > 0) ? data.drivers : DEFAULT_DRIVERS;
+    },
+
     getBookings: function () {
       const data = this.load();
       return data.bookings || [];
     },
 
     getBooking: function (id) {
+      if (!id) return null;
       const bookings = this.getBookings();
-      return bookings.find(b => b.id === id) || bookings[0] || null;
+      return bookings.find(b => b.id === id) || null;
+    },
+
+    getHoldWindow: function (booking) {
+      if (!booking) {
+        return {
+          start: '2026-10-18 08:00',
+          end: '2026-10-18 18:45',
+          startDateObj: new Date(),
+          endDateObj: new Date(),
+          bufferMinutes: 45,
+          formatted: '18 Oct 08:00 → 18 Oct 18:45',
+          formattedWithBuffer: '18 Oct 08:00 → 18 Oct 18:45 (45m turnaround buffer)'
+        };
+      }
+
+      const settings = this.getSettings();
+      const bufferMin = (settings.rules && settings.rules.turnaroundBufferMin) !== undefined
+        ? settings.rules.turnaroundBufferMin
+        : 45;
+
+      let startStr = '';
+      let endStr = '';
+
+      if (Array.isArray(booking.itinerary) && booking.itinerary.length >= 1) {
+        const firstPt = booking.itinerary[0];
+        const lastPt = booking.itinerary[booking.itinerary.length - 1];
+        startStr = firstPt.depart_at || `${booking.startDate || '2026-10-18'} 08:00`;
+        endStr = lastPt.arrive_at || lastPt.depart_at || `${booking.endDate || '2026-10-22'} 18:00`;
+      } else {
+        startStr = `${booking.startDate || booking.start_date || '2026-10-18'} ${booking.departureTime || '08:00'}`;
+        endStr = `${booking.endDate || booking.end_date || '2026-10-22'} ${booking.expectedEnd || '18:00'}`;
+      }
+
+      const startObj = parseDateTimeSafe(startStr, '08:00');
+      const baseEndObj = parseDateTimeSafe(endStr, '18:00');
+      const holdEndObj = new Date(baseEndObj.getTime() + bufferMin * 60000);
+
+      const sFmt = formatShortDate(startStr);
+      const eFmt = formatShortDate(endStr);
+      const sTime = startObj.toTimeString().substring(0, 5);
+      const eTime = holdEndObj.toTimeString().substring(0, 5);
+
+      const formatted = `${sFmt} ${sTime} → ${eFmt} ${eTime}`;
+
+      return {
+        start: startStr,
+        end: endStr,
+        startDateObj: startObj,
+        endDateObj: holdEndObj,
+        bufferMinutes: bufferMin,
+        formatted: formatted,
+        formattedWithBuffer: `${formatted} (${bufferMin}m turnaround buffer)`
+      };
+    },
+
+    computeDailyDrivingSummary: function (booking) {
+      if (!booking) return [];
+      const points = Array.isArray(booking.itinerary) ? booking.itinerary : [];
+      const legs = Array.isArray(booking.route_legs) ? booking.route_legs : [];
+      const settings = this.getSettings();
+      const maxHours = (settings.rules && settings.rules.maxDrivingHoursPerDay) || 8.0;
+      const maxMins = maxHours * 60;
+
+      const dailyMap = {};
+
+      legs.forEach((leg, idx) => {
+        const fromPt = points[idx] || {};
+        const rawDate = (fromPt.depart_at || booking.startDate || '2026-10-18').split(' ')[0];
+        dailyMap[rawDate] = (dailyMap[rawDate] || 0) + (leg.drive_minutes || 0);
+      });
+
+      if (Object.keys(dailyMap).length === 0) {
+        const sDate = booking.startDate || '2026-10-18';
+        dailyMap[sDate] = booking.estDriveMinutes || 0;
+      }
+
+      const summary = [];
+      let dayIdx = 1;
+      const sortedDates = Object.keys(dailyMap).sort();
+
+      sortedDates.forEach(dateStr => {
+        const totalMins = dailyMap[dateStr];
+        const h = Math.floor(totalMins / 60);
+        const m = totalMins % 60;
+        const exceeds = totalMins > maxMins;
+        summary.push({
+          dayIndex: dayIdx,
+          date: dateStr,
+          dateFormatted: formatShortDate(dateStr),
+          driveMinutes: totalMins,
+          driveHoursFormatted: `${h}h ${m.toString().padStart(2, '0')}m`,
+          exceedsLimit: exceeds,
+          notice: exceeds
+            ? `Day ${dayIdx} (${formatShortDate(dateStr)}) needs ${h}h ${m.toString().padStart(2, '0')}m driving — assign a second driver.`
+            : null
+        });
+        dayIdx++;
+      });
+
+      return summary;
+    },
+
+    getVehicleEligibility: function (booking) {
+      if (!booking) return [];
+      const hold = this.getHoldWindow(booking);
+      const allVehicles = this.getVehicles();
+      const allBookings = this.getBookings();
+      const settings = this.getSettings();
+
+      const pax = booking.passengers || 1;
+      const cargoKg = booking.has_extra_cargo
+        ? (parseFloat(booking.cargo_kg || booking.cargoWeightKg) || 0)
+        : 0;
+
+      const depPlace = (Array.isArray(booking.itinerary) && booking.itinerary[0])
+        ? (booking.itinerary[0].place_name || '')
+        : (booking.origin || '');
+
+      const activeBookings = allBookings.filter(b =>
+        b.id !== booking.id && ['Approved', 'Dispatched', 'Active'].includes(b.status)
+      );
+
+      const rates = (settings.fuelPrices && settings.fuelPrices.rates) || DEFAULT_SETTINGS.fuelPrices.rates;
+
+      const evaluated = allVehicles.map(v => {
+        const reasons = [];
+
+        if (['Maintenance', 'Out of service', 'Decommissioned'].includes(v.status)) {
+          reasons.push(`Service lockout (${v.status === 'Maintenance' ? 'Workshop maintenance' : v.status})`);
+        }
+
+        if (v.seats < pax) {
+          reasons.push(`Only ${v.seats} seats (${pax} required)`);
+        }
+
+        if (cargoKg > 0 && v.payloadKg < cargoKg) {
+          reasons.push(`Payload ${v.payloadKg.toLocaleString()} kg < ${cargoKg.toLocaleString()} kg`);
+        }
+
+        const conflictingBooking = activeBookings.find(other => {
+          if (other.vehicleCode !== v.code) return false;
+          const otherHold = this.getHoldWindow(other);
+          return hold.startDateObj < otherHold.endDateObj && hold.endDateObj > otherHold.startDateObj;
+        });
+
+        if (conflictingBooking) {
+          const sRange = formatShortRange(conflictingBooking.startDate, conflictingBooking.endDate);
+          reasons.push(`Busy ${sRange} (${conflictingBooking.id})`);
+        }
+
+        let repositioningKm = 0;
+        const vLoc = (v.location || '').toLowerCase();
+        const dLoc = depPlace.toLowerCase();
+
+        if (vLoc && dLoc && !vLoc.includes(dLoc) && !dLoc.includes(vLoc)) {
+          const vKnown = findLocationByName(v.location);
+          const dKnown = findLocationByName(depPlace);
+          if (vKnown && dKnown) {
+            const key = `${vKnown.name}|${dKnown.name}`;
+            repositioningKm = KNOWN_DISTANCES[key]
+              ? KNOWN_DISTANCES[key].km
+              : calculateHaversineKm(vKnown.lat, vKnown.lng, dKnown.lat, dKnown.lng);
+          } else {
+            repositioningKm = (vLoc.includes('cairo') && dLoc.includes('assiut')) ? 380 : 0;
+          }
+        }
+
+        let fuelPrice = rates.diesel || 20.50;
+        if (v.fuelType === 'Petrol 92') fuelPrice = rates.petrol92 || 22.25;
+        if (v.fuelType === 'Petrol 95') fuelPrice = rates.petrol95 || 24.00;
+        if (v.fuelType === 'CNG') fuelPrice = rates.cng || 6.50;
+
+        const loadFactor = (cargoKg > 0 && v.payloadKg > 0)
+          ? (1.0 + Math.min(0.5, (cargoKg / v.payloadKg) * 0.25))
+          : 1.0;
+
+        const baseDistKm = booking.distanceKm || 100;
+        const totalKm = Math.round((baseDistKm + repositioningKm) * 10) / 10;
+        const nominal = v.ratePer100Km || 9.5;
+        const fuelLiters = Math.round((totalKm * (nominal / 100) * loadFactor) * 10) / 10;
+        const costEGP = Math.round(fuelLiters * fuelPrice * 100) / 100;
+
+        return {
+          vehicle: v,
+          eligible: reasons.length === 0,
+          reasons: reasons,
+          estimate: {
+            distanceKm: baseDistKm,
+            repositioningKm: repositioningKm,
+            totalKm: totalKm,
+            fuelLiters: fuelLiters,
+            costEGP: costEGP,
+            loadFactor: loadFactor,
+            fuelPrice: fuelPrice,
+            fuelType: v.fuelType,
+            nominalRate: nominal
+          }
+        };
+      });
+
+      evaluated.sort((a, b) => {
+        if (a.eligible && !b.eligible) return -1;
+        if (!a.eligible && b.eligible) return 1;
+        if (a.eligible && b.eligible) {
+          if (a.vehicle.seats !== b.vehicle.seats) return a.vehicle.seats - b.vehicle.seats;
+          if (a.vehicle.payloadKg !== b.vehicle.payloadKg) return a.vehicle.payloadKg - b.vehicle.payloadKg;
+          return a.estimate.costEGP - b.estimate.costEGP;
+        }
+        return a.vehicle.code.localeCompare(b.vehicle.code);
+      });
+
+      return evaluated;
+    },
+
+    getDriverEligibility: function (booking, vehicleId) {
+      if (!booking) return [];
+      const hold = this.getHoldWindow(booking);
+      const allDrivers = this.getDrivers();
+      const allVehicles = this.getVehicles();
+      const allBookings = this.getBookings();
+
+      const selectedVehicle = allVehicles.find(v => v.code === vehicleId || v.model === vehicleId) || null;
+      const dailySummary = this.computeDailyDrivingSummary(booking);
+      const requiresSecondDriver = dailySummary.some(d => d.exceedsLimit);
+
+      const activeBookings = allBookings.filter(b =>
+        b.id !== booking.id && ['Approved', 'Dispatched', 'Active'].includes(b.status)
+      );
+
+      const evaluated = allDrivers.map(d => {
+        const reasons = [];
+
+        if (selectedVehicle) {
+          const vType = selectedVehicle.type || selectedVehicle.category;
+          if (d.licenseClass.includes('Class 3')) {
+            if (vType !== 'Sedan') {
+              reasons.push('Class 3 license (Private): Sedan only');
+            }
+          } else if (d.licenseClass.includes('Class 2')) {
+            if (vType === 'Bus' || vType === 'Truck' || selectedVehicle.category === 'Bus' || selectedVehicle.category === 'Heavy Cargo Truck') {
+              reasons.push('Class 2 license: Cannot operate Heavy Coach/Truck');
+            }
+          }
+        }
+
+        const expDate = parseDateTimeSafe(d.expires, '23:59');
+        if (expDate <= hold.endDateObj) {
+          reasons.push(`License expires ${formatShortDate(d.expires)}`);
+        }
+
+        const conflictingBooking = activeBookings.find(other => {
+          const matchDriver = (other.driver === d.name) ||
+                              (Array.isArray(other.assignedDriverIds) && other.assignedDriverIds.includes(d.id)) ||
+                              (other.driverId === d.id);
+          if (!matchDriver) return false;
+          const otherHold = this.getHoldWindow(other);
+          return hold.startDateObj < otherHold.endDateObj && hold.endDateObj > otherHold.startDateObj;
+        });
+
+        if (conflictingBooking) {
+          const sRange = formatShortRange(conflictingBooking.startDate, conflictingBooking.endDate);
+          reasons.push(`Assigned ${sRange} (${conflictingBooking.id})`);
+        }
+
+        if (d.status.includes('Expired')) {
+          reasons.push('Off Duty: Expired license');
+        } else if (d.status.includes('Incident')) {
+          reasons.push('Suspended: Incident Triage');
+        } else if (d.status.includes('Off Duty')) {
+          reasons.push('Off Duty on trip schedule');
+        }
+
+        return {
+          driver: d,
+          eligible: reasons.length === 0,
+          reasons: reasons,
+          dailyHours: dailySummary,
+          requiresSecondDriver: requiresSecondDriver
+        };
+      });
+
+      evaluated.sort((a, b) => {
+        if (a.eligible && !b.eligible) return -1;
+        if (!a.eligible && b.eligible) return 1;
+        return a.driver.name.localeCompare(b.driver.name);
+      });
+
+      return evaluated;
+    },
+
+    listQueue: function (tab = 'pending', search = '', sort = 'trip_start') {
+      const allBookings = this.getBookings();
+      const settings = this.getSettings();
+      const agingHours = (settings.rules && settings.rules.agingThresholdHours) || 4;
+
+      const counts = {
+        pending: 0,
+        changes: 0,
+        approved: 0,
+        rejected: 0
+      };
+
+      allBookings.forEach(b => {
+        if (b.status === 'Pending') counts.pending++;
+        else if (b.status === 'Changes requested') counts.changes++;
+        else if (b.status === 'Approved') counts.approved++;
+        else if (b.status === 'Rejected') counts.rejected++;
+      });
+
+      const cleanTab = (tab || 'pending').toLowerCase();
+      let filtered = allBookings.filter(b => {
+        if (cleanTab === 'pending') return b.status === 'Pending';
+        if (cleanTab === 'changes') return b.status === 'Changes requested';
+        if (cleanTab === 'approved') return b.status === 'Approved';
+        if (cleanTab === 'rejected') return b.status === 'Rejected';
+        return true;
+      });
+
+      if (search && search.trim()) {
+        const q = search.trim().toLowerCase();
+        filtered = filtered.filter(b => {
+          const idMatch = (b.id || '').toLowerCase().includes(q);
+          const reqMatch = (b.requesterName || '').toLowerCase().includes(q);
+          const deptMatch = (b.dept || '').toLowerCase().includes(q);
+          const routeMatch = (b.route || '').toLowerCase().includes(q);
+          const placeMatch = Array.isArray(b.itinerary) && b.itinerary.some(p => (p.place_name || '').toLowerCase().includes(q));
+          return idMatch || reqMatch || deptMatch || routeMatch || placeMatch;
+        });
+      }
+
+      filtered.sort((a, b) => {
+        if (sort === 'submitted') {
+          const tA = new Date(a.createdAt || 0).getTime();
+          const tB = new Date(b.createdAt || 0).getTime();
+          return tB - tA;
+        }
+        const startA = a.startDate || a.start_date || '2099-12-31';
+        const startB = b.startDate || b.start_date || '2099-12-31';
+        if (startA !== startB) return startA.localeCompare(startB);
+        return (a.departureTime || '00:00').localeCompare(b.departureTime || '00:00');
+      });
+
+      const nowMs = Date.now();
+      const items = filtered.map(b => {
+        const createdMs = b.createdAt ? new Date(b.createdAt).getTime() : nowMs;
+        const diffHours = Math.max(0, Math.round((nowMs - createdMs) / 3600000));
+        let ageStr = `${diffHours} h ago`;
+        if (diffHours < 1) {
+          const diffMins = Math.max(1, Math.round((nowMs - createdMs) / 60000));
+          ageStr = `${diffMins} m ago`;
+        } else if (diffHours >= 24) {
+          ageStr = `${Math.floor(diffHours / 24)} d ago`;
+        }
+
+        const isAmber = diffHours >= agingHours;
+
+        const warningChips = [];
+        const daily = this.computeDailyDrivingSummary(b);
+        const overLimitDay = daily.find(d => d.exceedsLimit);
+        if (overLimitDay) {
+          warningChips.push({
+            type: 'danger',
+            label: `Day ${overLimitDay.dayIndex}: ${overLimitDay.driveHoursFormatted} driving`
+          });
+        }
+
+        const days = b.daysCount || RouteEstimator.calculateDaysCount(b.startDate, b.endDate);
+        if (days > 1) {
+          warningChips.push({
+            type: 'info',
+            label: `Overnight ×${days - 1}`
+          });
+        }
+
+        const hasUnpinned = Array.isArray(b.itinerary) && b.itinerary.some(p => p.pinned === false || !p.lat);
+        if (hasUnpinned) {
+          warningChips.push({
+            type: 'warning',
+            label: 'Unpinned location'
+          });
+        }
+
+        const hasCargo = Boolean(b.has_extra_cargo || (b.cargo_kg && b.cargo_kg > 0) || (b.cargoWeightKg && b.cargoWeightKg > 0));
+        const cargoWeight = b.cargo_kg || b.cargoWeightKg || 0;
+
+        return {
+          booking: b,
+          id: b.id,
+          requesterName: b.requesterName || 'Institutional Requester',
+          dept: b.dept || 'Academic Directorate',
+          periodStr: `${formatShortRange(b.startDate, b.endDate)} · ${days} day${days > 1 ? 's' : ''}`,
+          routeSummary: b.route || `${b.origin || 'Origin'} → ${b.destination || 'Destination'}`,
+          passengers: b.passengers || 4,
+          hasCargo: hasCargo,
+          cargoWeight: cargoWeight,
+          ageStr: ageStr,
+          isAmberAge: isAmber,
+          warningChips: warningChips
+        };
+      });
+
+      return {
+        items: items,
+        counts: counts
+      };
+    },
+
+    approveBooking: function (id, vehicleId, driverIds, note = '') {
+      const data = this.load();
+      const b = (data.bookings || []).find(item => item.id === id);
+      if (!b) {
+        return { success: false, error: `Booking ${id} not found.` };
+      }
+
+      const vehicleCode = (typeof vehicleId === 'object' && vehicleId.code) ? vehicleId.code : vehicleId;
+      const vEligList = this.getVehicleEligibility(b);
+      const vMatch = vEligList.find(item => item.vehicle.code === vehicleCode);
+
+      if (!vMatch || !vMatch.eligible) {
+        const reason = vMatch ? vMatch.reasons.join(', ') : 'Vehicle unavailable';
+        return {
+          success: false,
+          conflict: true,
+          error: `${vehicleCode} was just assigned or is unavailable: ${reason}. The list has been refreshed.`
+        };
+      }
+
+      const dIds = Array.isArray(driverIds) ? driverIds : [driverIds];
+      const dEligList = this.getDriverEligibility(b, vehicleCode);
+
+      if (dEligList[0] && dEligList[0].requiresSecondDriver && dIds.length < 2) {
+        return {
+          success: false,
+          error: 'Daily driving duty exceeds 8 hours. Two certified drivers must be assigned.'
+        };
+      }
+
+      const assignedDrivers = [];
+      for (const dId of dIds) {
+        const dMatch = dEligList.find(item => item.driver.id === dId || item.driver.name === dId);
+        if (!dMatch || !dMatch.eligible) {
+          const reason = dMatch ? dMatch.reasons.join(', ') : 'Driver unavailable';
+          return {
+            success: false,
+            conflict: true,
+            error: `Driver is no longer available: ${reason}. The list has been refreshed.`
+          };
+        }
+        assignedDrivers.push(dMatch.driver);
+      }
+
+      const primaryDriver = assignedDrivers[0];
+      const secondDriver = assignedDrivers[1] || null;
+
+      b.status = 'Approved';
+      b.statusAr = 'Approved';
+      b.vehicleCode = vMatch.vehicle.code;
+      b.vehicle = `${vMatch.vehicle.model} (${vMatch.vehicle.code})`;
+      b.vehicleCategory = vMatch.vehicle.category;
+      b.driver = secondDriver ? `${primaryDriver.name} & ${secondDriver.name}` : primaryDriver.name;
+      b.driverId = primaryDriver.id;
+      b.assignedDriverIds = assignedDrivers.map(d => d.id);
+      if (secondDriver) b.driver2 = secondDriver.name;
+
+      b.hold_window = this.getHoldWindow(b);
+      b.estFuelLiters = vMatch.estimate.fuelLiters;
+      b.estCostEGP = vMatch.estimate.costEGP;
+      b.finalEstimate = {
+        fuelLiters: vMatch.estimate.fuelLiters,
+        costEGP: vMatch.estimate.costEGP,
+        repositioningKm: vMatch.estimate.repositioningKm,
+        priceBookVersion: (this.getSettings().fuelPrices && this.getSettings().fuelPrices.activeVersion) || 'v3 (Effective 01 Aug 2026)'
+      };
+
+      b.approved_by = 'Khaled Ibrahim (Dispatcher)';
+      b.approved_at = new Date().toISOString();
+      b.dispatcherNote = note || '';
+
+      b.history = b.history || [];
+      b.history.push({
+        status: 'Approved',
+        at: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        by: 'Khaled Ibrahim (Dispatcher)',
+        time: new Date().toISOString(),
+        action: 'Approved & Assigned',
+        user: 'Khaled Ibrahim (Dispatcher)',
+        note: note || `Assigned ${b.vehicle} with driver ${b.driver}.`
+      });
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: 'Khaled Ibrahim (Dispatcher)',
+        action: 'Approve & Assign Vehicle',
+        ref: b.id,
+        details: `Assigned ${b.vehicle} + ${b.driver} for window ${b.hold_window.formatted}. Final estimate: ${b.estFuelLiters} L (EGP ${b.estCostEGP}).`
+      });
+
+      data.notifications = data.notifications || [];
+      data.notifications.unshift({
+        id: 'NOTIF-' + Date.now(),
+        targetRole: 'Requester',
+        targetUser: b.requesterName,
+        title: `Booking ${b.id} Approved`,
+        message: `Your booking for ${b.route} has been approved. Vehicle: ${b.vehicle}, Driver: ${b.driver}.`,
+        time: 'Just now',
+        read: false,
+        link: `booking-detail.html?id=${b.id}`
+      });
+      data.notifications.unshift({
+        id: 'NOTIF-' + (Date.now() + 1),
+        targetRole: 'Driver',
+        targetUser: primaryDriver.name,
+        title: `New Mission Assignment: ${b.id}`,
+        message: `You are assigned to mission ${b.id} (${b.startDate} → ${b.endDate}). Vehicle: ${b.vehicle}.`,
+        time: 'Just now',
+        read: false,
+        link: `driver-trip.html?id=${b.id}`
+      });
+
+      this.save(data);
+      return { success: true, booking: b };
+    },
+
+    rejectBooking: function (id, reasonCode, text) {
+      const data = this.load();
+      const b = (data.bookings || []).find(item => item.id === id);
+      if (!b) return { success: false, error: 'Booking not found' };
+
+      b.status = 'Rejected';
+      b.statusAr = 'Rejected';
+      b.rejectionReason = reasonCode || 'Other';
+      b.rejectionText = text || 'Request rejected by operations dispatch.';
+      b.rejected_by = 'Khaled Ibrahim (Dispatcher)';
+      b.rejected_at = new Date().toISOString();
+
+      b.history = b.history || [];
+      b.history.push({
+        time: new Date().toISOString(),
+        action: 'Rejected',
+        user: 'Khaled Ibrahim (Dispatcher)',
+        note: `Reason: ${b.rejectionReason}. Details: ${b.rejectionText}`
+      });
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: 'Khaled Ibrahim (Dispatcher)',
+        action: 'Reject Booking',
+        ref: id,
+        details: `Rejected with reason: "${b.rejectionReason}". Message: ${b.rejectionText}`
+      });
+
+      data.notifications = data.notifications || [];
+      data.notifications.unshift({
+        id: 'NOTIF-' + Date.now(),
+        targetRole: 'Requester',
+        targetUser: b.requesterName,
+        title: `Booking ${id} Rejected`,
+        message: `Reason: ${b.rejectionReason}. Note: ${b.rejectionText}`,
+        time: 'Just now',
+        read: false,
+        link: `booking-detail.html?id=${id}`
+      });
+
+      this.save(data);
+      return { success: true, booking: b };
+    },
+
+    requestChanges: function (id, message) {
+      const data = this.load();
+      const b = (data.bookings || []).find(item => item.id === id);
+      if (!b) return { success: false, error: 'Booking not found' };
+
+      b.status = 'Changes requested';
+      b.statusAr = 'Changes requested';
+      b.changesRequestedMessage = message || 'Please adjust your mission schedule or itinerary.';
+      b.changesRequestedBy = 'Khaled Ibrahim (Dispatcher)';
+      b.changesRequestedAt = new Date().toISOString();
+
+      b.history = b.history || [];
+      b.history.push({
+        time: new Date().toISOString(),
+        action: 'Changes Requested',
+        user: 'Khaled Ibrahim (Dispatcher)',
+        note: b.changesRequestedMessage
+      });
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: 'Khaled Ibrahim (Dispatcher)',
+        action: 'Request Changes',
+        ref: id,
+        details: `Sent change request: "${b.changesRequestedMessage}"`
+      });
+
+      data.notifications = data.notifications || [];
+      data.notifications.unshift({
+        id: 'NOTIF-' + Date.now(),
+        targetRole: 'Requester',
+        targetUser: b.requesterName,
+        title: `Changes Requested for ${id}`,
+        message: `Dispatch requested adjustments: ${b.changesRequestedMessage}`,
+        time: 'Just now',
+        read: false,
+        link: `booking-new.html?edit=${id}`
+      });
+
+      this.save(data);
+      return { success: true, booking: b };
+    },
+
+    dispatchBooking: function (id) {
+      const data = this.load();
+      const b = (data.bookings || []).find(item => item.id === id);
+      if (!b) return { success: false, error: 'Booking not found' };
+
+      b.status = 'Dispatched';
+      b.statusAr = 'Dispatched';
+      b.dispatched_at = new Date().toISOString();
+
+      b.history = b.history || [];
+      b.history.push({
+        time: new Date().toISOString(),
+        action: 'Dispatched to Fleet',
+        user: 'Khaled Ibrahim (Dispatcher)',
+        note: `Dispatched vehicle ${b.vehicle} and driver ${b.driver}.`
+      });
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: 'Khaled Ibrahim (Dispatcher)',
+        action: 'Dispatch Mission',
+        ref: id,
+        details: `Dispatched ${b.id} with vehicle ${b.vehicleCode} and driver ${b.driver}.`
+      });
+
+      this.save(data);
+      return { success: true, booking: b };
     },
 
     createBooking: function (payload) {
       const data = this.load();
       if (!data.bookings) data.bookings = [];
-      if (!data.dispatchQueue) data.dispatchQueue = [];
       if (!data.auditTrail) data.auditTrail = [];
 
       const newId = 'BK-' + (2050 + data.bookings.length);
@@ -568,7 +1386,7 @@
         returnTrip: Boolean(payload.return_with_vehicle),
         itinerary: points,
         route_legs: legs,
-        vehicleCategory: payload.vehicleCategory || 'Pending Operations Assignment',
+        vehicleCategory: payload.vehicleCategory || 'Passenger Van',
         vehicle: 'Pending Allocation',
         vehicleCode: 'TBD',
         driver: 'Pending Assignment',
@@ -593,28 +1411,24 @@
         holdAmountEGP: Math.round(totalCost * 1.25),
         status: 'Pending',
         statusAr: 'Pending',
+        history: [
+          {
+            status: 'Submitted',
+            at: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            by: `${payload.requesterName || 'Dr. Sarah Mansour'} (Requester)`,
+            note: 'Initial booking request submitted'
+          }
+        ],
+        messages: [],
         hold_window: {
           start: firstPoint.depart_at || `${startDate} 08:00`,
           end: lastPoint.arrive_at ? `${lastPoint.arrive_at} (+45m buffer)` : `${endDate} 18:45`,
           bufferMinutes: 45
         },
-        actualOdoStart: null,
-        actualOdoEnd: null,
-        actualFuelLitres: null,
-        actualFuelCostEGP: null,
-        fuelVariancePct: null,
         createdAt: new Date().toISOString()
       };
 
       data.bookings.unshift(newBooking);
-
-      data.dispatchQueue.unshift({
-        id: newId,
-        route: newBooking.route,
-        flag: daysCount > 1 ? `Multi-Day (${daysCount}d)` : 'New Submission',
-        kind: 'info',
-        meta: `${startDate} → ${endDate} · ${newBooking.dept}`
-      });
 
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
@@ -622,11 +1436,27 @@
         user: newBooking.requesterName + ' (Requester)',
         action: 'Submit Itinerary Booking',
         ref: newId,
-        details: `Created multi-stop itinerary (${points.length} points, ${newBooking.distanceKm} km, ${daysCount} days). Est cost: EGP ${newBooking.estCostEGP}`
+        details: `Created multi-stop itinerary (${points.length} points, ${newBooking.distanceKm} km, ${daysCount} days).`
       });
 
       this.save(data);
       return newBooking;
+    },
+
+    addBookingMessage: function (id, msg) {
+      const data = this.load();
+      const b = (data.bookings || []).find(item => item.id === id);
+      if (!b) return null;
+      if (!b.messages) b.messages = [];
+      const messageObj = {
+        sender: msg.sender || 'requester',
+        senderName: msg.senderName || b.requesterName || 'Requester',
+        time: msg.time || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+        text: msg.text || ''
+      };
+      b.messages.push(messageObj);
+      this.save(data);
+      return messageObj;
     },
 
     updateBookingItinerary: function (id, itineraryPayload) {
@@ -634,7 +1464,8 @@
       const b = data.bookings.find(item => item.id === id);
       if (!b) return null;
 
-      const wasApproved = (b.status === 'Dispatched' || b.status === 'Active');
+      const wasApproved = (b.status === 'Dispatched' || b.status === 'Active' || b.status === 'Approved');
+      const wasChangesRequested = (b.status === 'Changes requested');
 
       if (itineraryPayload.itinerary) b.itinerary = itineraryPayload.itinerary;
       if (itineraryPayload.route_legs) b.route_legs = itineraryPayload.route_legs;
@@ -689,61 +1520,23 @@
         b.route = b.itinerary.map(p => p.place_name).join(' → ');
       }
 
-      if (wasApproved) {
+      if (wasApproved || wasChangesRequested) {
         b.status = 'Pending';
         b.statusAr = 'Pending';
         b.vehicle = 'Pending Allocation';
         b.vehicleCode = 'TBD';
         b.driver = 'Pending Assignment';
-
-        if (!data.dispatchQueue.some(q => q.id === id)) {
-          data.dispatchQueue.unshift({
-            id: id,
-            route: b.route,
-            flag: 'Itinerary Modified',
-            kind: 'warn',
-            meta: `${b.startDate} → ${b.endDate} · Re-review required`
-          });
-        }
+        b.changesRequestedMessage = null;
       }
 
+      data.auditTrail = data.auditTrail || [];
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
         user: b.requesterName + ' (Requester)',
-        action: wasApproved ? 'Modify Itinerary (Reset to Pending)' : 'Update Itinerary',
+        action: wasApproved ? 'Modify Itinerary (Reset to Pending)' : (wasChangesRequested ? 'Resubmit Modified Itinerary' : 'Update Itinerary'),
         ref: id,
-        details: `Updated itinerary points. ${wasApproved ? 'Approved status revoked for re-dispatch.' : ''}`
-      });
-
-      this.save(data);
-      return b;
-    },
-
-    approveBooking: function (id, vehicleCode, driverName, vehicleModel, category, fuelLiters, costEGP) {
-      const data = this.load();
-      const b = data.bookings.find(item => item.id === id);
-      if (!b) return null;
-
-      b.status = 'Dispatched';
-      b.statusAr = 'Dispatched';
-      b.vehicleCode = vehicleCode || 'V-122';
-      b.vehicle = vehicleModel || (vehicleCode === 'V-130' ? 'Toyota HiAce (V-130)' : 'Hyundai H-1 (V-122)');
-      b.driver = driverName || 'Ahmed Hassan (Driver A)';
-      if (category) b.vehicleCategory = category;
-      if (fuelLiters !== undefined && fuelLiters !== null) b.estFuelLiters = fuelLiters;
-      if (costEGP !== undefined && costEGP !== null) b.estCostEGP = costEGP;
-      b.actualOdoStart = 84210;
-
-      data.dispatchQueue = data.dispatchQueue.filter(q => q.id !== id);
-
-      data.auditTrail.unshift({
-        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
-        time: 'Just now',
-        user: 'Khaled Ibrahim (Dispatcher)',
-        action: 'Approve & Assign Vehicle',
-        ref: id,
-        details: `Assigned vehicle ${b.vehicleCode} and driver ${b.driver} for period ${b.startDate} → ${b.endDate}.`
+        details: `Updated itinerary points. Reset to Pending for Operations review.`
       });
 
       this.save(data);
@@ -758,10 +1551,11 @@
       b.status = 'Active';
       b.statusAr = 'Active';
 
+      data.auditTrail = data.auditTrail || [];
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
-        user: b.driver || 'Ahmed Hassan (Driver)',
+        user: b.driver || 'Driver',
         action: 'Start Trip & GPS Run',
         ref: id,
         details: 'Trip started. Live GPS telemetry streaming to Dispatch Map Hub.'
@@ -776,7 +1570,7 @@
       const b = data.bookings.find(item => item.id === id);
       if (!b) return null;
 
-      b.actualOdoEnd = parseInt(payload.endOdo || (b.actualOdoStart + b.distanceKm), 10);
+      b.actualOdoEnd = parseInt(payload.endOdo || ((b.actualOdoStart || 50000) + b.distanceKm), 10);
       b.actualFuelLitres = parseFloat(payload.fuelLitres || 14.5);
       b.actualFuelCostEGP = parseFloat(payload.fuelCost || 297.25);
 
@@ -787,6 +1581,7 @@
       b.status = 'Closed';
       b.statusAr = 'Closed';
 
+      data.auditTrail = data.auditTrail || [];
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
@@ -809,6 +1604,7 @@
       b.statusAr = 'Completed';
       b.auditorClearedAt = new Date().toISOString();
 
+      data.auditTrail = data.auditTrail || [];
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
