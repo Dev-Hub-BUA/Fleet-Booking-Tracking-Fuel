@@ -6,8 +6,24 @@
   <title>New Itinerary Booking — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="js/auth.js"></script>
   <style>
+    .leaflet-container {
+      font-family: inherit;
+    }
+    .search-result-item {
+      padding: 9px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s ease;
+    }
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+    .search-result-item:hover {
+      background: var(--navy-50);
+    }
     .cargo-expand-container {
       display: none;
       background: var(--bg-page);
@@ -343,9 +359,9 @@
             </div>
           </div>
 
-          <!-- Step 3: Load & Required Vehicle Category -->
+          <!-- Step 3: Passengers, Cargo & Dispatch Notes -->
           <div class="card" id="card-load-vehicle">
-            <h2 class="card-title">3. Load &amp; Vehicle Requirements</h2>
+            <h2 class="card-title">3. Passengers, Cargo &amp; Dispatch Notes</h2>
             <div style="display: flex; flex-direction: column; gap: 16px;">
               
               <!-- Passengers Field -->
@@ -417,61 +433,15 @@
 
               </div>
 
-              <!-- Vehicle Category Selection -->
+              <!-- Notes for Operations / Dispatch -->
               <div class="form-group" style="border-top: 1px solid var(--border); padding-top: 14px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                  <label class="form-label" for="route-vehicle-cat">Requested Vehicle Category <span style="color:var(--danger);">*</span></label>
-                  <span id="vehicle-capacity-summary-badge" class="badge badge-info" style="font-size: 11.5px;">Max 9 seats · 1,000 kg</span>
-                </div>
-                <select class="form-select" id="route-vehicle-cat" onchange="handleLoadOrVehicleChange();" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background:#fff;">
-                  <option value="Passenger Van" selected>Passenger Van / Minibus (up to 9 seats, 1,000 kg payload) — e.g. HiAce / H-1</option>
-                  <option value="Sedan">Sedan (up to 4 seats, 400 kg payload) — e.g. Corolla / Elantra</option>
-                  <option value="Bus">Delegation Bus / Minibus (up to 28 seats, 4,000 kg payload) — e.g. Coaster / MCV</option>
-                  <option value="Heavy Cargo Truck">Heavy Cargo Truck &amp; Equipment (up to 3 seats, 4,500 kg payload) — e.g. Isuzu NPR</option>
-                </select>
-
-                <!-- Vehicle Suggestions / Filter Note -->
-                <div id="vehicle-suggestion-note" style="display:none; font-size: 12.5px; color: var(--navy-700); margin-top: 6px; font-weight: 600;"></div>
-
-                <!-- Vehicle Capacity Violations Alert -->
-                <div id="vehicle-capacity-alert" style="display: none; margin-top: 8px;" class="alert-banner alert-danger">
-                  <div style="display: flex; align-items: flex-start; gap: 8px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="16"/></svg>
-                    <span id="vehicle-capacity-alert-text"></span>
-                  </div>
-                </div>
-
-                <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                  <span>Vehicle assignment is verified against turnaround buffers (30m inspection, 45m cleaning).</span>
+                <label class="form-label" for="mission-notes">Notes for Operations / Dispatch (Optional)</label>
+                <textarea class="form-textarea" id="mission-notes" rows="2" placeholder="e.g. Fragile cargo crates, special schedule requirements or accessibility requests..." style="width: 100%;">Delegates traveling with 2 fragile reagent crates; tie-down straps requested.</textarea>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                  Operations Desk will review these instructions when allocating vehicle assets and driver credentials.
                 </div>
               </div>
 
-            </div>
-          </div>
-
-          <!-- Step 4: Purpose & Billing -->
-          <div class="card">
-            <h2 class="card-title">4. Mission Purpose &amp; Cost Center</h2>
-            <div style="display: flex; flex-direction: column; gap: 14px;">
-              <div class="form-group">
-                <label class="form-label" for="route-purpose">Mission Purpose &amp; Justification</label>
-                <textarea class="form-textarea" id="route-purpose" rows="2">Official University Delegation Mission & Central Research Symposium</textarea>
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                <div class="form-group">
-                  <label class="form-label" for="cost-center">Department Cost Center</label>
-                  <input type="text" class="form-input" id="cost-center" value="CC-410 (Faculty of Pharmacy)">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="requester-name">Requester Lead</label>
-                  <input type="text" class="form-input" id="requester-name" readonly value="Dr. Sarah Mansour">
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="mission-notes">General Dispatch Instructions / Special Gear (Optional)</label>
-                <input type="text" class="form-input" id="mission-notes" placeholder="e.g. Fragile cargo crates, tie-down ratchet straps needed" value="Delegates traveling with 2 fragile reagent crates; tie-down straps requested.">
-              </div>
             </div>
           </div>
 
@@ -488,14 +458,12 @@
               <span class="badge badge-success" id="summary-points-count">4 Waypoints</span>
             </div>
 
-            <!-- Overview Mini Map -->
-            <div style="position: relative; height: 180px; border-radius: var(--radius-sm); overflow: hidden; background: #E2E8F0; border: 1px solid var(--border); margin-bottom: 16px;">
-              <svg id="overview-map-svg" style="width: 100%; height: 100%;" preserveAspectRatio="none">
-                <!-- Route lines and waypoint pins rendered by JS -->
-              </svg>
-              <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(255,255,255,0.92); border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 600; color: var(--navy-800); display:flex; align-items:center; gap:6px;">
-                <span style="display:inline-block; width:12px; height:2px; background:var(--navy-800);"></span> Outbound
-                <span style="display:inline-block; width:12px; height:2px; border-top:2px dashed var(--gold-500); margin-left:4px;"></span> Return
+            <!-- Overview Leaflet Map -->
+            <div style="position: relative; height: 220px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); margin-bottom: 16px;">
+              <div id="summary-leaflet-map" style="width: 100%; height: 100%; z-index: 1;"></div>
+              <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(255,255,255,0.92); border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 600; color: var(--navy-800); display:flex; align-items:center; gap:6px; z-index: 500; pointer-events: none;">
+                <span style="display:inline-block; width:12px; height:3px; background:var(--navy-800);"></span> Outbound
+                <span style="display:inline-block; width:12px; height:3px; border-top:2px dashed var(--gold-500); margin-left:4px;"></span> Return
               </div>
             </div>
 
@@ -522,11 +490,11 @@
             <div style="background: var(--bg-page); border-radius: var(--radius-sm); padding: 14px; margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px;">
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted);">Total Estimated Distance:</span>
-                <strong id="summary-total-km" style="font-family: var(--font-mono);">865.0 km (est.)</strong>
+                <strong id="summary-total-km" style="font-family: var(--font-mono);">865.0 km</strong>
               </div>
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted);">Total Driving Time:</span>
-                <strong id="summary-total-drive" style="font-family: var(--font-mono);">11h 20m (est.)</strong>
+                <strong id="summary-total-drive" style="font-family: var(--font-mono);">11h 20m</strong>
               </div>
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted);">Mission Duration:</span>
@@ -534,27 +502,18 @@
               </div>
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted);">Estimated Fuel Consumption:</span>
-                <strong id="summary-total-fuel" style="font-family: var(--font-mono);">82.2 L Diesel (est.)</strong>
+                <strong id="summary-total-fuel" style="font-family: var(--font-mono);">90.8 L (fleet avg)</strong>
               </div>
               <div id="summary-load-factor-badge" style="display: none; font-size: 11px; color: var(--cira-burgundy); font-weight: 600; text-align: right; margin-top: -4px;"></div>
-              <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 8px; font-size: 15px;">
-                <span style="font-weight: 700; color: var(--navy-800);">Estimated Fuel Cost:</span>
-                <strong id="summary-total-cost" style="color: var(--cira-burgundy); font-family: var(--font-mono); font-size: 17px;">EGP 1,828.95</strong>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; border-top: 1px solid var(--border); padding-top: 8px; font-size: 15px;">
+                <div>
+                  <span style="font-weight: 700; color: var(--navy-800);">Estimate (fleet average):</span>
+                  <div style="font-size: 11.5px; color: var(--text-muted); font-weight: normal; margin-top: 2px;">
+                    Final cost depends on the vehicle Operations assigns.
+                  </div>
+                </div>
+                <strong id="summary-total-cost" style="color: var(--cira-burgundy); font-family: var(--font-mono); font-size: 17px; white-space: nowrap;">EGP 1,225.80</strong>
               </div>
-            </div>
-
-            <!-- Vehicle Hold Window Notice -->
-            <div style="background: var(--navy-50); border: 1px solid #C5D7ED; border-radius: var(--radius-sm); padding: 12px; margin-top: 14px; font-size: 12.5px; line-height: 1.5; color: var(--navy-800);">
-              <div style="font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                <span>Vehicle Hold Window</span>
-              </div>
-              <div id="summary-hold-window-text" style="font-family: var(--font-mono); font-weight: 600;">
-                18 Oct 08:00 → 22 Oct 18:45
-              </div>
-              <span style="font-size: 11.5px; color: var(--text-muted);">
-                Includes 45-min turnaround buffer. Vehicle is unavailable for other bookings for this entire window.
-              </span>
             </div>
 
             <!-- Inline Validation Errors -->
@@ -566,13 +525,14 @@
             <!-- Submit Button -->
             <div style="margin-top: 18px;">
               <button type="button" class="btn btn-gold btn-lg" id="submit-booking-btn" style="width: 100%; font-weight: 800; font-size: 15px; display:inline-flex; align-items:center; justify-content:center; gap:8px;" onclick="validateAndSubmitBooking();">
-                <span>Submit Booking Request to Operations</span>
+                <span>Send request to Operations</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </button>
             </div>
 
-            <div style="font-size: 11.5px; color: var(--text-muted); text-align: center; margin-top: 8px;">
-              Distances and fuel figures are mock estimates based on route index v3 tariff.
+            <div style="font-size: 11.5px; color: var(--text-muted); text-align: center; margin-top: 10px; line-height: 1.4;">
+              Map data &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener" style="color:var(--navy-600); text-decoration:underline;">OpenStreetMap contributors</a>. Routing by <a href="https://project-osrm.org/" target="_blank" rel="noopener" style="color:var(--navy-600); text-decoration:underline;">OSRM (demo server)</a>.
+            </div>
             </div>
 
           </div>
@@ -596,37 +556,40 @@
         </button>
       </div>
 
-      <!-- Search Location in Modal -->
-      <div style="display: flex; gap: 8px;">
-        <input type="text" id="modal-place-search" class="form-input" placeholder="Type campus or place name (e.g. Cairo University, BUA Assiut)..." oninput="filterModalSuggestions();">
+      <!-- Search Location in Modal (Nominatim) -->
+      <div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="modal-place-search" class="form-input" placeholder="Search address, campus or landmark in Egypt (e.g. Cairo University, Assiut)..." onkeydown="if(event.key==='Enter'){event.preventDefault();executeNominatimSearch();}">
+          <button type="button" class="btn btn-primary" id="btn-modal-search" onclick="executeNominatimSearch();" style="flex-shrink:0; display:inline-flex; align-items:center; gap:6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Search</span>
+          </button>
+        </div>
+        <div id="modal-search-results" style="display: none; max-height: 140px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-top: 6px; background: #FFF; box-shadow: var(--shadow-md);"></div>
       </div>
 
-      <div id="modal-place-chips" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 70px; overflow-y: auto;">
+      <!-- Quick Preset Locations -->
+      <div id="modal-place-chips" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 60px; overflow-y: auto;">
         <!-- Chips injected by JS -->
       </div>
 
-      <!-- Interactive Map Canvas -->
-      <div id="modal-map-canvas" style="position: relative; height: 260px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background-color: #E2E8F0; background-image: radial-gradient(#CBD5E1 1.5px, transparent 1.5px), linear-gradient(#D8E0EB 1px, transparent 1px), linear-gradient(90deg, #D8E0EB 1px, transparent 1px); background-size: 24px 24px, 48px 48px, 48px 48px; cursor: crosshair; overflow: hidden;" onclick="handleModalMapClick(event);">
-        
-        <div style="position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.92); border-radius: 4px; padding: 4px 8px; font-size: 11.5px; color: var(--navy-800); font-weight: 600;">
-          Egypt Strategic Transport Grid
-        </div>
-
-        <!-- Draggable / Click Pin Marker -->
-        <div id="modal-pin-marker" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; pointer-events: none;">
-          <div style="background: var(--navy-800); color: #FFF; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; white-space: nowrap; margin-bottom: 2px;" id="modal-pin-label">Selected Pin</div>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="#B91C1C" stroke="#FFFFFF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="#FFFFFF"/></svg>
-        </div>
-      </div>
+      <!-- Real Leaflet Map Container -->
+      <div id="modal-leaflet-map" style="position: relative; height: 320px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); z-index: 10;"></div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-page); padding: 10px 14px; border-radius: var(--radius-sm);">
-        <span style="font-size: 13px; color: var(--text-muted);">Current Pin Coordinates:</span>
-        <strong id="modal-coords-display" style="font-family: var(--font-mono); font-size: 13.5px; color: var(--navy-800);">27.1809° N, 31.1837° E</strong>
+        <div>
+          <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; display: block;">Selected Location</span>
+          <strong id="modal-pin-label" style="color: var(--navy-800); font-size: 13.5px;">Badr University in Assiut</strong>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; display: block;">Coordinates</span>
+          <strong id="modal-coords-display" style="font-family: var(--font-mono); font-size: 13px; color: var(--navy-800);">27.1809° N, 31.1837° E</strong>
+        </div>
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); padding-top: 14px;">
         <button type="button" class="btn btn-secondary" onclick="closeMapModal();">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="confirmModalPin();">Use this location</button>
+        <button type="button" class="btn btn-gold" onclick="confirmModalPin();">Use this location</button>
       </div>
 
     </div>
@@ -712,12 +675,21 @@
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
   <script src="js/main.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/geo.js"></script>
   <script>
     let itineraryPoints = [];
     let returnWithVehicle = true;
     let editingBookingId = null;
     let activeModalPointIndex = null;
     let modalTempCoords = { lat: 27.1809, lng: 31.1837, placeName: 'Badr University in Assiut' };
+
+    let modalLeafletMap = null;
+    let modalMarker = null;
+    let summaryLeafletMap = null;
+    let summaryMapLayers = [];
+    let routingDebounceTimer = null;
+    let computedRouteLegs = [];
 
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Requester", "Dispatcher", "Fleet admin", "Auditor", "Driver"])) return;
@@ -806,7 +778,8 @@
       ];
 
       handleTripDatesChanged();
-      handleLoadOrVehicleChange();
+      handleLoadChange();
+      scheduleRoutingUpdate();
     }
 
     function loadBookingForEditing(id) {
@@ -845,11 +818,12 @@
         }
       }
 
-      document.getElementById('route-purpose').value = b.purpose || '';
-      document.getElementById('cost-center').value = b.cost_center || b.dept || 'CC-410 (Pharmacy)';
-      document.getElementById('mission-notes').value = b.notes || '';
-      if (b.vehicleCategory) document.getElementById('route-vehicle-cat').value = b.vehicleCategory;
-      if (b.driver_overnight_location) document.getElementById('driver-overnight-location').value = b.driver_overnight_location;
+      const notesEl = document.getElementById('mission-notes');
+      if (notesEl) notesEl.value = b.notes || '';
+      if (b.driver_overnight_location) {
+        const accomEl = document.getElementById('driver-overnight-location');
+        if (accomEl) accomEl.value = b.driver_overnight_location;
+      }
 
       returnWithVehicle = b.return_with_vehicle !== undefined ? Boolean(b.return_with_vehicle) : true;
       document.getElementById('toggle-return-vehicle').checked = returnWithVehicle;
@@ -861,7 +835,8 @@
       }
 
       handleTripDatesChanged();
-      handleLoadOrVehicleChange();
+      handleLoadChange();
+      scheduleRoutingUpdate();
     }
 
     function handleTripDatesChanged() {
@@ -918,7 +893,7 @@
       });
 
       renderPointsList();
-      renderLiveSummary();
+      scheduleRoutingUpdate();
     }
 
     function handleReturnToggleChanged() {
@@ -947,7 +922,7 @@
 
       resequencePoints();
       renderPointsList();
-      renderLiveSummary();
+      scheduleRoutingUpdate();
     }
 
     function addNewStop() {
@@ -974,7 +949,7 @@
 
       resequencePoints();
       renderPointsList();
-      renderLiveSummary();
+      scheduleRoutingUpdate();
     }
 
     function removePoint(index) {
@@ -982,7 +957,7 @@
       itineraryPoints.splice(index, 1);
       resequencePoints();
       renderPointsList();
-      renderLiveSummary();
+      scheduleRoutingUpdate();
     }
 
     function movePointUp(index) {
@@ -992,7 +967,7 @@
       itineraryPoints[index - 1] = temp;
       resequencePoints();
       renderPointsList();
-      renderLiveSummary();
+      scheduleRoutingUpdate();
     }
 
     function movePointDown(index) {
@@ -1003,7 +978,7 @@
       itineraryPoints[index + 1] = temp;
       resequencePoints();
       renderPointsList();
-      renderLiveSummary();
+      scheduleRoutingUpdate();
     }
 
     function resequencePoints() {
@@ -1148,7 +1123,7 @@
         itineraryPoints[index].pinned = true;
       }
       renderPointsList();
-      renderLiveSummary();
+      scheduleRoutingUpdate();
     }
 
     function updatePointNotes(index, val) {
@@ -1175,41 +1150,6 @@
       }
       renderLiveSummary();
     }
-
-    const VEHICLE_CATEGORIES = {
-      'Passenger Van': {
-        name: 'Passenger Van / Minibus',
-        seats: 9,
-        payloadKg: 1000,
-        ratePer100Km: 9.5,
-        fuelPrice: 20.50,
-        fuelType: 'Diesel'
-      },
-      'Sedan': {
-        name: 'Sedan',
-        seats: 4,
-        payloadKg: 400,
-        ratePer100Km: 7.0,
-        fuelPrice: 22.25,
-        fuelType: 'Petrol 92'
-      },
-      'Bus': {
-        name: 'Delegation Bus / Minibus',
-        seats: 28,
-        payloadKg: 4000,
-        ratePer100Km: 26.0,
-        fuelPrice: 20.50,
-        fuelType: 'Diesel'
-      },
-      'Heavy Cargo Truck': {
-        name: 'Heavy Cargo Truck & Equipment',
-        seats: 3,
-        payloadKg: 4500,
-        ratePer100Km: 18.0,
-        fuelPrice: 20.50,
-        fuelType: 'Diesel'
-      }
-    };
 
     function handleCargoToggle() {
       const checkbox = document.getElementById('has-extra-cargo');
@@ -1254,90 +1194,15 @@
         }
       }
 
-      handleLoadOrVehicleChange();
+      handleLoadChange();
     }
 
-    function handleLoadOrVehicleChange() {
-      updateVehicleCategoryOptions();
+    function handleLoadChange() {
       renderLiveSummary();
     }
 
-    function updateVehicleCategoryOptions() {
-      const paxCount = parseInt(document.getElementById('route-pax').value, 10) || 1;
-      const hasExtra = document.getElementById('has-extra-cargo').checked;
-      const cargoWeight = hasExtra ? (parseFloat(document.getElementById('cargo-weight').value) || 0) : 0;
-      const catSelect = document.getElementById('route-vehicle-cat');
-      const selectedCat = catSelect.value;
-
-      let recommendedCat = null;
-
-      Array.from(catSelect.options).forEach(opt => {
-        const spec = VEHICLE_CATEGORIES[opt.value];
-        if (!spec) return;
-
-        const seatsOk = spec.seats >= paxCount;
-        const payloadOk = !hasExtra || spec.payloadKg >= cargoWeight;
-
-        if (seatsOk && payloadOk) {
-          opt.textContent = `${spec.name} (up to ${spec.seats} seats, ${spec.payloadKg.toLocaleString()} kg payload)`;
-          if (!recommendedCat) recommendedCat = opt.value;
-        } else {
-          let reason = '';
-          if (!seatsOk && !payloadOk) {
-            reason = `Exceeds: max ${spec.seats} seats & ${spec.payloadKg.toLocaleString()} kg`;
-          } else if (!seatsOk) {
-            reason = `Exceeds: max ${spec.seats} seats`;
-          } else {
-            reason = `Exceeds: max ${spec.payloadKg.toLocaleString()} kg payload`;
-          }
-          opt.textContent = `${spec.name} (${reason})`;
-        }
-      });
-
-      const currentSpec = VEHICLE_CATEGORIES[selectedCat] || VEHICLE_CATEGORIES['Passenger Van'];
-      const capBadge = document.getElementById('vehicle-capacity-summary-badge');
-      if (capBadge) {
-        capBadge.textContent = `Max ${currentSpec.seats} seats · ${currentSpec.payloadKg.toLocaleString()} kg`;
-      }
-
-      const alertEl = document.getElementById('vehicle-capacity-alert');
-      const alertText = document.getElementById('vehicle-capacity-alert-text');
-      const suggestNote = document.getElementById('vehicle-suggestion-note');
-
-      let errorMsg = null;
-      if (paxCount > currentSpec.seats) {
-        errorMsg = `This vehicle has only ${currentSpec.seats} seats. Choose a bigger vehicle or reduce the number of passengers.`;
-      } else if (hasExtra && cargoWeight > currentSpec.payloadKg) {
-        errorMsg = `This vehicle can carry up to ${currentSpec.payloadKg.toLocaleString()} kg. Choose a bigger vehicle or reduce the load.`;
-      }
-
-      if (errorMsg) {
-        if (alertEl && alertText) {
-          alertText.textContent = errorMsg;
-          alertEl.style.display = 'block';
-        }
-        if (suggestNote && recommendedCat && recommendedCat !== selectedCat) {
-          suggestNote.style.display = 'block';
-          suggestNote.innerHTML = `Recommended vehicle for this load: <a href="javascript:void(0)" onclick="selectVehicleCategory('${recommendedCat}')" style="color:var(--navy-600); text-decoration:underline; font-weight:700;">Switch to ${VEHICLE_CATEGORIES[recommendedCat].name}</a>`;
-        } else if (suggestNote) {
-          suggestNote.style.display = 'none';
-        }
-      } else {
-        if (alertEl) alertEl.style.display = 'none';
-        if (suggestNote) suggestNote.style.display = 'none';
-      }
-    }
-
-    function selectVehicleCategory(catName) {
-      const select = document.getElementById('route-vehicle-cat');
-      if (select) {
-        select.value = catName;
-        handleLoadOrVehicleChange();
-      }
-    }
-
     function clearCargoFieldErrors() {
-      ['route-pax', 'cargo-weight', 'cargo-description', 'route-vehicle-cat'].forEach(id => {
+      ['route-pax', 'cargo-weight', 'cargo-description'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('field-has-error');
       });
@@ -1359,7 +1224,7 @@
       }
     }
 
-    function validateLoadAndVehicle() {
+    function validateLoad() {
       clearCargoFieldErrors();
       const errors = [];
       let firstEl = null;
@@ -1376,10 +1241,9 @@
       const hasExtra = document.getElementById('has-extra-cargo').checked;
       const weightInput = document.getElementById('cargo-weight');
       const descInput = document.getElementById('cargo-description');
-      let cargoWeight = 0;
 
       if (hasExtra) {
-        cargoWeight = parseFloat(weightInput.value);
+        const cargoWeight = parseFloat(weightInput.value);
         if (isNaN(cargoWeight) || cargoWeight <= 0) {
           const msg = 'Enter the approximate weight';
           errors.push(msg);
@@ -1396,115 +1260,194 @@
         }
       }
 
-      const catSelect = document.getElementById('route-vehicle-cat');
-      const selectedCat = catSelect.value;
-      const catSpec = VEHICLE_CATEGORIES[selectedCat] || VEHICLE_CATEGORIES['Passenger Van'];
-
-      if (!isNaN(pax) && pax > catSpec.seats) {
-        const msg = `This vehicle has only ${catSpec.seats} seats. Choose a bigger vehicle or reduce the number of passengers.`;
-        errors.push(msg);
-        showFieldError('route-vehicle-cat', null, msg);
-        const alertEl = document.getElementById('vehicle-capacity-alert');
-        const alertText = document.getElementById('vehicle-capacity-alert-text');
-        if (alertEl && alertText) {
-          alertText.textContent = msg;
-          alertEl.style.display = 'block';
-        }
-        if (!firstEl) firstEl = paxInput;
-      }
-
-      if (hasExtra && !isNaN(cargoWeight) && cargoWeight > catSpec.payloadKg) {
-        const msg = `This vehicle can carry up to ${catSpec.payloadKg.toLocaleString()} kg. Choose a bigger vehicle or reduce the load.`;
-        errors.push(msg);
-        showFieldError('cargo-weight', 'cargo-weight-error', msg);
-        const alertEl = document.getElementById('vehicle-capacity-alert');
-        const alertText = document.getElementById('vehicle-capacity-alert-text');
-        if (alertEl && alertText) {
-          alertText.textContent = msg;
-          alertEl.style.display = 'block';
-        }
-        if (!firstEl) firstEl = weightInput;
-      }
-
       return { errors, firstEl };
     }
 
-    function renderLiveSummary() {
-      const cat = document.getElementById('route-vehicle-cat').value;
-      const catSpec = VEHICLE_CATEGORIES[cat] || VEHICLE_CATEGORIES['Passenger Van'];
+    function createNumberedMarkerIcon(index, type, isReturn) {
+      const isDep = type === 'departure';
+      const bg = isDep ? '#703845' : (isReturn ? '#D4AF37' : '#0B2545');
+      const label = isDep ? 'D' : (isReturn ? 'R' : String(index));
+      return L.divIcon({
+        className: 'custom-map-marker',
+        html: `<div style="background:${bg}; color:#ffffff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; border:2px solid #ffffff; box-shadow:0 2px 6px rgba(0,0,0,0.35);">${label}</div>`,
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
+        popupAnchor: [0, -13]
+      });
+    }
 
+    function scheduleRoutingUpdate() {
+      if (routingDebounceTimer) {
+        clearTimeout(routingDebounceTimer);
+      }
+      routingDebounceTimer = setTimeout(() => {
+        executeRoutingUpdate();
+      }, 350);
+    }
+
+    async function executeRoutingUpdate() {
+      const paxCount = parseInt(document.getElementById('route-pax').value, 10) || 1;
+      const hasExtra = document.getElementById('has-extra-cargo').checked;
+      const cargoWeight = hasExtra ? (parseFloat(document.getElementById('cargo-weight').value) || 0) : 0;
+      const loadFactor = (hasExtra && cargoWeight > 0) ? (1.0 + Math.min(0.3, (cargoWeight / 1000) * 0.15)) : 1.0;
+
+      const legs = [];
+      for (let i = 0; i < itineraryPoints.length - 1; i++) {
+        const p1 = itineraryPoints[i];
+        const p2 = itineraryPoints[i + 1];
+
+        if (p1 && p2 && typeof p1.lat === 'number' && typeof p1.lng === 'number' && typeof p2.lat === 'number' && typeof p2.lng === 'number') {
+          try {
+            const route = await GeoService.getRouteBetweenPoints(p1, p2);
+            if (route) {
+              const nominalFuelPer100 = 10.0;
+              const fuelLiters = Math.round((route.distance_km * (nominalFuelPer100 / 100) * loadFactor) * 10) / 10;
+              const costEGP = Math.round(fuelLiters * 20.50 * 100) / 100;
+              legs.push({
+                from_index: i,
+                to_index: i + 1,
+                from_place: p1.place_name,
+                to_place: p2.place_name,
+                distance_km: route.distance_km,
+                drive_minutes: route.drive_minutes,
+                fuel_liters: fuelLiters,
+                cost_egp: costEGP,
+                isRealRoute: route.isRealRoute,
+                coordinates: route.coordinates
+              });
+              continue;
+            }
+          } catch (e) {
+            // fallback handled below
+          }
+        }
+
+        const est = FleetStore.RouteEstimator.estimateLeg(p1, p2, 'Passenger Van', loadFactor);
+        legs.push({
+          from_index: i,
+          to_index: i + 1,
+          from_place: p1.place_name,
+          to_place: p2.place_name,
+          distance_km: est.distance_km,
+          drive_minutes: est.drive_minutes,
+          fuel_liters: est.fuel_liters,
+          cost_egp: est.cost_egp,
+          isRealRoute: false,
+          coordinates: (p1 && p2 && p1.lat && p2.lat) ? [[p1.lat, p1.lng], [p2.lat, p2.lng]] : []
+        });
+      }
+
+      computedRouteLegs = legs;
+      renderLiveSummary();
+    }
+
+    function renderLiveSummary() {
       const paxCount = parseInt(document.getElementById('route-pax').value, 10) || 1;
       const hasExtra = document.getElementById('has-extra-cargo').checked;
       const cargoWeight = hasExtra ? (parseFloat(document.getElementById('cargo-weight').value) || 0) : 0;
       const cargoDesc = hasExtra ? document.getElementById('cargo-description').value.trim() : '';
+      const loadFactor = (hasExtra && cargoWeight > 0) ? (1.0 + Math.min(0.3, (cargoWeight / 1000) * 0.15)) : 1.0;
 
-      const loadFactor = (hasExtra && cargoWeight > 0) ? (1.0 + Math.min(0.5, (cargoWeight / catSpec.payloadKg) * 0.25)) : 1.0;
+      let legs = computedRouteLegs;
+      if (!legs || legs.length !== Math.max(0, itineraryPoints.length - 1)) {
+        legs = FleetStore.RouteEstimator.computeItineraryLegs(itineraryPoints, 'Passenger Van', loadFactor).map(l => ({
+          ...l,
+          isRealRoute: false,
+          coordinates: []
+        }));
+      }
 
-      const legs = FleetStore.RouteEstimator.computeItineraryLegs(itineraryPoints, cat, loadFactor);
       const timelineContainer = document.getElementById('summary-timeline-container');
-      timelineContainer.innerHTML = '';
+      if (timelineContainer) {
+        timelineContainer.innerHTML = '';
+        let totalKm = 0;
+        let totalMins = 0;
+        let totalFuel = 0;
+        let totalCost = 0;
 
-      let totalKm = 0;
-      let totalMins = 0;
-      let totalFuel = 0;
-      let totalCost = 0;
+        itineraryPoints.forEach((point, idx) => {
+          const isDep = point.type === 'departure';
+          const isRet = point.type === 'return';
+          const dotClass = isDep ? 'timeline-marker-dot' : (isRet ? 'timeline-marker-dot return-dot' : 'timeline-marker-dot stop-dot');
+          const nodeClass = `timeline-node ${isRet ? 'return-node' : ''}`;
 
-      itineraryPoints.forEach((point, idx) => {
-        const isDep = point.type === 'departure';
-        const isRet = point.type === 'return';
-        let dotClass = isDep ? 'timeline-marker-dot' : (isRet ? 'timeline-marker-dot return-dot' : 'timeline-marker-dot stop-dot');
-        let nodeClass = `timeline-node ${isRet ? 'return-node' : ''}`;
+          const timeStr = isDep ? `Leaves at ${point.depart_at || ''}` : (isRet ? `Arrives back at ${point.arrive_at || ''}` : `Arrives ${point.arrive_at || ''}${point.depart_at ? ` · Leaves ${point.depart_at}` : ''}`);
 
-        const timeStr = isDep ? `Leaves at ${point.depart_at || ''}` : (isRet ? `Arrives back at ${point.arrive_at || ''}` : `Arrives ${point.arrive_at || ''}${point.depart_at ? ` · Leaves ${point.depart_at}` : ''}`);
-
-        const nodeEl = document.createElement('div');
-        nodeEl.className = nodeClass;
-        nodeEl.innerHTML = `
-          <div class="${dotClass}"></div>
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-            <div>
-              <strong style="color:var(--navy-800); font-size:14px;">${escapeHtml(point.place_name || 'Unnamed Point')}</strong>
-              <div style="font-size:12px; color:var(--text-muted); margin-top:1px;">${timeStr}</div>
-            </div>
-            <span class="badge ${point.pinned ? 'badge-success' : 'badge-neutral'}" style="font-size:11px;">
-              ${point.pinned ? 'Pinned' : 'Not pinned'}
-            </span>
-          </div>
-        `;
-        timelineContainer.appendChild(nodeEl);
-
-        // Render leg between this point and the next
-        if (idx < itineraryPoints.length - 1 && legs[idx]) {
-          const leg = legs[idx];
-          totalKm += leg.distance_km;
-          totalMins += leg.drive_minutes;
-          totalFuel += leg.fuel_liters;
-          totalCost += leg.cost_egp;
-
-          const h = Math.floor(leg.drive_minutes / 60);
-          const m = leg.drive_minutes % 60;
-          const isReturnLeg = (idx === itineraryPoints.length - 2 && returnWithVehicle);
-
-          const legEl = document.createElement('div');
-          legEl.className = `leg-summary-card ${isReturnLeg ? 'return-leg' : ''}`;
-          legEl.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-weight:700; color:var(--navy-800);">${leg.distance_km} km</span>
-              <span style="color:var(--text-muted); font-family:var(--font-mono);">${h}h ${m.toString().padStart(2, '0')}m driving (est.)</span>
-            </div>
-            <div style="font-size:12px; color:var(--text-muted);">${leg.fuel_liters.toFixed(1)} L (${leg.cost_egp.toFixed(2)} EGP)</div>
-            ${leg.warning ? `
-              <div style="margin-top:4px; font-size:11.5px; color:#B91C1C; display:flex; align-items:center; gap:4px; font-weight:600;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span>${leg.warning}</span>
+          const nodeEl = document.createElement('div');
+          nodeEl.className = nodeClass;
+          nodeEl.innerHTML = `
+            <div class="${dotClass}"></div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+              <div>
+                <strong style="color:var(--navy-800); font-size:14px;">${escapeHtml(point.place_name || 'Unnamed Point')}</strong>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:1px;">${timeStr}</div>
               </div>
-            ` : ''}
+              <span class="badge ${point.pinned ? 'badge-success' : 'badge-neutral'}" style="font-size:11px;">
+                ${point.pinned ? 'Pinned' : 'Not pinned'}
+              </span>
+            </div>
           `;
-          timelineContainer.appendChild(legEl);
-        }
-      });
+          timelineContainer.appendChild(nodeEl);
 
-      // Update Estimate Panel Load Manifest
+          if (idx < itineraryPoints.length - 1 && legs[idx]) {
+            const leg = legs[idx];
+            totalKm += leg.distance_km;
+            totalMins += leg.drive_minutes;
+            totalFuel += leg.fuel_liters;
+            totalCost += leg.cost_egp;
+
+            const h = Math.floor(leg.drive_minutes / 60);
+            const m = leg.drive_minutes % 60;
+            const isReturnLeg = (idx === itineraryPoints.length - 2 && returnWithVehicle);
+            const approxLabel = !leg.isRealRoute ? '<span style="color:var(--text-muted); font-size:11px; margin-left:4px;">(approx.)</span>' : '';
+
+            const legEl = document.createElement('div');
+            legEl.className = `leg-summary-card ${isReturnLeg ? 'return-leg' : ''}`;
+            legEl.innerHTML = `
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:700; color:var(--navy-800);">${leg.distance_km} km ${approxLabel}</span>
+                <span style="color:var(--text-muted); font-family:var(--font-mono);">${h}h ${m.toString().padStart(2, '0')}m driving</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-muted);">${leg.fuel_liters.toFixed(1)} L (${leg.cost_egp.toFixed(2)} EGP est.)</div>
+            `;
+            timelineContainer.appendChild(legEl);
+          }
+        });
+
+        const pointsCountEl = document.getElementById('summary-points-count');
+        if (pointsCountEl) pointsCountEl.textContent = `${itineraryPoints.length} Waypoints`;
+
+        const totalKmEl = document.getElementById('summary-total-km');
+        if (totalKmEl) totalKmEl.textContent = `${totalKm.toFixed(1)} km`;
+
+        const totH = Math.floor(totalMins / 60);
+        const totM = totalMins % 60;
+        const totalDriveEl = document.getElementById('summary-total-drive');
+        if (totalDriveEl) totalDriveEl.textContent = `${totH}h ${totM.toString().padStart(2, '0')}m`;
+
+        const sDate = document.getElementById('trip-start-date').value;
+        const eDate = document.getElementById('trip-end-date').value;
+        const daysCount = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
+        const daysEl = document.getElementById('summary-total-days');
+        if (daysEl) daysEl.textContent = `${daysCount} day${daysCount > 1 ? 's' : ''} (${Math.max(0, daysCount - 1)} night${daysCount > 2 ? 's' : ''})`;
+
+        const fuelEl = document.getElementById('summary-total-fuel');
+        if (fuelEl) fuelEl.textContent = `${totalFuel.toFixed(1)} L (fleet avg)`;
+
+        const costEl = document.getElementById('summary-total-cost');
+        if (costEl) costEl.textContent = `EGP ${totalCost.toFixed(2)}`;
+
+        const loadFactorBadge = document.getElementById('summary-load-factor-badge');
+        if (loadFactorBadge) {
+          if (hasExtra && cargoWeight > 0 && loadFactor > 1.0) {
+            loadFactorBadge.style.display = 'block';
+            loadFactorBadge.textContent = `Cargo load factor applied: +${Math.round((loadFactor - 1) * 100)}% fuel`;
+          } else {
+            loadFactorBadge.style.display = 'none';
+          }
+        }
+      }
+
       const paxManifest = document.getElementById('summary-pax-manifest');
       if (paxManifest) {
         paxManifest.textContent = `${paxCount} passenger${paxCount > 1 ? 's' : ''} · personal luggage`;
@@ -1535,162 +1478,222 @@
         }
       }
 
-      document.getElementById('summary-points-count').textContent = `${itineraryPoints.length} Waypoints`;
-      document.getElementById('summary-total-km').textContent = `${totalKm.toFixed(1)} km (est.)`;
-
-      const totH = Math.floor(totalMins / 60);
-      const totM = totalMins % 60;
-      document.getElementById('summary-total-drive').textContent = `${totH}h ${totM.toString().padStart(2, '0')}m (est.)`;
-
-      const sDate = document.getElementById('trip-start-date').value;
-      const eDate = document.getElementById('trip-end-date').value;
-      const daysCount = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
-      document.getElementById('summary-total-days').textContent = `${daysCount} day${daysCount > 1 ? 's' : ''} (${Math.max(0, daysCount - 1)} night${daysCount > 2 ? 's' : ''})`;
-
-      // Fuel & Cost Estimates
-      const fuelType = catSpec.fuelType || (cat === 'Sedan' ? 'Petrol 92' : 'Diesel');
-      const fuelEl = document.getElementById('summary-total-fuel');
-      if (fuelEl) {
-        fuelEl.textContent = `${totalFuel.toFixed(1)} L ${fuelType} (est.)`;
-      }
-      const costEl = document.getElementById('summary-total-cost');
-      if (costEl) {
-        costEl.textContent = `EGP ${totalCost.toFixed(2)}`;
-      }
-
-      const loadFactorBadge = document.getElementById('summary-load-factor-badge');
-      if (loadFactorBadge) {
-        if (hasExtra && cargoWeight > 0 && loadFactor > 1.0) {
-          loadFactorBadge.style.display = 'block';
-          loadFactorBadge.textContent = `Cargo load factor applied: +${Math.round((loadFactor - 1) * 100)}% fuel`;
-        } else {
-          loadFactorBadge.style.display = 'none';
-        }
-      }
-
-      // Hold window text
-      const firstPt = itineraryPoints[0];
-      const lastPt = itineraryPoints[itineraryPoints.length - 1];
-      const holdStart = firstPt && firstPt.depart_at ? firstPt.depart_at : `${sDate} 08:00`;
-      const holdEnd = lastPt && lastPt.arrive_at ? `${lastPt.arrive_at} (+45m buffer)` : `${eDate} 18:45`;
-      document.getElementById('summary-hold-window-text').textContent = `${holdStart} → ${holdEnd}`;
-
-      // Check daily driving rules for > 8h
       const rules = FleetStore.RouteEstimator.checkDriverRules(itineraryPoints, legs);
       const dutyNotice = document.getElementById('driver-daily-limit-notice');
-      if (rules.dayViolations && rules.dayViolations.length > 0) {
-        dutyNotice.style.display = 'block';
-        document.getElementById('driver-daily-limit-text').textContent = rules.dayViolations[0].notice;
-      } else {
-        dutyNotice.style.display = 'none';
-      }
-
-      // Render overview map
-      drawOverviewMap();
-    }
-
-    function drawOverviewMap() {
-      const svg = document.getElementById('overview-map-svg');
-      if (!svg) return;
-      svg.innerHTML = '';
-
-      if (itineraryPoints.length < 2) return;
-
-      const pts = itineraryPoints.map(p => {
-        let lat = p.lat || 30.0;
-        let lng = p.lng || 31.2;
-        return { ...p, lat, lng };
-      });
-
-      let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
-      pts.forEach(p => {
-        if (p.lat < minLat) minLat = p.lat;
-        if (p.lat > maxLat) maxLat = p.lat;
-        if (p.lng < minLng) minLng = p.lng;
-        if (p.lng > maxLng) maxLng = p.lng;
-      });
-
-      if (maxLat - minLat < 0.2) { minLat -= 0.2; maxLat += 0.2; }
-      if (maxLng - minLng < 0.2) { minLng -= 0.2; maxLng += 0.2; }
-
-      const pad = 24;
-      const width = svg.clientWidth || 300;
-      const height = svg.clientHeight || 180;
-
-      function project(lat, lng) {
-        const x = pad + ((lng - minLng) / (maxLng - minLng)) * (width - pad * 2);
-        const y = height - (pad + ((lat - minLat) / (maxLat - minLat)) * (height - pad * 2));
-        return { x: Math.round(x), y: Math.round(y) };
-      }
-
-      const coords = pts.map(p => project(p.lat, p.lng));
-
-      // Draw lines
-      for (let i = 0; i < coords.length - 1; i++) {
-        const c1 = coords[i];
-        const c2 = coords[i + 1];
-        const isReturn = (i === coords.length - 2 && returnWithVehicle);
-
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', c1.x);
-        line.setAttribute('y1', c1.y);
-        line.setAttribute('x2', c2.x);
-        line.setAttribute('y2', c2.y);
-        line.setAttribute('stroke', isReturn ? '#D4AF37' : '#0B2545');
-        line.setAttribute('stroke-width', '3.5');
-        line.setAttribute('stroke-linecap', 'round');
-        if (isReturn) {
-          line.setAttribute('stroke-dasharray', '6,6');
+      if (dutyNotice) {
+        if (rules.dayViolations && rules.dayViolations.length > 0) {
+          dutyNotice.style.display = 'block';
+          document.getElementById('driver-daily-limit-text').textContent = rules.dayViolations[0].notice;
+        } else {
+          dutyNotice.style.display = 'none';
         }
-        svg.appendChild(line);
       }
 
-      // Draw pins
-      coords.forEach((c, idx) => {
-        const isDep = idx === 0;
-        const isRet = idx === coords.length - 1 && returnWithVehicle;
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', c.x);
-        circle.setAttribute('cy', c.y);
-        circle.setAttribute('r', '6');
-        circle.setAttribute('fill', isDep ? '#703845' : (isRet ? '#D4AF37' : '#1D4E89'));
-        circle.setAttribute('stroke', '#FFFFFF');
-        circle.setAttribute('stroke-width', '2');
-        svg.appendChild(circle);
-
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', c.x + 8);
-        text.setAttribute('y', c.y - 4);
-        text.setAttribute('font-size', '10');
-        text.setAttribute('font-weight', '700');
-        text.setAttribute('fill', '#0B2545');
-        text.textContent = isDep ? 'Departure' : (isRet ? 'Return' : `Stop #${idx}`);
-        svg.appendChild(text);
-      });
+      updateSummaryMap(legs);
     }
 
-    // Modal Map Picker Functions
+    function updateSummaryMap(legs) {
+      const container = document.getElementById('summary-leaflet-map');
+      if (!container || typeof L === 'undefined') return;
+
+      if (!summaryLeafletMap) {
+        summaryLeafletMap = L.map('summary-leaflet-map', {
+          zoomControl: true,
+          attributionControl: true
+        }).setView([27.1809, 31.1837], 6);
+
+        const tileLayer = GeoService.createTileLayer();
+        if (tileLayer) tileLayer.addTo(summaryLeafletMap);
+      }
+
+      summaryMarkerLayers.forEach(l => summaryLeafletMap.removeLayer(l));
+      summaryMarkerLayers = [];
+      summaryRouteLayers.forEach(l => summaryLeafletMap.removeLayer(l));
+      summaryRouteLayers = [];
+
+      const boundsGroup = [];
+
+      itineraryPoints.forEach((point, idx) => {
+        if (typeof point.lat === 'number' && typeof point.lng === 'number') {
+          const isRet = point.type === 'return';
+          const icon = createNumberedMarkerIcon(idx, point.type, isRet);
+          const marker = L.marker([point.lat, point.lng], { icon: icon }).addTo(summaryLeafletMap);
+          marker.bindPopup(`<strong>${escapeHtml(point.place_name || 'Point')}</strong><br>${point.depart_at || point.arrive_at || ''}`);
+          summaryMarkerLayers.push(marker);
+          boundsGroup.push([point.lat, point.lng]);
+        }
+      });
+
+      if (legs && legs.length > 0) {
+        legs.forEach((leg, idx) => {
+          const isReturn = (idx === legs.length - 1 && returnWithVehicle);
+          if (leg.coordinates && leg.coordinates.length > 0) {
+            const poly = L.polyline(leg.coordinates, {
+              color: isReturn ? '#D4AF37' : '#0B2545',
+              weight: 4,
+              opacity: 0.85,
+              dashArray: isReturn ? '8, 8' : undefined
+            }).addTo(summaryLeafletMap);
+            summaryRouteLayers.push(poly);
+            leg.coordinates.forEach(c => boundsGroup.push(c));
+          } else {
+            const p1 = itineraryPoints[leg.from_index];
+            const p2 = itineraryPoints[leg.to_index];
+            if (p1 && p2 && p1.lat && p2.lat) {
+              const poly = L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], {
+                color: isReturn ? '#D4AF37' : '#0B2545',
+                weight: 3,
+                opacity: 0.65,
+                dashArray: isReturn ? '6, 6' : '4, 4'
+              }).addTo(summaryLeafletMap);
+              summaryRouteLayers.push(poly);
+            }
+          }
+        });
+      }
+
+      if (boundsGroup.length > 0) {
+        try {
+          const bounds = L.latLngBounds(boundsGroup);
+          if (bounds.isValid()) {
+            summaryLeafletMap.fitBounds(bounds, { padding: [25, 25], maxZoom: 14 });
+          }
+        } catch (e) {}
+      }
+
+      setTimeout(() => {
+        if (summaryLeafletMap) summaryLeafletMap.invalidateSize();
+      }, 100);
+    }
+
     function openMapModalForPoint(index) {
       activeModalPointIndex = index;
       const pt = itineraryPoints[index];
-      modalTempCoords.lat = pt.lat || 27.1809;
-      modalTempCoords.lng = pt.lng || 31.1837;
-      modalTempCoords.placeName = pt.place_name || 'Selected Point';
+      modalTempCoords.lat = (typeof pt.lat === 'number') ? pt.lat : 27.1809;
+      modalTempCoords.lng = (typeof pt.lng === 'number') ? pt.lng : 31.1837;
+      modalTempCoords.placeName = pt.place_name || '';
 
       document.getElementById('modal-place-search').value = pt.place_name || '';
       document.getElementById('modal-pin-label').textContent = pt.place_name || 'Selected Location';
       document.getElementById('modal-coords-display').textContent = `${modalTempCoords.lat.toFixed(4)}° N, ${modalTempCoords.lng.toFixed(4)}° E`;
+      document.getElementById('modal-search-results').style.display = 'none';
 
-      document.getElementById('map-modal').style.display = 'flex';
+      const modalEl = document.getElementById('map-modal');
+      modalEl.style.display = 'flex';
+
+      setTimeout(() => {
+        initOrUpdateModalMap(modalTempCoords.lat, modalTempCoords.lng, pt.pinned);
+      }, 120);
+    }
+
+    function initOrUpdateModalMap(lat, lng, isPinned) {
+      if (typeof L === 'undefined') return;
+
+      const mapContainer = document.getElementById('modal-leaflet-map');
+      if (!mapContainer) return;
+
+      const initialZoom = isPinned ? 13 : 6;
+
+      if (!modalLeafletMap) {
+        modalLeafletMap = L.map('modal-leaflet-map', {
+          zoomControl: true,
+          attributionControl: true
+        }).setView([lat, lng], initialZoom);
+
+        const tileLayer = GeoService.createTileLayer();
+        if (tileLayer) tileLayer.addTo(modalLeafletMap);
+
+        modalLeafletMap.on('click', (e) => {
+          updateModalMarkerPosition(e.latlng.lat, e.latlng.lng, null);
+        });
+      } else {
+        modalLeafletMap.setView([lat, lng], initialZoom);
+        modalLeafletMap.invalidateSize();
+      }
+
+      if (!modalMarker) {
+        modalMarker = L.marker([lat, lng], { draggable: true }).addTo(modalLeafletMap);
+        modalMarker.on('dragend', (e) => {
+          const pos = e.target.getLatLng();
+          updateModalMarkerPosition(pos.lat, pos.lng, null);
+        });
+      } else {
+        modalMarker.setLatLng([lat, lng]);
+      }
+
+      modalLeafletMap.invalidateSize();
+    }
+
+    function updateModalMarkerPosition(lat, lng, name) {
+      modalTempCoords.lat = Math.round(lat * 10000) / 10000;
+      modalTempCoords.lng = Math.round(lng * 10000) / 10000;
+
+      if (name) {
+        modalTempCoords.placeName = name;
+        document.getElementById('modal-place-search').value = name;
+        document.getElementById('modal-pin-label').textContent = name;
+      }
+
+      document.getElementById('modal-coords-display').textContent = `${modalTempCoords.lat.toFixed(4)}° N, ${modalTempCoords.lng.toFixed(4)}° E`;
+
+      if (modalMarker) {
+        modalMarker.setLatLng([modalTempCoords.lat, modalTempCoords.lng]);
+      }
+      if (modalLeafletMap) {
+        modalLeafletMap.panTo([modalTempCoords.lat, modalTempCoords.lng]);
+      }
     }
 
     function closeMapModal() {
       document.getElementById('map-modal').style.display = 'none';
+      document.getElementById('modal-search-results').style.display = 'none';
       activeModalPointIndex = null;
+    }
+
+    async function executeNominatimSearch() {
+      const q = document.getElementById('modal-place-search').value.trim();
+      if (!q) return;
+
+      const resultsContainer = document.getElementById('modal-search-results');
+      resultsContainer.style.display = 'block';
+      resultsContainer.innerHTML = '<div style="padding:10px; color:var(--text-muted); font-size:12.5px;">Searching locations in Egypt...</div>';
+
+      try {
+        const results = await GeoService.searchNominatim(q);
+        if (!results || results.length === 0) {
+          resultsContainer.innerHTML = '<div style="padding:10px; color:var(--text-muted); font-size:12.5px;">No locations found. Try a different search term or click directly on the map.</div>';
+          return;
+        }
+
+        resultsContainer.innerHTML = '';
+        results.forEach(res => {
+          const item = document.createElement('div');
+          item.className = 'modal-search-item';
+          item.innerHTML = `
+            <strong>${escapeHtml(res.name)}</strong>
+            <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">${escapeHtml(res.fullAddress)}</div>
+          `;
+          item.onclick = () => {
+            selectModalSearchResult(res);
+          };
+          resultsContainer.appendChild(item);
+        });
+      } catch (err) {
+        resultsContainer.innerHTML = '<div style="padding:10px; color:#B91C1C; font-size:12.5px;">Search error. You can drop a pin directly on the map.</div>';
+      }
+    }
+
+    function selectModalSearchResult(result) {
+      document.getElementById('modal-search-results').style.display = 'none';
+      updateModalMarkerPosition(result.lat, result.lng, result.name);
+      if (modalLeafletMap) {
+        modalLeafletMap.setView([result.lat, result.lng], 14);
+      }
     }
 
     function renderModalLocationChips() {
       const container = document.getElementById('modal-place-chips');
+      if (!container) return;
       container.innerHTML = '';
       FleetStore.RouteEstimator.locations.forEach(loc => {
         const btn = document.createElement('button');
@@ -1701,50 +1704,13 @@
         btn.style.background = 'var(--bg-page)';
         btn.textContent = loc.name;
         btn.onclick = () => {
-          modalTempCoords.lat = loc.lat;
-          modalTempCoords.lng = loc.lng;
-          modalTempCoords.placeName = loc.name;
-          document.getElementById('modal-place-search').value = loc.name;
-          document.getElementById('modal-pin-label').textContent = loc.name;
-          document.getElementById('modal-coords-display').textContent = `${loc.lat.toFixed(4)}° N, ${loc.lng.toFixed(4)}° E`;
+          updateModalMarkerPosition(loc.lat, loc.lng, loc.name);
+          if (modalLeafletMap) {
+            modalLeafletMap.setView([loc.lat, loc.lng], 13);
+          }
         };
         container.appendChild(btn);
       });
-    }
-
-    function filterModalSuggestions() {
-      const q = document.getElementById('modal-place-search').value.trim();
-      const loc = FleetStore.RouteEstimator.findLocation(q);
-      if (loc) {
-        modalTempCoords.lat = loc.lat;
-        modalTempCoords.lng = loc.lng;
-        modalTempCoords.placeName = loc.name;
-        document.getElementById('modal-pin-label').textContent = loc.name;
-        document.getElementById('modal-coords-display').textContent = `${loc.lat.toFixed(4)}° N, ${loc.lng.toFixed(4)}° E`;
-      }
-    }
-
-    function handleModalMapClick(event) {
-      const canvas = document.getElementById('modal-map-canvas');
-      const rect = canvas.getBoundingClientRect();
-      const clickX = event.clientX - rect.left;
-      const clickY = event.clientY - rect.top;
-
-      // Project click into Egypt bounds: Lat ~24 to 32, Lng ~25 to 35
-      const pctX = Math.max(0, Math.min(1, clickX / rect.width));
-      const pctY = Math.max(0, Math.min(1, clickY / rect.height));
-
-      const lng = 25.0 + pctX * (35.0 - 25.0);
-      const lat = 32.0 - pctY * (32.0 - 24.0);
-
-      modalTempCoords.lat = Math.round(lat * 10000) / 10000;
-      modalTempCoords.lng = Math.round(lng * 10000) / 10000;
-
-      const marker = document.getElementById('modal-pin-marker');
-      marker.style.left = `${clickX}px`;
-      marker.style.top = `${clickY}px`;
-
-      document.getElementById('modal-coords-display').textContent = `${modalTempCoords.lat.toFixed(4)}° N, ${modalTempCoords.lng.toFixed(4)}° E`;
     }
 
     function confirmModalPin() {
@@ -1753,12 +1719,12 @@
       pt.lat = modalTempCoords.lat;
       pt.lng = modalTempCoords.lng;
       pt.pinned = true;
-      if (modalTempCoords.placeName && !pt.place_name) {
+      if (modalTempCoords.placeName) {
         pt.place_name = modalTempCoords.placeName;
       }
       closeMapModal();
       renderPointsList();
-      renderLiveSummary();
+      scheduleRoutingUpdate();
     }
 
     // Validation & Submission
@@ -1824,7 +1790,7 @@
     }
 
     function validateAndSubmitBooking() {
-      const loadValidation = validateLoadAndVehicle();
+      const loadValidation = validateLoad();
       const itineraryErrors = validateItinerary();
       const allErrors = [...loadValidation.errors, ...itineraryErrors];
 
@@ -1870,16 +1836,17 @@
         strap: hasExtra && document.getElementById('cargo-flag-strap').checked,
         loading_help: hasExtra && document.getElementById('cargo-flag-loading-help').checked
       };
-      const vehicleCat = document.getElementById('route-vehicle-cat').value;
-      const purpose = document.getElementById('route-purpose').value.trim();
-      const costCenter = document.getElementById('cost-center').value.trim();
-      const notes = document.getElementById('mission-notes').value.trim();
-      const overnightLocation = document.getElementById('driver-overnight-location').value.trim();
+      const notesEl = document.getElementById('mission-notes');
+      const notes = notesEl ? notesEl.value.trim() : '';
 
       const user = Auth.getUser() || { name: 'Dr. Sarah Mansour', dept: 'Faculty of Pharmacy' };
-      const catSpec = VEHICLE_CATEGORIES[vehicleCat] || VEHICLE_CATEGORIES['Passenger Van'];
-      const loadFactor = (hasExtra && cargoWeight > 0) ? (1.0 + Math.min(0.5, (cargoWeight / catSpec.payloadKg) * 0.25)) : 1.0;
-      const legs = FleetStore.RouteEstimator.computeItineraryLegs(itineraryPoints, vehicleCat, loadFactor);
+      const costCenter = user.dept ? `CC-410 (${user.dept})` : 'CC-410 (General)';
+
+      const loadFactor = (hasExtra && cargoWeight > 0) ? (1.0 + Math.min(0.3, (cargoWeight / 1000) * 0.15)) : 1.0;
+      let legs = computedRouteLegs;
+      if (!legs || legs.length !== Math.max(0, itineraryPoints.length - 1)) {
+        legs = FleetStore.RouteEstimator.computeItineraryLegs(itineraryPoints, 'Passenger Van', loadFactor);
+      }
 
       const payload = {
         start_date: sDate,
@@ -1893,13 +1860,11 @@
         cargoWeightKg: cargoWeight,
         cargo_description: cargoDesc,
         cargo_flags: cargoFlags,
-        purpose: purpose,
         cost_center: costCenter,
-        dept: user.dept,
-        requesterName: user.name,
+        dept: user.dept || 'Operations',
+        requesterName: user.name || 'Requester',
         notes: notes,
-        driver_overnight_location: overnightLocation,
-        vehicleCategory: vehicleCat
+        vehicleCategory: 'Pending Operations Assignment'
       };
 
       let booking;
@@ -1909,7 +1874,7 @@
         booking = FleetStore.createBooking(payload);
       }
 
-      alert(`Booking request ${booking.id} submitted successfully!\n\nMulti-Stop Route: ${booking.route}\nDates: ${booking.startDate} → ${booking.endDate} (${booking.daysCount} days)\nEstimated Distance: ${booking.distanceKm} km\nVehicle Category: ${booking.vehicleCategory}\n\nCentral Operations Desk has received the requisition to review schedules and allocate vehicle and driver.`);
+      alert(`Booking request ${booking.id} submitted successfully!\n\nMulti-Stop Route: ${booking.route}\nDates: ${booking.startDate} → ${booking.endDate} (${booking.daysCount} days)\nEstimated Distance: ${booking.distanceKm} km\nStatus: Pending Operations Assignment\n\nCentral Operations Desk has received the requisition to review schedules and allocate vehicle and driver.`);
       window.location.href = `booking-detail.html?id=${booking.id}`;
     }
 

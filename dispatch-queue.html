@@ -84,9 +84,9 @@
                 <span id="detail-booking-pretitle" style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">BK-2047 · Dr. Sarah Mansour (Pharmacy)</span>
                 <h2 id="detail-booking-route" style="margin: 4px 0 0; font-size: 22px; color: var(--navy-800);">Assiut → Cairo → Badr City → Return</h2>
                 <div style="margin-top: 6px; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
-                  <span style="color: var(--text-muted);">Requested Vehicle Category:</span>
-                  <span class="badge badge-info" id="detail-requested-cat">Passenger Van / Minibus</span>
-                  <span class="badge badge-gold" id="detail-period-badge">5-Day Mission</span>
+                  <span style="color: var(--text-muted);">Vehicle Allocation:</span>
+                  <span class="badge badge-gold" id="detail-requested-cat">Pending Operations Choice</span>
+                  <span class="badge badge-neutral" id="detail-period-badge">5-Day Mission</span>
                 </div>
               </div>
               <div style="display: flex; gap: 16px; font-size: 14px;">
@@ -178,6 +178,23 @@
                 </tbody>
               </table>
             </div>
+            <div id="dispatch-vehicle-recalc-box" style="margin-top: 14px; background: var(--bg-page); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Operational Fuel &amp; Cost Recalculation</div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--navy-800);" id="recalc-vehicle-name">—</div>
+                <div style="font-size: 12px; color: var(--text-muted);" id="recalc-vehicle-spec">Rate: — L/100km · Load adjustment: —</div>
+              </div>
+              <div style="display: flex; gap: 24px; align-items: center;">
+                <div>
+                  <span style="font-size: 11.5px; color: var(--text-muted);">Recomputed Fuel:</span>
+                  <div id="recalc-fuel-liters" style="font-family: var(--font-mono); font-weight: 700; color: var(--navy-800); font-size: 15px;">— L</div>
+                </div>
+                <div>
+                  <span style="font-size: 11.5px; color: var(--text-muted);">Recomputed Cost:</span>
+                  <div id="recalc-fuel-cost" style="font-family: var(--font-mono); font-weight: 700; color: var(--gold-600); font-size: 15px;">— EGP</div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Section 2: Driver Certification & Roster Across Entire Period -->
@@ -268,6 +285,98 @@
   <script src="js/main.js"></script>
   <script>
     let activeBookingId = 'BK-2047';
+    let currentActiveBooking = null;
+    let currentSelectedVehicle = null;
+    let currentFuelLiters = null;
+    let currentCostEGP = null;
+
+    const FLEET_VEHICLES = [
+      {
+        code: 'V-122',
+        model: 'Hyundai H-1 2023',
+        category: 'Passenger Van',
+        seats: 9,
+        payloadKg: 1000,
+        ratePer100Km: 9.5,
+        fuelPrice: 20.50,
+        fuelType: 'Diesel',
+        isFreeWholePeriod: true,
+        conflictReason: null
+      },
+      {
+        code: 'V-130',
+        model: 'Toyota HiAce 2020',
+        category: 'Passenger Van',
+        seats: 12,
+        payloadKg: 1200,
+        ratePer100Km: 10.5,
+        fuelPrice: 20.50,
+        fuelType: 'Diesel',
+        isFreeWholePeriod: true,
+        conflictReason: null
+      },
+      {
+        code: 'V-105',
+        model: 'Toyota Corolla 2022',
+        category: 'Sedan',
+        seats: 4,
+        payloadKg: 400,
+        ratePer100Km: 7.0,
+        fuelPrice: 22.25,
+        fuelType: 'Petrol 92',
+        isFreeWholePeriod: true,
+        conflictReason: null
+      },
+      {
+        code: 'V-145',
+        model: 'Mercedes-Benz MCV 28-Seat',
+        category: 'Bus',
+        seats: 28,
+        payloadKg: 4000,
+        ratePer100Km: 26.0,
+        fuelPrice: 20.50,
+        fuelType: 'Diesel',
+        isFreeWholePeriod: true,
+        conflictReason: null
+      },
+      {
+        code: 'V-114',
+        model: 'Toyota HiAce 2022',
+        category: 'Passenger Van',
+        seats: 9,
+        payloadKg: 1100,
+        ratePer100Km: 10.0,
+        fuelPrice: 20.50,
+        fuelType: 'Diesel',
+        isFreeWholePeriod: false,
+        conflictReason: 'Booked on Oct 19–20'
+      },
+      {
+        code: 'V-108',
+        model: 'Nissan Urvan 2019',
+        category: 'Passenger Van',
+        seats: 12,
+        payloadKg: 1000,
+        ratePer100Km: 11.0,
+        fuelPrice: 20.50,
+        fuelType: 'Diesel',
+        isFreeWholePeriod: false,
+        conflictReason: 'Maintenance lockout (Brake pads)'
+      }
+    ];
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[m];
+      });
+    }
 
     function initQueue() {
       const bookings = FleetStore.getBookings();
@@ -326,6 +435,7 @@
 
       const booking = FleetStore.getBooking(id);
       if (!booking) return;
+      currentActiveBooking = booking;
 
       const sDate = booking.startDate || booking.start_date || '2026-10-18';
       const eDate = booking.endDate || booking.end_date || '2026-10-22';
@@ -333,7 +443,7 @@
 
       document.getElementById('detail-booking-pretitle').textContent = `${booking.id} · ${booking.requesterName || 'Dr. Sarah Mansour'} (${booking.dept || 'Faculty of Pharmacy'})`;
       document.getElementById('detail-booking-route').textContent = booking.route || (booking.origin + ' → ' + booking.destination);
-      document.getElementById('detail-requested-cat').textContent = booking.vehicleCategory || 'Passenger Van / Minibus';
+      document.getElementById('detail-requested-cat').textContent = booking.vehicleCategory || 'Pending Operations Choice';
       document.getElementById('detail-period-badge').textContent = `${days}-Day Mission`;
 
       document.getElementById('detail-metric-km').textContent = `${(booking.distanceKm || 865.0).toFixed(1)} km`;
@@ -427,36 +537,106 @@
 
     function renderVehicleRosterForPeriod(days, sDate, eDate) {
       const tbody = document.getElementById('vehicle-roster-tbody');
-      tbody.innerHTML = `
-        <tr style="background: var(--navy-50);">
-          <td><input type="radio" checked name="vsel" value="V-122" style="accent-color:var(--navy-800);"></td>
-          <td><span style="font-family:var(--font-mono); font-weight:700;">V-122</span></td>
-          <td><strong>Hyundai H-1 2023</strong></td>
-          <td>9 pax / 1,000 kg</td>
-          <td><span class="badge badge-success">Available for Full ${days}-Day Window</span></td>
-        </tr>
-        <tr>
-          <td><input type="radio" name="vsel" value="V-130" style="accent-color:var(--navy-800);"></td>
-          <td><span style="font-family:var(--font-mono); font-weight:700;">V-130</span></td>
-          <td><strong>Toyota HiAce 2020</strong></td>
-          <td>12 pax / 1,200 kg</td>
-          <td><span class="badge badge-success">Available for Full ${days}-Day Window</span></td>
-        </tr>
-        <tr style="opacity: 0.6;">
-          <td><input type="radio" disabled name="vsel" value="V-114"></td>
-          <td><span style="font-family:var(--font-mono);">V-114</span></td>
-          <td>Toyota HiAce 2022</td>
-          <td>9 pax / 1,100 kg</td>
-          <td><span class="badge badge-danger">Unavailable · Booked Oct 19–20</span></td>
-        </tr>
-        <tr style="opacity: 0.6;">
-          <td><input type="radio" disabled name="vsel" value="V-108"></td>
-          <td><span style="font-family:var(--font-mono);">V-108</span></td>
-          <td>Nissan Urvan 2019</td>
-          <td>12 pax / 1,000 kg</td>
-          <td><span class="badge badge-warning">Maintenance Lockout (Brake pads)</span></td>
-        </tr>
-      `;
+      tbody.innerHTML = '';
+
+      const paxCount = currentActiveBooking ? (currentActiveBooking.passengers || 4) : 4;
+      const cargoWeight = currentActiveBooking ? ((currentActiveBooking.has_extra_cargo || currentActiveBooking.cargo_kg) ? (currentActiveBooking.cargo_kg || currentActiveBooking.cargoWeightKg || 0) : 0) : 0;
+
+      let firstEligibleCode = null;
+
+      FLEET_VEHICLES.forEach(v => {
+        const seatsOk = v.seats >= paxCount;
+        const payloadOk = cargoWeight === 0 || v.payloadKg >= cargoWeight;
+        const periodOk = v.isFreeWholePeriod;
+        const isEligible = seatsOk && payloadOk && periodOk;
+
+        if (isEligible && !firstEligibleCode) {
+          firstEligibleCode = v.code;
+        }
+
+        let badgeHtml = '';
+        if (isEligible) {
+          badgeHtml = `<span class="badge badge-success">Recommended · Meets Capacity &amp; Free Whole Period</span>`;
+        } else if (!periodOk) {
+          badgeHtml = `<span class="badge badge-danger">Unavailable · ${escapeHtml(v.conflictReason)}</span>`;
+        } else if (!seatsOk && !payloadOk) {
+          badgeHtml = `<span class="badge badge-danger">Capacity Deficit (${v.seats} seats &lt; ${paxCount}, ${v.payloadKg.toLocaleString()} kg &lt; ${cargoWeight} kg)</span>`;
+        } else if (!seatsOk) {
+          badgeHtml = `<span class="badge badge-danger">Capacity Deficit (${v.seats} seats &lt; ${paxCount} pax)</span>`;
+        } else {
+          badgeHtml = `<span class="badge badge-danger">Payload Deficit (${v.payloadKg.toLocaleString()} kg &lt; ${cargoWeight} kg cargo)</span>`;
+        }
+
+        const isChecked = isEligible && (v.code === firstEligibleCode);
+        const isDisabled = !isEligible;
+        const rowStyle = isChecked ? 'background: var(--navy-50);' : (isDisabled ? 'opacity: 0.65;' : '');
+
+        const tr = document.createElement('tr');
+        tr.style.cssText = rowStyle;
+        tr.innerHTML = `
+          <td>
+            <input type="radio" name="vsel" value="${v.code}" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''} onchange="handleVehicleSelected('${v.code}');" style="accent-color:var(--navy-800);">
+          </td>
+          <td><span style="font-family:var(--font-mono); font-weight:700;">${v.code}</span></td>
+          <td><strong>${v.model}</strong> <span style="font-size:11.5px; color:var(--text-muted);">(${v.category})</span></td>
+          <td>${v.seats} pax / ${v.payloadKg.toLocaleString()} kg</td>
+          <td>${badgeHtml}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (firstEligibleCode) {
+        handleVehicleSelected(firstEligibleCode);
+      } else {
+        handleVehicleSelected(FLEET_VEHICLES[0].code);
+      }
+    }
+
+    function handleVehicleSelected(code) {
+      const v = FLEET_VEHICLES.find(item => item.code === code) || FLEET_VEHICLES[0];
+      currentSelectedVehicle = v;
+
+      document.querySelectorAll('#vehicle-roster-tbody tr').forEach(row => {
+        const radio = row.querySelector('input[type="radio"]');
+        if (radio && radio.checked) {
+          row.style.background = 'var(--navy-50)';
+        } else if (radio && radio.disabled) {
+          row.style.background = '';
+        } else {
+          row.style.background = '';
+        }
+      });
+
+      const cargoWeight = currentActiveBooking ? ((currentActiveBooking.has_extra_cargo || currentActiveBooking.cargo_kg) ? (currentActiveBooking.cargo_kg || currentActiveBooking.cargoWeightKg || 0) : 0) : 0;
+      const loadFactor = (cargoWeight > 0 && v.payloadKg > 0) ? (1.0 + Math.min(0.5, (cargoWeight / v.payloadKg) * 0.25)) : 1.0;
+
+      const dist = currentActiveBooking && typeof currentActiveBooking.distanceKm === 'number' ? currentActiveBooking.distanceKm : 865.0;
+      const fuelLiters = Math.round((dist * (v.ratePer100Km / 100) * loadFactor) * 10) / 10;
+      const costEGP = Math.round(fuelLiters * v.fuelPrice * 100) / 100;
+
+      currentFuelLiters = fuelLiters;
+      currentCostEGP = costEGP;
+
+      const nameEl = document.getElementById('recalc-vehicle-name');
+      if (nameEl) nameEl.textContent = `${v.model} (${v.code}) · ${v.category}`;
+
+      const specEl = document.getElementById('recalc-vehicle-spec');
+      if (specEl) {
+        const extraNote = (cargoWeight > 0) ? ` · Cargo load factor: +${Math.round((loadFactor - 1) * 100)}% fuel` : ' · Standard passenger load';
+        specEl.textContent = `Nominal rate: ${v.ratePer100Km} L/100km (${v.fuelType} @ ${v.fuelPrice.toFixed(2)} EGP/L)${extraNote}`;
+      }
+
+      const litersEl = document.getElementById('recalc-fuel-liters');
+      if (litersEl) litersEl.textContent = `${fuelLiters.toFixed(1)} L (${v.fuelType})`;
+
+      const costEl = document.getElementById('recalc-fuel-cost');
+      if (costEl) costEl.textContent = `EGP ${costEGP.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      const badgeEl = document.getElementById('detail-requested-cat');
+      if (badgeEl) {
+        badgeEl.textContent = `${v.category} (${v.code})`;
+        badgeEl.className = 'badge badge-success';
+      }
     }
 
     function renderDriverRosterForPeriod(days, sDate, eDate) {
@@ -487,26 +667,33 @@
     }
 
     function handleApproveBooking() {
-      const selectedV = document.querySelector('input[name="vsel"]:checked');
-      let vehicleCode = 'V-122';
-      let vehicleModel = 'Hyundai H-1 (V-122)';
-      if (selectedV) {
-        vehicleCode = selectedV.value;
-        const row = selectedV.closest('tr');
-        const modelEl = row ? row.querySelector('strong') : null;
-        if (modelEl) vehicleModel = `${modelEl.textContent.trim()} (${vehicleCode})`;
+      if (!currentSelectedVehicle) {
+        const selectedV = document.querySelector('input[name="vsel"]:checked');
+        const code = selectedV ? selectedV.value : 'V-122';
+        currentSelectedVehicle = FLEET_VEHICLES.find(item => item.code === code) || FLEET_VEHICLES[0];
       }
 
       const selectedD = document.querySelector('input[name="dsel"]:checked');
-      let driverName = selectedD ? selectedD.value : 'Ahmed Hassan (Driver A)';
+      const driverName = selectedD ? selectedD.value : 'Ahmed Hassan (Driver A)';
+      const v = currentSelectedVehicle;
+      const vehicleModel = `${v.model} (${v.code})`;
 
-      const approved = FleetStore.approveBooking(activeBookingId, vehicleCode, driverName, vehicleModel);
+      const approved = FleetStore.approveBooking(
+        activeBookingId,
+        v.code,
+        driverName,
+        vehicleModel,
+        v.category,
+        currentFuelLiters,
+        currentCostEGP
+      );
+
       const box = document.getElementById('dispatch-actions-box');
       if (box) {
         box.innerHTML = `
           <div class="alert-banner alert-success" style="flex: 1; margin: 0; display:flex; align-items:center;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-inline-end:8px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-            <span><strong>Multi-day booking (${approved ? approved.id : activeBookingId}) approved and dispatched!</strong> Assigned vehicle (${vehicleModel}) and certified driver (${driverName}) across the whole period (${approved ? approved.startDate : '18 Oct'} → ${approved ? approved.endDate : '22 Oct'}).</span>
+            <span><strong>Multi-day booking (${approved ? approved.id : activeBookingId}) approved and dispatched!</strong> Assigned vehicle (${vehicleModel}) and certified driver (${driverName}) across the whole period (${approved ? approved.startDate : '18 Oct'} → ${approved ? approved.endDate : '22 Oct'}). Recomputed operational fuel: <strong>${(currentFuelLiters || 0).toFixed(1)} L</strong> (EGP ${(currentCostEGP || 0).toFixed(2)}).</span>
           </div>
           <div style="display:flex; gap:10px;">
             <a href="bookings.html" class="btn btn-secondary">View Bookings</a>

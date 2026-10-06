@@ -568,7 +568,7 @@
         returnTrip: Boolean(payload.return_with_vehicle),
         itinerary: points,
         route_legs: legs,
-        vehicleCategory: payload.vehicleCategory || 'Passenger Van',
+        vehicleCategory: payload.vehicleCategory || 'Pending Operations Assignment',
         vehicle: 'Pending Allocation',
         vehicleCode: 'TBD',
         driver: 'Pending Assignment',
@@ -720,7 +720,7 @@
       return b;
     },
 
-    approveBooking: function (id, vehicleCode, driverName, vehicleModel) {
+    approveBooking: function (id, vehicleCode, driverName, vehicleModel, category, fuelLiters, costEGP) {
       const data = this.load();
       const b = data.bookings.find(item => item.id === id);
       if (!b) return null;
@@ -730,6 +730,9 @@
       b.vehicleCode = vehicleCode || 'V-122';
       b.vehicle = vehicleModel || (vehicleCode === 'V-130' ? 'Toyota HiAce (V-130)' : 'Hyundai H-1 (V-122)');
       b.driver = driverName || 'Ahmed Hassan (Driver A)';
+      if (category) b.vehicleCategory = category;
+      if (fuelLiters !== undefined && fuelLiters !== null) b.estFuelLiters = fuelLiters;
+      if (costEGP !== undefined && costEGP !== null) b.estCostEGP = costEGP;
       b.actualOdoStart = 84210;
 
       data.dispatchQueue = data.dispatchQueue.filter(q => q.id !== id);
