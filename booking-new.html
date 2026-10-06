@@ -344,7 +344,7 @@
                 </div>
                 <div class="form-group" style="margin: 0;">
                   <label class="form-label" style="font-size: 12px;">Where will the driver stay overnight? (Optional)</label>
-                  <input type="text" class="form-input" id="driver-overnight-location" placeholder="e.g. BUC Faculty Guesthouse, Badr City / Hotel reservation" value="BUC Faculty Guesthouse, Badr City">
+                  <input type="text" class="form-input" id="driver-overnight-location" placeholder="e.g. BUC Faculty Guesthouse, Badr City / Hotel reservation" value="">
                 </div>
               </div>
 
@@ -794,14 +794,14 @@
       document.getElementById('trip-end-date').value = b.endDate || b.end_date || '2026-10-22';
       document.getElementById('route-pax').value = b.passengers || 4;
 
-      const hasExtra = Boolean(b.has_extra_cargo || (b.cargo_kg && b.cargo_kg > 0) || (b.cargoWeightKg && b.cargoWeightKg > 0));
+      const hasExtra = Boolean(b.has_extra_cargo || (b.cargo_kg && b.cargo_kg > 0));
       document.getElementById('has-extra-cargo').checked = hasExtra;
       const cargoContainer = document.getElementById('extra-cargo-container');
       if (cargoContainer) {
         if (hasExtra) {
           cargoContainer.style.display = 'flex';
           cargoContainer.classList.add('open');
-          document.getElementById('cargo-weight').value = b.cargo_kg || b.cargoWeightKg || '';
+          document.getElementById('cargo-weight').value = b.cargo_kg || '';
           document.getElementById('cargo-description').value = b.cargo_description || '';
           const flags = b.cargo_flags || {};
           document.getElementById('cargo-flag-fragile').checked = Boolean(flags.fragile);
@@ -819,7 +819,7 @@
       }
 
       const notesEl = document.getElementById('mission-notes');
-      if (notesEl) notesEl.value = b.notes || '';
+      if (notesEl) notesEl.value = b.notes_for_dispatch || b.notes || '';
       if (b.driver_overnight_location) {
         const accomEl = document.getElementById('driver-overnight-location');
         if (accomEl) accomEl.value = b.driver_overnight_location;
@@ -1727,6 +1727,7 @@
       const errList = document.getElementById('itinerary-validation-list');
 
       if (allErrors.length > 0) {
+        errBox.className = 'alert-banner alert-danger';
         errList.innerHTML = allErrors.map(e => `<li>${escapeHtml(e)}</li>`).join('');
         errBox.style.display = 'block';
 
@@ -1736,6 +1737,29 @@
         } else {
           errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+        return;
+      }
+
+      const sDate = document.getElementById('trip-start-date').value;
+      const eDate = document.getElementById('trip-end-date').value;
+      const nights = FleetStore.calculateOvernightNights({
+        start_date: sDate,
+        end_date: eDate,
+        return_with_vehicle: returnWithVehicle,
+        itinerary: itineraryPoints
+      });
+      const overnightInput = document.getElementById('driver-overnight-location');
+      const overnightVal = overnightInput ? overnightInput.value.trim() : '';
+
+      if (nights > 0 && !overnightVal && !window._overnightWarningAcknowledged) {
+        window._overnightWarningAcknowledged = true;
+        errBox.className = 'alert-banner alert-warning';
+        errList.innerHTML = `<li><strong>Notice:</strong> This is a multi-day mission (${nights} overnight night${nights > 1 ? 's' : ''}), but driver overnight accommodation is not specified. Operations dispatch will require accommodation details before approving the request. You may enter it now, or click Submit again to proceed.</li>`;
+        errBox.style.display = 'block';
+        if (overnightInput) {
+          overnightInput.focus();
+        }
+        errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
 
@@ -1815,8 +1839,11 @@
       const notesEl = document.getElementById('mission-notes');
       const notes = notesEl ? notesEl.value.trim() : '';
 
-      const user = Auth.getUser() || { name: 'Dr. Sarah Mansour', dept: 'Faculty of Pharmacy' };
-      const costCenter = user.dept ? `CC-410 (${user.dept})` : 'CC-410 (General)';
+      const overnightInput = document.getElementById('driver-overnight-location');
+      const overnightLoc = overnightInput ? overnightInput.value.trim() : '';
+
+      const user = Auth.getUser() || { name: 'Dr. Sarah Mansour', dept: 'Faculty of Pharmacy', id: 'USR-REQ-101' };
+      const costCenter = FleetStore.getCostCenterForDepartment(user.dept);
 
       const loadFactor = (hasExtra && cargoWeight > 0) ? (1.0 + Math.min(0.3, (cargoWeight / 1000) * 0.15)) : 1.0;
       let legs = computedRouteLegs;
@@ -1833,14 +1860,16 @@
         passengers: pax,
         has_extra_cargo: hasExtra,
         cargo_kg: cargoWeight,
-        cargoWeightKg: cargoWeight,
         cargo_description: cargoDesc,
         cargo_flags: cargoFlags,
+        driver_overnight_location: overnightLoc,
+        notes_for_dispatch: notes,
         cost_center: costCenter,
-        dept: user.dept || 'Operations',
-        requesterName: user.name || 'Requester',
-        notes: notes,
-        vehicleCategory: 'Pending Operations Assignment'
+        requester: {
+          id: user.id || 'USR-REQ-101',
+          name: user.name || 'Dr. Sarah Mansour',
+          department: user.dept || 'Faculty of Pharmacy'
+        }
       };
 
       let booking;

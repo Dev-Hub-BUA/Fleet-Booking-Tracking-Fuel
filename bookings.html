@@ -219,9 +219,11 @@
             ${b.rejectionReason ? `<div style="font-size:11px;color:#DC2626;margin-top:2px;">Reason: ${escapeHtml(b.rejectionReason)}</div>` : ''}
           `;
         } else {
+          const vCode = b.assignment ? b.assignment.vehicle_id : 'Assigned';
+          const dIds = b.assignment && b.assignment.driver_ids.length > 0 ? b.assignment.driver_ids.join(', ') : 'Assigned';
           allocatedVehicleHtml = `
-            <strong>${b.vehicle || 'Hyundai H-1 (V-122)'}</strong>
-            <div style="font-size:12px;color:var(--text-muted); margin-top:2px;">Driver: ${b.driver || 'Ahmed Hassan'}</div>
+            <strong>${vCode}</strong>
+            <div style="font-size:12px;color:var(--text-muted); margin-top:2px;">Driver ID: ${dIds}</div>
           `;
         }
 
@@ -233,18 +235,26 @@
           ? `<a href="booking-new.html?edit=${b.id}" class="btn btn-warning-outline btn-sm" style="padding:4px 8px;font-size:12px;border:1px solid #D97706;color:#D97706;text-decoration:none;border-radius:4px;display:inline-flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>Edit</span></a>`
           : '';
 
+        const routeText = (b.itinerary && b.itinerary.length > 0)
+          ? b.itinerary.map(p => p.place_name).join(' → ')
+          : 'Trip Route';
+        const notesText = b.notes_for_dispatch || (b.requester ? b.requester.department : 'Institutional Mission');
+        const depTime = (b.itinerary && b.itinerary[0] && b.itinerary[0].depart_at)
+          ? b.itinerary[0].depart_at.split('T')[1].slice(0, 5)
+          : '08:00';
+
         return `
           <tr>
             <td><span style="font-family:var(--font-mono);font-weight:700;">${b.id}</span></td>
             <td>
-              <strong>${b.route || (b.origin + ' → ' + b.destination)}</strong>
-              <div style="font-size:12px;color:var(--text-muted);">${b.purpose || 'Official Delegation'}</div>
+              <strong>${escapeHtml(routeText)}</strong>
+              <div style="font-size:12px;color:var(--text-muted);">${escapeHtml(notesText)}</div>
             </td>
             <td>
-              <div>${b.startDate || b.date || 'Today'}</div>
-              <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">${b.departureTime || '09:00'}–${b.expectedEnd || '14:00'}</div>
+              <div>${escapeHtml(b.start_date)} → ${escapeHtml(b.end_date)}</div>
+              <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">${depTime} · ${b.return_with_vehicle ? 'Round-trip' : 'One-way'}</div>
             </td>
-            <td><span style="font-size:13px; font-weight:600; color:var(--navy-700);">${b.vehicleCategory || 'Passenger Van / Minibus'}</span></td>
+            <td><span style="font-size:13px; font-weight:600; color:var(--navy-700);">${b.passengers || 1} pax${b.has_extra_cargo ? ` · ${b.cargo_kg}kg cargo` : ''}</span></td>
             <td>${allocatedVehicleHtml}</td>
             <td>${getStatusBadge(b.status)}</td>
             <td>

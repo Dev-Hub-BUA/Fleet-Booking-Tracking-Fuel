@@ -180,13 +180,13 @@
       const points = Array.isArray(trip.itinerary) && trip.itinerary.length >= 2
         ? trip.itinerary
         : [
-            { sequence: 1, type: 'departure', place_name: trip.origin || 'Main Campus', depart_at: `${trip.startDate || '2026-10-18'} 08:00`, notes: 'Departure base point', pinned: true },
-            { sequence: 2, type: 'stop', place_name: 'Cairo University', arrive_at: `${trip.startDate || '2026-10-18'} 14:30`, depart_at: `${trip.startDate || '2026-10-18'} 17:00`, notes: 'Faculty Meeting', pinned: true },
-            { sequence: 3, type: 'return', place_name: trip.destination || 'Assiut Campus', arrive_at: `${trip.endDate || '2026-10-22'} 18:00`, notes: 'Return vehicle', pinned: true }
+            { sequence: 1, type: 'departure', place_name: (trip.itinerary && trip.itinerary[0] && trip.itinerary[0].place_name) || 'Main Campus', depart_at: `${trip.start_date || '2026-10-18'} 08:00`, notes: 'Departure base point', pinned: true },
+            { sequence: 2, type: 'stop', place_name: 'Cairo University', arrive_at: `${trip.start_date || '2026-10-18'} 14:30`, depart_at: `${trip.start_date || '2026-10-18'} 17:00`, notes: 'Faculty Meeting', pinned: true },
+            { sequence: 3, type: 'return', place_name: 'Assiut Campus', arrive_at: `${trip.end_date || '2026-10-22'} 18:00`, notes: 'Return vehicle', pinned: true }
           ];
 
-      const sDate = trip.startDate || trip.start_date || '2026-10-18';
-      const eDate = trip.endDate || trip.end_date || '2026-10-22';
+      const sDate = trip.start_date || '2026-10-18';
+      const eDate = trip.end_date || '2026-10-22';
       const days = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
 
       document.getElementById('trip-summary-pill').textContent = `${points.length} Stops · ${days} Days (${sDate} → ${eDate})`;
@@ -303,7 +303,7 @@
           if (noCargoNote) noCargoNote.style.display = 'none';
 
           const weightEl = document.getElementById('driver-cargo-weight');
-          if (weightEl) weightEl.textContent = `${myTrip.cargo_kg || myTrip.cargoWeightKg || 0} kg`;
+          if (weightEl) weightEl.textContent = `${myTrip.cargo_kg || 0} kg`;
 
           const descEl = document.getElementById('driver-cargo-description');
           if (descEl) descEl.textContent = myTrip.cargo_description || 'Cargo manifest declared';

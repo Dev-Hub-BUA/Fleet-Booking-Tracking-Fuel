@@ -529,8 +529,8 @@
       const container = document.getElementById('trip-details-list');
       if (!container) return;
 
-      const sDate = booking.startDate || booking.start_date || '2026-10-18';
-      const eDate = booking.endDate || booking.end_date || '2026-10-22';
+      const sDate = booking.start_date || '2026-10-18';
+      const eDate = booking.end_date || '2026-10-22';
       const days = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
 
       const currentUser = Auth.getUser();
@@ -539,11 +539,15 @@
       let html = `
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="color:var(--text-muted);">Requester:</span>
-          <strong>${escapeHtml(booking.requesterName || 'Requester')}</strong>
+          <strong>${escapeHtml((booking.requester && booking.requester.name) || booking.requesterName || 'Requester')}</strong>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="color:var(--text-muted);">Department:</span>
-          <strong>${escapeHtml(booking.dept || 'Faculty')}</strong>
+          <strong>${escapeHtml((booking.requester && booking.requester.department) || booking.dept || 'Faculty')}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Cost Center:</span>
+          <strong style="font-family:var(--font-mono);">${escapeHtml(booking.cost_center || 'General')}</strong>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="color:var(--text-muted);">Passengers:</span>
@@ -563,7 +567,7 @@
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="color:var(--text-muted);">Return with Vehicle:</span>
-          <strong>${booking.return_with_vehicle ? 'Yes' : 'No'}</strong>
+          <strong>${booking.return_with_vehicle ? 'Yes' : 'No (One-way)'}</strong>
         </div>
       `;
 
@@ -576,32 +580,30 @@
         `;
       }
 
-      if (booking.notes && booking.notes.trim()) {
+      const notesVal = booking.notes_for_dispatch || booking.notes;
+      if (notesVal && notesVal.trim()) {
         html += `
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
             <span style="color:var(--text-muted);">Notes for Dispatch:</span>
-            <strong style="text-align:right; max-width:240px; font-weight:600;">${escapeHtml(booking.notes.trim())}</strong>
+            <strong style="text-align:right; max-width:240px; font-weight:600;">${escapeHtml(notesVal.trim())}</strong>
           </div>
         `;
       }
 
-      if (isOpsOrAdmin) {
-        let holdStart = `${sDate} 08:00`;
-        let holdEnd = `${eDate} 18:45`;
-        if (booking.hold_window && booking.hold_window.start && booking.hold_window.end) {
-          holdStart = booking.hold_window.start;
-          holdEnd = booking.hold_window.end;
-        } else if (booking.itinerary && booking.itinerary.length >= 2) {
-          const p1 = booking.itinerary[0];
-          const pLast = booking.itinerary[booking.itinerary.length - 1];
-          if (p1.depart_at) holdStart = p1.depart_at;
-          if (pLast.arrive_at) holdEnd = `${pLast.arrive_at} (+45m buffer)`;
-        }
+      if (booking.estimate) {
+        html += `
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border); padding-top:8px; margin-top:4px;">
+            <span style="color:var(--text-muted);">Fuel Estimate (${booking.estimate.basis === 'vehicle' ? 'Vehicle Specific' : 'Fleet Average'}):</span>
+            <strong style="font-family:var(--font-mono);">${booking.estimate.fuel_liters} L (EGP ${booking.estimate.cost_egp.toLocaleString()})</strong>
+          </div>
+        `;
+      }
 
+      if (isOpsOrAdmin && booking.hold_window) {
         html += `
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; border-top:1px dashed var(--border); padding-top:8px; margin-top:4px;">
             <span style="color:var(--text-muted);">Vehicle Hold Window (Ops):</span>
-            <strong style="font-family:var(--font-mono); font-size:12px; text-align:right;">${escapeHtml(holdStart)} → ${escapeHtml(holdEnd)}</strong>
+            <strong style="font-family:var(--font-mono); font-size:12px; text-align:right;">${escapeHtml(booking.hold_window.start)} → ${escapeHtml(booking.hold_window.end)} (${booking.hold_window.buffer_minutes || 45}m buffer)</strong>
           </div>
         `;
       }
@@ -621,7 +623,7 @@
 
       cargoBlock.style.display = 'block';
       const weightEl = document.getElementById('detail-cargo-weight');
-      if (weightEl) weightEl.textContent = `${booking.cargo_kg || booking.cargoWeightKg || 0} kg`;
+      if (weightEl) weightEl.textContent = `${booking.cargo_kg || 0} kg`;
 
       const descEl = document.getElementById('detail-cargo-desc');
       if (descEl) descEl.textContent = booking.cargo_description || 'Declared cargo items';
@@ -671,18 +673,28 @@
           </div>
         `;
       } else {
+        const vCode = (booking.assignment && booking.assignment.vehicle_id) || booking.vehicleCode || 'Assigned';
+        const vehicles = FleetStore.getVehicles();
+        const vObj = vehicles.find(v => v.code === vCode);
+        const vModel = vObj ? `${vObj.model} (${vObj.code})` : vCode;
+
+        const drivers = FleetStore.getDrivers();
+        const dIds = (booking.assignment && booking.assignment.driver_ids) || [];
+        const dObjs = drivers.filter(d => dIds.includes(d.id));
+        const dNames = dObjs.length > 0 ? dObjs.map(d => d.name).join(' & ') : 'Assigned Driver';
+
         resContent.innerHTML = `
           <div style="display: flex; gap: 14px; align-items: center;">
             <div style="width: 80px; height: 60px; background: #E2E8F0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--navy-800); font-family: var(--font-mono);">
-              ${escapeHtml(booking.vehicleCode || 'Assigned')}
+              ${escapeHtml(vCode)}
             </div>
             <div>
-              <h3 style="margin: 0; font-size: 16px; color: var(--navy-800);">${escapeHtml(booking.vehicle || 'Assigned Vehicle')}</h3>
-              <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">Assigned &amp; Sanitized</div>
+              <h3 style="margin: 0; font-size: 16px; color: var(--navy-800);">${escapeHtml(vModel)}</h3>
+              <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">${escapeHtml(vObj ? vObj.category : 'Fleet Resource')}</div>
             </div>
           </div>
           <div style="font-size: 14px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 12px;">
-            <strong>Certified Driver:</strong> ${escapeHtml(booking.driver || 'Assigned Driver')}
+            <strong>Certified Driver:</strong> ${escapeHtml(dNames)}
           </div>
         `;
       }
@@ -837,6 +849,24 @@
           <span><strong>One-way · vehicle does not return with the group</strong></span>
         `;
         timelineContainer.appendChild(oneWayNotice);
+
+        if (booking.deadhead) {
+          const deadheadEl = document.createElement('div');
+          deadheadEl.className = 'leg-summary-card';
+          deadheadEl.style.cssText = 'background: #FEF3C7; border: 1px dashed #D97706; margin-top: 8px;';
+          const dhH = Math.floor(booking.deadhead.drive_minutes / 60);
+          const dhM = booking.deadhead.drive_minutes % 60;
+          deadheadEl.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; color:#92400E;">Empty return to base: ${escapeHtml(booking.deadhead.to_place)}</span>
+              <span style="font-weight:700; color:#92400E;">${booking.deadhead.distance_km} km</span>
+            </div>
+            <div style="font-size:12px; color:#B45309; font-family:var(--font-mono); margin-top:2px;">
+              ${dhH}h ${dhM.toString().padStart(2, '0')}m driving window · (route)
+            </div>
+          `;
+          timelineContainer.appendChild(deadheadEl);
+        }
       }
 
       const lastPoint = points[points.length - 1];
@@ -851,8 +881,8 @@
         timelineContainer.appendChild(warnEl);
       }
 
-      const finalKm = booking.distanceKm || totKm;
-      const finalMins = booking.estDriveMinutes || totMins;
+      const finalKm = totKm + (booking.deadhead ? booking.deadhead.distance_km : 0);
+      const finalMins = totMins + (booking.deadhead ? booking.deadhead.drive_minutes : 0);
       document.getElementById('detail-total-km').textContent = `${finalKm.toFixed(1)} km`;
       const totH = Math.floor(finalMins / 60);
       const totM = finalMins % 60;

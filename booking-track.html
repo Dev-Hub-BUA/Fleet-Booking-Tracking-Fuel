@@ -198,7 +198,7 @@
 
       if (trip) {
         const pretitle = document.querySelector('.page-pretitle');
-        if (pretitle) pretitle.textContent = `${trip.id} · Real-Time Telemetry (${trip.statusAr || trip.status})`;
+        if (pretitle) pretitle.textContent = `${trip.id} · Real-Time Telemetry (${trip.status})`;
         const cardTitle = document.querySelector('.card strong');
         // Update driver / vehicle details if elements exist
         const vehicleInfo = document.querySelector('.card div strong');

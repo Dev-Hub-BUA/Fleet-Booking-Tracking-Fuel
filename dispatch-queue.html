@@ -733,7 +733,14 @@
       }
 
       const chosenVehicleItem = vehicleEligList.find(v => v.vehicle.code === selectedVehicleCode) || vehicleEligList[0];
-      const primaryDriverItem = driverEligList.find(d => d.driver.id === selectedDriverIds[0]) || driverEligList[0];
+      let primaryDriverItem = driverEligList.find(d => d.driver.id === selectedDriverIds[0]) || driverEligList[0];
+      if (booking.status === 'Pending' && primaryDriverItem && !primaryDriverItem.eligible) {
+        const firstEligD = driverEligList.find(d => d.eligible);
+        if (firstEligD) {
+          selectedDriverIds = [firstEligD.driver.id];
+          primaryDriverItem = firstEligD;
+        }
+      }
       const secondDriverItem = selectedDriverIds[1] ? driverEligList.find(d => d.driver.id === selectedDriverIds[1]) : null;
 
       const dailySummary = FleetStore.computeDailyDrivingSummary(booking);
@@ -787,10 +794,10 @@
                 ${statusBadge}
               </div>
               <div style="font-size:14px; color:var(--navy-800); font-weight:700;">
-                ${escapeHtml(booking.requesterName)} · <span style="font-weight:400; color:var(--text-muted);">${escapeHtml(booking.dept)}</span>
+                ${escapeHtml((booking.requester && booking.requester.name) || booking.requesterName)} · <span style="font-weight:400; color:var(--text-muted);">${escapeHtml((booking.requester && booking.requester.department) || booking.dept)}</span>
               </div>
               <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">
-                Submitted ${booking.createdAt ? new Date(booking.createdAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : 'Today'}
+                Cost Center: <strong style="color:var(--navy-800); font-family:var(--font-mono);">${escapeHtml(booking.cost_center || 'General')}</strong> · Submitted ${booking.history && booking.history[0] ? new Date(booking.history[0].at).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : 'Today'}
               </div>
             </div>
 
@@ -883,9 +890,15 @@
               ${legs.map(leg => `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                   <span style="color:var(--navy-800);">${escapeHtml(leg.from_place || 'Point A')} → ${escapeHtml(leg.to_place || 'Point B')}</span>
-                  <strong style="font-family:var(--font-mono);">${leg.distance_km} km · ${Math.floor(leg.drive_minutes / 60)}h ${(leg.drive_minutes % 60).toString().padStart(2, '0')}m (est.)</strong>
+                  <strong style="font-family:var(--font-mono);">${leg.distance_km} km · ${Math.floor(leg.drive_minutes / 60)}h ${(leg.drive_minutes % 60).toString().padStart(2, '0')}m (${leg.source === 'route' ? 'route' : 'est.'})</strong>
                 </div>
               `).join('')}
+              ${booking.deadhead ? `
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#FEF3C7; padding:8px 12px; border-radius:4px; margin-top:4px; border:1px dashed #D97706;">
+                  <span style="color:#92400E; font-weight:700;">Empty return to base: ${escapeHtml((points[points.length - 1] && points[points.length - 1].place_name) || 'Destination')} → ${escapeHtml(booking.deadhead.to_place)}</span>
+                  <strong style="font-family:var(--font-mono); color:#92400E;">${booking.deadhead.distance_km} km · ${Math.floor(booking.deadhead.drive_minutes / 60)}h ${(booking.deadhead.drive_minutes % 60).toString().padStart(2, '0')}m (route)</strong>
+                </div>
+              ` : ''}
             </div>
           </div>
 
@@ -938,14 +951,14 @@
             
             <div style="background:#F8FAFC; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border);">
               <span style="color:var(--text-muted); display:block; margin-bottom:4px;">Passenger Manifest:</span>
-              <strong style="color:var(--navy-800); font-size:14px;">${booking.passengers || 4} Passengers</strong>
+              <strong style="color:var(--navy-800); font-size:14px;">${booking.passengers || 1} Passengers</strong>
               <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Standard personal luggage declared</div>
             </div>
 
             <div style="background:#F8FAFC; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border);">
               <span style="color:var(--text-muted); display:block; margin-bottom:4px;">Extra Cargo Payload:</span>
               ${booking.has_extra_cargo || (booking.cargo_kg && booking.cargo_kg > 0) ? `
-                <strong style="color:var(--navy-800); font-size:14px;">${booking.cargo_kg || booking.cargoWeightKg || 0} kg Cargo</strong>
+                <strong style="color:var(--navy-800); font-size:14px;">${booking.cargo_kg || 0} kg Cargo</strong>
                 <div style="font-size:12px; color:var(--navy-800); margin-top:2px;">${escapeHtml(booking.cargo_description || 'General Cargo')}</div>
                 <div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:6px;">
                   ${booking.cargo_flags && booking.cargo_flags.fragile ? '<span class="chip-warning">Fragile</span>' : ''}
@@ -960,13 +973,18 @@
             <div style="background:#F8FAFC; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border);">
               <span style="color:var(--text-muted); display:block; margin-bottom:4px;">Driver Accommodation:</span>
               <strong style="color:var(--navy-800); font-size:13.5px;">${escapeHtml(booking.driver_overnight_location || 'Not specified')}</strong>
-              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Driver accommodation needed: ${Math.max(0, days - 1)} nights</div>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Driver accommodation needed: ${FleetStore.calculateOvernightNights(booking)} night${FleetStore.calculateOvernightNights(booking) !== 1 ? 's' : ''}</div>
+              ${FleetStore.calculateOvernightNights(booking) > 0 && (!booking.driver_overnight_location || !booking.driver_overnight_location.trim()) ? `
+                <div style="margin-top:6px;">
+                  <span class="badge badge-warning" style="font-size:11px;">Overnight location missing</span>
+                </div>
+              ` : ''}
             </div>
 
             <div style="background:#F8FAFC; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border); grid-column:1 / -1;">
               <span style="color:var(--text-muted); display:block; margin-bottom:4px;">Notes for Dispatch Desk:</span>
               <div style="color:var(--navy-800); font-size:13px; font-style:italic;">
-                ${booking.notes ? escapeHtml(booking.notes) : 'No special operational dispatch notes submitted.'}
+                ${escapeHtml(booking.notes_for_dispatch || booking.notes || 'No special operational dispatch notes submitted.')}
               </div>
             </div>
 
@@ -1059,9 +1077,12 @@
           </div>
 
           ${requiresSecondDriver ? `
-            <div class="alert-banner alert-warning" style="margin-bottom:12px; font-weight:700; color:#92400E; display:flex; align-items:center; gap:8px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              <span>Driving exceeds 8h on Day ${overLimitDay ? overLimitDay.dayIndex : 1} — a second driver is required</span>
+            <div class="alert-banner alert-warning" style="margin-bottom:12px; font-weight:700; color:#92400E; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>Day ${overLimitDay ? overLimitDay.dayIndex : 1} needs ${overLimitDay ? overLimitDay.driveHoursFormatted : '9h+'} — assign a second driver</span>
+              </div>
+              <span class="badge badge-warning" style="font-size:11.5px; background:#FDE68A; color:#78350F; font-weight:700;">+ Add second driver enabled</span>
             </div>
           ` : ''}
 
@@ -1072,8 +1093,9 @@
                   <th style="width:36px;">Select</th>
                   <th>Driver Name</th>
                   <th>License Class &amp; Expiry</th>
-                  <th>Availability &amp; Schedule</th>
-                  <th>Experience</th>
+                  <th>Availability</th>
+                  <th>Total Driving (Trip)</th>
+                  <th>Trips This Month</th>
                   <th>Eligibility Status</th>
                 </tr>
               </thead>
@@ -1089,6 +1111,8 @@
                   }
 
                   const inputType = requiresSecondDriver ? 'checkbox' : 'radio';
+                  const totalTripHours = (dailySummary.reduce((sum, day) => sum + day.driveMinutes, 0) / 60).toFixed(1);
+                  const tripsThisMo = Math.min(18, Math.max(3, Math.round((d.totalTrips || 10) / 25)));
 
                   return `
                     <tr class="${trClass}" onclick="${item.eligible ? `handleSelectDriver('${d.id}')` : ''}">
@@ -1107,7 +1131,8 @@
                         <div>${escapeHtml(d.status)}</div>
                         <div style="font-size:11.5px; color:var(--text-muted);">Free for full ${days} days</div>
                       </td>
-                      <td>${d.totalTrips} missions completed</td>
+                      <td style="font-family:var(--font-mono); font-weight:600;">${totalTripHours} h</td>
+                      <td>${tripsThisMo} trips</td>
                       <td>${badgeHtml}</td>
                     </tr>
                   `;
@@ -1122,7 +1147,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div style="font-size:13.5px; color:var(--navy-800);">
               <strong id="decision-summary-text" style="font-size:14px;">
-                Assigned: ${chosenVehicleItem ? `${chosenVehicleItem.vehicle.code} (${chosenVehicleItem.vehicle.model})` : 'Pending Vehicle'} + ${secondDriverItem ? `${primaryDriverItem.driver.name} & ${secondDriverItem.driver.name}` : (primaryDriverItem ? primaryDriverItem.driver.name : 'Pending Driver')} · Hold: ${hold.formatted} · ${chosenVehicleItem ? chosenVehicleItem.estimate.fuelLiters : 0} L · EGP ${chosenVehicleItem ? chosenVehicleItem.estimate.costEGP.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
+                ${chosenVehicleItem ? chosenVehicleItem.vehicle.code : 'Pending Vehicle'} + ${secondDriverItem ? `${primaryDriverItem.driver.name} & ${secondDriverItem.driver.name}` : (primaryDriverItem ? primaryDriverItem.driver.name : 'Pending Driver')} · ${hold.formatted} · ${chosenVehicleItem ? chosenVehicleItem.estimate.fuelLiters : 0} L · EGP ${chosenVehicleItem ? chosenVehicleItem.estimate.costEGP.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
               </strong>
             </div>
             <div style="font-size:12px; color:var(--text-muted);">
@@ -1239,7 +1264,11 @@
         return;
       }
 
-      alert(`Booking ${bookingId} approved successfully!\n\nAssigned Vehicle: ${result.booking.vehicle}\nAssigned Driver(s): ${result.booking.driver}\nHold Window: ${result.booking.hold_window.formatted}\nRecomputed Fuel: ${result.booking.estFuelLiters} L (EGP ${result.booking.estCostEGP.toLocaleString()})`);
+      const vAssigned = result.booking.assignment ? result.booking.assignment.vehicle_id : 'Assigned';
+      const dAssigned = result.booking.assignment ? result.booking.assignment.driver_ids.join(', ') : 'Assigned';
+      const estLiters = result.booking.estimate ? result.booking.estimate.fuel_liters : 0;
+      const estCost = result.booking.estimate ? result.booking.estimate.cost_egp : 0;
+      alert(`Booking ${bookingId} approved successfully!\n\nAssigned Vehicle: ${vAssigned}\nAssigned Driver(s): ${dAssigned}\nHold Window: ${result.booking.hold_window.start} → ${result.booking.hold_window.end}\nRecomputed Fuel: ${estLiters} L (EGP ${estCost.toLocaleString()})`);
       switchQueueTab('approved');
       selectBooking(bookingId);
     }

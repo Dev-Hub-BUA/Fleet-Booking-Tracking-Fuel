@@ -458,14 +458,20 @@
     function showMultiDayTripModal(id) {
       const booking = FleetStore.getBooking(id);
       if (booking) {
+        const vCode = booking.assignment ? booking.assignment.vehicle_id : 'Assigned Vehicle';
+        const dIds = booking.assignment ? booking.assignment.driver_ids.join(', ') : 'Assigned Driver';
+        const routeStr = (booking.itinerary && booking.itinerary.length > 0) ? booking.itinerary.map(p => p.place_name).join(' → ') : 'Trip Route';
+        const days = FleetStore.RouteEstimator.calculateDaysCount(booking.start_date, booking.end_date);
+        const nights = FleetStore.calculateOvernightNights(booking);
+
         document.getElementById('md-modal-pretitle').textContent = `${booking.id} · Multi-Day Mission`;
-        document.getElementById('md-modal-title').textContent = booking.route;
-        document.getElementById('md-modal-vehicle').textContent = booking.vehicle || 'Hyundai H-1 (V-122)';
-        document.getElementById('md-modal-driver').textContent = booking.driver || 'Ahmed Hassan';
-        document.getElementById('md-modal-km').textContent = `${(booking.distanceKm || 865.0).toFixed(1)} km (est.)`;
-        document.getElementById('md-modal-dates').textContent = `${booking.startDate || '18 Oct'} → ${booking.endDate || '22 Oct 2026'} (${booking.daysCount || 5} days)`;
-        document.getElementById('md-modal-hold').textContent = booking.hold_window ? `${booking.hold_window.start} → ${booking.hold_window.end}` : '18 Oct 08:00 → 22 Oct 18:45';
-        document.getElementById('md-modal-lodging').textContent = `${booking.driver_overnight_location || 'Campus Guesthouse'} (${(booking.daysCount || 5) - 1} nights)`;
+        document.getElementById('md-modal-title').textContent = routeStr;
+        document.getElementById('md-modal-vehicle').textContent = vCode;
+        document.getElementById('md-modal-driver').textContent = dIds;
+        document.getElementById('md-modal-km').textContent = `${booking.hold_window ? booking.hold_window.buffer_minutes : 45}m buffer`;
+        document.getElementById('md-modal-dates').textContent = `${booking.start_date} → ${booking.end_date} (${days} days)`;
+        document.getElementById('md-modal-hold').textContent = booking.hold_window ? `${booking.hold_window.start} → ${booking.hold_window.end}` : 'Hold window active';
+        document.getElementById('md-modal-lodging').textContent = `${booking.driver_overnight_location || 'Not specified'} (${nights} nights)`;
         document.getElementById('md-modal-detail-link').href = `booking-detail.html?id=${booking.id}`;
       }
       document.getElementById('multi-day-modal').style.display = 'flex';
