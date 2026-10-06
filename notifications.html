@@ -67,7 +67,10 @@
         <h1 class="page-title">Notifications</h1>
         <span class="page-subtitle">Trip approvals, vehicle dispatches, compliance alerts and schedule notices</span>
       </div>
-      <button class="btn btn-secondary btn-sm" onclick="document.querySelectorAll('.card').forEach(c => c.style.borderLeftColor='var(--border)'); alert('All notifications marked as read.');">Mark All Read</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.querySelectorAll('.card').forEach(c => c.style.borderLeftColor='var(--border)'); alert('All notifications marked as read.');" style="display:inline-flex; align-items:center; gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Mark All Read</span>
+      </button>
     </div>
     
     <div style="display:flex; flex-direction:column; gap:12px;">

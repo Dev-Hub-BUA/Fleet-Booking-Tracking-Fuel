@@ -184,7 +184,7 @@
         fuelCost: 297.25
       });
 
-      alert(`Trip (${closed ? closed.id : activeCloseTripId}) closed successfully!\n\n• Final Odometer: ${closed ? closed.actualOdoEnd : '48,276'} km\n• Actual Fuel: ${closed ? closed.actualFuelLitres : 14.5} L\n• Fuel Variance: ${closed ? closed.fuelVariancePct : 2.8}% (within allowable ±10% threshold)\n\nTrip automatically forwarded to Internal Audit & Reconciliation (Stage 4).`);
+      alert(`Trip (${closed ? closed.id : activeCloseTripId}) closed successfully!\n\nFinal Odometer: ${closed ? closed.actualOdoEnd : '48,276'} km\nActual Fuel: ${closed ? closed.actualFuelLitres : 14.5} L\nFuel Variance: ${closed ? closed.fuelVariancePct : 2.8}% (within allowable ±10% threshold)\n\nTrip automatically forwarded to Internal Audit & Reconciliation (Stage 4).`);
       window.location.href = 'audit.html';
     }
 

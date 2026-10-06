@@ -262,7 +262,7 @@
 
     function handleReconcileTrip(id) {
       const reconciled = FleetStore.reconcileTrip(id, 'Verified fuel receipt & odometer. Cleared within ±10% threshold.');
-      alert(`Financial reconciliation approved for trip (${id}) successfully!\n\n• Fuel Variance: ${reconciled ? reconciled.fuelVariancePct : 0}%\n• Status: Reconciled\n• Final chargeback successfully debited against departmental budget.`);
+      alert(`Financial reconciliation approved for trip (${id}) successfully!\n\nFuel Variance: ${reconciled ? reconciled.fuelVariancePct : 0}%\nStatus: Reconciled\nFinal chargeback successfully debited against departmental budget.`);
       renderAuditLedger();
     }
 
