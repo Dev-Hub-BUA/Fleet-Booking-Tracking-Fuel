@@ -224,31 +224,92 @@
     'Heavy Cargo Truck': { ratePer100Km: 18.0, fuelPrice: 20.50, fuelType: 'Diesel' }
   };
 
+  const CIRA_INSTITUTIONS = [
+    'Badr University in Assiut (BUA)',
+    'Badr University in Cairo (BUC)',
+    'CIRA Alexandria Campus',
+    'Saxony Egypt University (SISU)',
+    'CIRA Central Logistics Directorate',
+    'Futures Educational Systems',
+    'Regent British School'
+  ];
+
+  const DEFAULT_SITES = [
+    {
+      id: 'SITE-BUA',
+      name: 'Badr University in Assiut',
+      institution: 'Badr University in Assiut (BUA)',
+      city: 'Assiut',
+      address: 'Assiut-Sohag Western Desert Road, Assiut',
+      lat: 27.1809,
+      lng: 31.1837,
+      pinned: false,
+      to_verify: true,
+      active: true
+    },
+    {
+      id: 'SITE-BUC',
+      name: 'Badr University in Cairo (Badr City)',
+      institution: 'Badr University in Cairo (BUC)',
+      city: 'Cairo',
+      address: 'Entertainment Area, Badr City, Cairo',
+      lat: 30.1378,
+      lng: 31.7456,
+      pinned: false,
+      to_verify: true,
+      active: true
+    },
+    {
+      id: 'SITE-ALEX',
+      name: 'Alexandria Branch (Borg El Arab)',
+      institution: 'CIRA Alexandria Campus',
+      city: 'Alexandria',
+      address: 'Universities District, New Borg El Arab City, Alexandria',
+      lat: 31.2001,
+      lng: 29.9187,
+      pinned: false,
+      to_verify: true,
+      active: true
+    },
+    {
+      id: 'SITE-HQ',
+      name: 'CIRA Central Headquarters',
+      institution: 'CIRA Central Logistics Directorate',
+      city: 'Cairo',
+      address: 'Campus Administration Building, G-14, Nasr City, Cairo',
+      lat: 30.0561,
+      lng: 31.3301,
+      pinned: false,
+      to_verify: true,
+      active: true
+    }
+  ];
+
   const DEFAULT_VEHICLES = [
-    { code: 'V-122', plate: 'BDR 3307', model: 'Toyota HiAce', year: 2023, category: 'Passenger Van', type: 'Van', seats: 9, payloadKg: 1000, fuelType: 'Diesel', ratePer100Km: 10.0, status: 'Available', location: 'Badr University in Assiut', odo: 48276 },
-    { code: 'V-130', plate: 'BDR 4182', model: 'Toyota HiAce', year: 2020, category: 'Passenger Van', type: 'Van', seats: 12, payloadKg: 1200, fuelType: 'Diesel', ratePer100Km: 10.5, status: 'Available', location: 'Badr University in Cairo', odo: 84150 },
-    { code: 'V-125', plate: 'BDR 8102', model: 'Toyota HiAce', year: 2023, category: 'Passenger Van', type: 'Van', seats: 12, payloadKg: 1100, fuelType: 'Diesel', ratePer100Km: 10.0, status: 'Available', location: 'Alexandria University / Borg El Arab', odo: 38200 },
-    { code: 'S-14', plate: 'BDR 4591', model: 'Hyundai Elantra', year: 2024, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'Petrol 92', ratePer100Km: 7.0, status: 'Available', location: 'Alexandria University / Borg El Arab', odo: 21500 },
-    { code: 'V-114', plate: 'BDR 2019', model: 'Toyota HiAce', year: 2022, category: 'Passenger Van', type: 'Van', seats: 9, payloadKg: 1100, fuelType: 'Diesel', ratePer100Km: 9.8, status: 'On trip', location: 'Transit to Obour', odo: 62400 },
-    { code: 'S-11', plate: 'BDR 1044', model: 'Hyundai Elantra', year: 2024, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'Petrol 92', ratePer100Km: 7.1, status: 'Available', location: 'Badr University in Assiut', odo: 18300 },
-    { code: 'V-205', plate: 'BDR 5580', model: 'Toyota Corolla', year: 2023, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'Petrol 95', ratePer100Km: 6.8, status: 'On trip', location: 'Cairo Airport T3', odo: 32100 },
-    { code: 'C-04', plate: 'BDR 7712', model: 'Hyundai Accent', year: 2022, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'CNG', ratePer100Km: 7.4, status: 'Available', location: 'Cairo University', odo: 51900 },
-    { code: 'B-07', plate: 'BDR 9901', model: 'MCV 500 Coach', year: 2021, category: 'Bus', type: 'Bus', seats: 45, payloadKg: 4000, fuelType: 'Diesel', ratePer100Km: 27.5, status: 'Available', location: 'Badr University in Cairo', odo: 112000 },
-    { code: 'T-02', plate: 'BDR 6623', model: 'Isuzu NPR Box Truck', year: 2021, category: 'Heavy Cargo Truck', type: 'Truck', seats: 3, payloadKg: 4500, fuelType: 'Diesel', ratePer100Km: 18.0, status: 'On trip', location: 'Plant 3 — 10th of Ramadan', odo: 95800 },
-    { code: 'V-108', plate: 'BDR 1198', model: 'Nissan Urvan', year: 2019, category: 'Passenger Van', type: 'Van', seats: 12, payloadKg: 1150, fuelType: 'Diesel', ratePer100Km: 10.4, status: 'Maintenance', location: 'Central Workshop', odo: 143200 }
+    { code: 'V-122', plate: 'BDR 3307', model: 'Toyota HiAce', year: 2023, category: 'Passenger Van', type: 'Van', seats: 9, payloadKg: 1000, fuelType: 'Diesel', ratePer100Km: 10.0, status: 'Available', location: 'Badr University in Assiut', home_site_id: 'SITE-BUA', odo: 48276 },
+    { code: 'V-130', plate: 'BDR 4182', model: 'Toyota HiAce', year: 2020, category: 'Passenger Van', type: 'Van', seats: 12, payloadKg: 1200, fuelType: 'Diesel', ratePer100Km: 10.5, status: 'Available', location: 'Badr University in Cairo', home_site_id: 'SITE-BUC', odo: 84150 },
+    { code: 'V-125', plate: 'BDR 8102', model: 'Toyota HiAce', year: 2023, category: 'Passenger Van', type: 'Van', seats: 12, payloadKg: 1100, fuelType: 'Diesel', ratePer100Km: 10.0, status: 'Available', location: 'Alexandria University / Borg El Arab', home_site_id: 'SITE-ALEX', odo: 38200 },
+    { code: 'S-14', plate: 'BDR 4591', model: 'Hyundai Elantra', year: 2024, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'Petrol 92', ratePer100Km: 7.0, status: 'Available', location: 'Alexandria University / Borg El Arab', home_site_id: 'SITE-ALEX', odo: 21500 },
+    { code: 'V-114', plate: 'BDR 2019', model: 'Toyota HiAce', year: 2022, category: 'Passenger Van', type: 'Van', seats: 9, payloadKg: 1100, fuelType: 'Diesel', ratePer100Km: 9.8, status: 'On trip', location: 'Transit to Obour', home_site_id: 'SITE-BUC', odo: 62400 },
+    { code: 'S-11', plate: 'BDR 1044', model: 'Hyundai Elantra', year: 2024, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'Petrol 92', ratePer100Km: 7.1, status: 'Available', location: 'Badr University in Assiut', home_site_id: 'SITE-BUA', odo: 18300 },
+    { code: 'V-205', plate: 'BDR 5580', model: 'Toyota Corolla', year: 2023, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'Petrol 95', ratePer100Km: 6.8, status: 'On trip', location: 'Cairo Airport T3', home_site_id: 'SITE-HQ', odo: 32100 },
+    { code: 'C-04', plate: 'BDR 7712', model: 'Hyundai Accent', year: 2022, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'CNG', ratePer100Km: 7.4, status: 'Available', location: 'Cairo University', home_site_id: 'SITE-HQ', odo: 51900 },
+    { code: 'B-07', plate: 'BDR 9901', model: 'MCV 500 Coach', year: 2021, category: 'Bus', type: 'Bus', seats: 45, payloadKg: 4000, fuelType: 'Diesel', ratePer100Km: 27.5, status: 'Available', location: 'Badr University in Cairo', home_site_id: 'SITE-BUC', odo: 112000 },
+    { code: 'T-02', plate: 'BDR 6623', model: 'Isuzu NPR Box Truck', year: 2021, category: 'Heavy Cargo Truck', type: 'Truck', seats: 3, payloadKg: 4500, fuelType: 'Diesel', ratePer100Km: 18.0, status: 'On trip', location: 'Plant 3 — 10th of Ramadan', home_site_id: 'SITE-BUC', odo: 95800 },
+    { code: 'V-108', plate: 'BDR 1198', model: 'Nissan Urvan', year: 2019, category: 'Passenger Van', type: 'Van', seats: 12, payloadKg: 1150, fuelType: 'Diesel', ratePer100Km: 10.4, status: 'Maintenance', location: 'Central Workshop', home_site_id: 'SITE-HQ', odo: 143200 }
   ];
 
   const DEFAULT_DRIVERS = [
-    { id: 'D-101', name: 'Mahmoud Fawzy', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-84920', expires: '2028-03-15', status: 'Available', totalTrips: 412, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
-    { id: 'D-102', name: 'Mostafa Kamel', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-GIZ-39102', expires: '2027-11-20', status: 'Available', totalTrips: 345, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
-    { id: 'D-103', name: 'Hany Mahmoud', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-12948', expires: '2027-08-10', status: 'Available', totalTrips: 520, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
-    { id: 'D-104', name: 'Sherif Fathy', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-SHR-77291', expires: '2026-09-15', status: 'Off Duty (Expired)', totalTrips: 288, allowedVehicles: ['Sedan', 'Van'] },
-    { id: 'D-105', name: 'Sameh Adel', licenseClass: 'Class 3 (Private)', licenseNo: 'EG-CAI-99201', expires: '2029-01-18', status: 'Available', totalTrips: 180, allowedVehicles: ['Sedan only'] },
-    { id: 'D-106', name: 'Khaled Soliman', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-66419', expires: '2027-05-30', status: 'Available', totalTrips: 390, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
-    { id: 'D-107', name: 'Walid Saad', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-33820', expires: '2028-09-12', status: 'On leave', totalTrips: 210, allowedVehicles: ['Sedan', 'Van', 'CNG'] },
-    { id: 'D-108', name: 'Hassan Metwally', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-CAI-00192', expires: '2027-12-05', status: 'Available', totalTrips: 640, allowedVehicles: ['Bus', 'Heavy Coach', 'Van', 'Sedan'] },
-    { id: 'D-109', name: 'Ibrahim Gamal', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-SHR-44109', expires: '2028-04-22', status: 'Available', totalTrips: 480, allowedVehicles: ['Truck', 'Van', 'Heavy Cargo'] },
-    { id: 'D-110', name: 'Mahmoud Reda', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-CAI-55219', expires: '2028-07-14', status: 'Suspended: Incident Triage', totalTrips: 310, allowedVehicles: ['Bus', 'Van'] }
+    { id: 'D-101', name: 'Mahmoud Fawzy', home_site_id: 'SITE-BUA', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-84920', expires: '2028-03-15', status: 'Available', totalTrips: 412, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
+    { id: 'D-102', name: 'Mostafa Kamel', home_site_id: 'SITE-BUC', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-GIZ-39102', expires: '2027-11-20', status: 'Available', totalTrips: 345, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
+    { id: 'D-103', name: 'Hany Mahmoud', home_site_id: 'SITE-BUC', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-12948', expires: '2027-08-10', status: 'Available', totalTrips: 520, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
+    { id: 'D-104', name: 'Sherif Fathy', home_site_id: 'SITE-BUC', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-SHR-77291', expires: '2026-09-15', status: 'Off Duty (Expired)', totalTrips: 288, allowedVehicles: ['Sedan', 'Van'] },
+    { id: 'D-105', name: 'Sameh Adel', home_site_id: 'SITE-BUA', licenseClass: 'Class 3 (Private)', licenseNo: 'EG-CAI-99201', expires: '2029-01-18', status: 'Available', totalTrips: 180, allowedVehicles: ['Sedan only'] },
+    { id: 'D-106', name: 'Khaled Soliman', home_site_id: 'SITE-HQ', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-66419', expires: '2027-05-30', status: 'Available', totalTrips: 390, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
+    { id: 'D-107', name: 'Walid Saad', home_site_id: 'SITE-ALEX', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-33820', expires: '2028-09-12', status: 'On leave', totalTrips: 210, allowedVehicles: ['Sedan', 'Van', 'CNG'] },
+    { id: 'D-108', name: 'Hassan Metwally', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-CAI-00192', expires: '2027-12-05', status: 'Available', totalTrips: 640, allowedVehicles: ['Bus', 'Heavy Coach', 'Van', 'Sedan'] },
+    { id: 'D-109', name: 'Ibrahim Gamal', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-SHR-44109', expires: '2028-04-22', status: 'Available', totalTrips: 480, allowedVehicles: ['Truck', 'Van', 'Heavy Cargo'] },
+    { id: 'D-110', name: 'Mahmoud Reda', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-CAI-55219', expires: '2028-07-14', status: 'Suspended: Incident Triage', totalTrips: 310, allowedVehicles: ['Bus', 'Van'] }
   ];
 
   function toEgyptISOString(date) {
@@ -1403,8 +1464,15 @@
       }
 
       if (!parsed.settings) parsed.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+      if (!parsed.sites || parsed.sites.length === 0) parsed.sites = JSON.parse(JSON.stringify(DEFAULT_SITES));
       if (!parsed.vehicles || parsed.vehicles.length === 0) parsed.vehicles = JSON.parse(JSON.stringify(DEFAULT_VEHICLES));
       if (!parsed.drivers || parsed.drivers.length === 0) parsed.drivers = JSON.parse(JSON.stringify(DEFAULT_DRIVERS));
+
+      DEFAULT_SITES.forEach(ds => {
+        if (!parsed.sites.some(s => s.id === ds.id)) {
+          parsed.sites.push(JSON.parse(JSON.stringify(ds)));
+        }
+      });
 
       if (parsed.settings.fuelPrices) {
         parsed.settings.fuelPrices.activeVersion = 'Effective 10 Mar 2026';
@@ -1430,6 +1498,7 @@
           ratePer100Km: 10.0,
           status: 'Available',
           location: 'Alexandria University / Borg El Arab',
+          home_site_id: 'SITE-ALEX',
           odo: 38200
         });
       }
@@ -1447,9 +1516,52 @@
           ratePer100Km: 7.0,
           status: 'Available',
           location: 'Alexandria University / Borg El Arab',
+          home_site_id: 'SITE-ALEX',
           odo: 21500
         });
       }
+
+      // Migrate existing vehicle and driver home sites
+      (parsed.vehicles || []).forEach(v => {
+        if (!v.home_site_id) {
+          const loc = (v.location || '').toLowerCase();
+          const base = (v.base || '').toLowerCase();
+          const target = `${loc} ${base}`;
+
+          const matchedSite = parsed.sites.find(s => {
+            const cityName = (s.city || '').toLowerCase();
+            const siteName = (s.name || '').toLowerCase();
+            return (cityName && target.includes(cityName)) || (siteName && target.includes(siteName));
+          });
+
+          if (matchedSite) {
+            v.home_site_id = matchedSite.id;
+          } else if (target.includes('obour') || target.includes('ramadan') || target.includes('depot')) {
+            v.home_site_id = 'SITE-BUC';
+          } else if (target.includes('airport') || target.includes('workshop')) {
+            v.home_site_id = 'SITE-HQ';
+          } else {
+            v.home_site_id = null;
+          }
+        }
+      });
+
+      (parsed.drivers || []).forEach(d => {
+        if (!d.home_site_id) {
+          const branch = (d.branch || '').toLowerCase();
+          const matchedSite = parsed.sites.find(s => {
+            const cityName = (s.city || '').toLowerCase();
+            const siteName = (s.name || '').toLowerCase();
+            return (cityName && branch.includes(cityName)) || (siteName && branch.includes(siteName));
+          });
+          if (matchedSite) {
+            d.home_site_id = matchedSite.id;
+          } else {
+            const defD = DEFAULT_DRIVERS.find(item => item.id === d.id);
+            d.home_site_id = (defD && defD.home_site_id) ? defD.home_site_id : 'SITE-BUC';
+          }
+        }
+      });
 
       const rawBookings = Array.isArray(parsed.bookings) ? parsed.bookings : [];
       let maxNumericId = 2050;
@@ -1554,6 +1666,321 @@
       const init = getInitialData();
       this.save(init);
       return init;
+    },
+
+    getCiraInstitutions: function () {
+      return CIRA_INSTITUTIONS;
+    },
+
+    getSites: function () {
+      const data = this.load();
+      return (data.sites && data.sites.length > 0) ? data.sites : DEFAULT_SITES;
+    },
+
+    listSites: function (filter = {}) {
+      const data = this.load();
+      const sites = (data.sites && data.sites.length > 0) ? data.sites : DEFAULT_SITES;
+      const vehicles = data.vehicles || [];
+      const drivers = data.drivers || [];
+
+      const enriched = sites.map(s => {
+        const vCount = vehicles.filter(v => v.home_site_id === s.id).length;
+        const dCount = drivers.filter(d => d.home_site_id === s.id).length;
+        return {
+          ...s,
+          vehicleCount: vCount,
+          driverCount: dCount
+        };
+      });
+
+      if (filter && filter.activeOnly) {
+        return enriched.filter(s => s.active !== false);
+      }
+      return enriched;
+    },
+
+    getSite: function (id) {
+      if (!id) return null;
+      const data = this.load();
+      const sites = (data.sites && data.sites.length > 0) ? data.sites : DEFAULT_SITES;
+      return sites.find(s => s.id === id) || null;
+    },
+
+    getSiteByName: function (name) {
+      if (!name) return null;
+      const lower = name.trim().toLowerCase();
+      const data = this.load();
+      const sites = (data.sites && data.sites.length > 0) ? data.sites : DEFAULT_SITES;
+      return sites.find(s => {
+        const sName = (s.name || '').toLowerCase();
+        return sName === lower || sName.includes(lower) || lower.includes(sName);
+      }) || null;
+    },
+
+    saveSite: function (siteData, user = 'Khaled Ibrahim (Fleet Admin)') {
+      if (!siteData || !siteData.name || !siteData.name.trim()) {
+        return { success: false, error: 'Site name is required.' };
+      }
+      const data = this.load();
+      data.sites = data.sites || [];
+
+      const nameTrimmed = siteData.name.trim();
+      const existingName = data.sites.find(s =>
+        s.id !== siteData.id && s.name.trim().toLowerCase() === nameTrimmed.toLowerCase()
+      );
+      if (existingName) {
+        return { success: false, error: `A site with the name "${nameTrimmed}" already exists.` };
+      }
+
+      let site;
+      let isNew = false;
+      if (siteData.id) {
+        site = data.sites.find(s => s.id === siteData.id);
+      }
+      if (!site) {
+        isNew = true;
+        const idSlug = nameTrimmed.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase();
+        site = {
+          id: `SITE-${idSlug || Math.floor(100 + Math.random() * 900)}`
+        };
+        data.sites.push(site);
+      }
+
+      site.name = nameTrimmed;
+      site.institution = siteData.institution || 'Badr University in Cairo (BUC)';
+      site.city = siteData.city || 'Cairo';
+      site.address = siteData.address || '';
+      site.lat = (typeof siteData.lat === 'number') ? siteData.lat : Number(siteData.lat) || 30.1378;
+      site.lng = (typeof siteData.lng === 'number') ? siteData.lng : Number(siteData.lng) || 31.7456;
+      site.pinned = Boolean(siteData.pinned);
+      site.to_verify = (siteData.to_verify !== undefined) ? Boolean(siteData.to_verify) : (!site.pinned);
+      site.active = (siteData.active !== undefined) ? Boolean(siteData.active) : true;
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: user,
+        action: isNew ? 'Create CIRA Site' : 'Update CIRA Site',
+        ref: site.id,
+        details: `${isNew ? 'Created' : 'Updated'} site "${site.name}" (${site.city}) with coordinates [${site.lat.toFixed(4)}, ${site.lng.toFixed(4)}]. Pinned: ${site.pinned}.`
+      });
+
+      this.save(data);
+      return { success: true, site: site };
+    },
+
+    deactivateSite: function (id, user = 'Khaled Ibrahim (Fleet Admin)') {
+      const data = this.load();
+      const site = (data.sites || []).find(s => s.id === id);
+      if (!site) return { success: false, error: 'Site not found.' };
+
+      site.active = false;
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: user,
+        action: 'Deactivate CIRA Site',
+        ref: id,
+        details: `Deactivated site "${site.name}".`
+      });
+
+      this.save(data);
+      return { success: true, site: site };
+    },
+
+    activateSite: function (id, user = 'Khaled Ibrahim (Fleet Admin)') {
+      const data = this.load();
+      const site = (data.sites || []).find(s => s.id === id);
+      if (!site) return { success: false, error: 'Site not found.' };
+
+      site.active = true;
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: user,
+        action: 'Activate CIRA Site',
+        ref: id,
+        details: `Re-activated site "${site.name}".`
+      });
+
+      this.save(data);
+      return { success: true, site: site };
+    },
+
+    deleteSite: function (id, user = 'Khaled Ibrahim (Fleet Admin)') {
+      const data = this.load();
+      const site = (data.sites || []).find(s => s.id === id);
+      if (!site) return { success: false, error: 'Site not found.' };
+
+      const vCount = (data.vehicles || []).filter(v => v.home_site_id === id).length;
+      const dCount = (data.drivers || []).filter(d => d.home_site_id === id).length;
+      if (vCount > 0 || dCount > 0) {
+        return {
+          success: false,
+          error: `Cannot delete site "${site.name}": ${vCount} vehicle(s) and ${dCount} driver(s) are assigned to it. Deactivate the site instead.`
+        };
+      }
+
+      data.sites = data.sites.filter(s => s.id !== id);
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: user,
+        action: 'Delete CIRA Site',
+        ref: id,
+        details: `Deleted empty site "${site.name}".`
+      });
+
+      this.save(data);
+      return { success: true };
+    },
+
+    updateVehicleHomeSite: function (vehicleCode, newHomeSiteId, reason, user = 'Khaled Ibrahim (Fleet Admin)') {
+      if (!reason || !reason.trim()) {
+        return { success: false, error: 'A reason is required when changing a vehicle home site.' };
+      }
+      const data = this.load();
+      const v = (data.vehicles || []).find(item => item.code === vehicleCode);
+      if (!v) return { success: false, error: `Vehicle ${vehicleCode} not found.` };
+
+      const newSite = (data.sites || []).find(s => s.id === newHomeSiteId);
+      if (!newSite) return { success: false, error: 'Target home site not found.' };
+      if (!newSite.active) return { success: false, error: 'Cannot assign an inactive site as home site.' };
+
+      const oldSite = (data.sites || []).find(s => s.id === v.home_site_id);
+      const upcoming = (data.bookings || []).filter(b =>
+        ['Approved', 'Dispatched', 'Active'].includes(b.status) &&
+        b.assignment && b.assignment.vehicle_id === vehicleCode
+      );
+
+      v.home_site_id = newHomeSiteId;
+      v.location = newSite.name;
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: user,
+        action: 'Change Vehicle Home Site',
+        ref: vehicleCode,
+        details: `Reassigned ${vehicleCode} (${v.model}) from ${oldSite ? oldSite.name : 'Unassigned'} to ${newSite.name}. Reason: "${reason.trim()}".`
+      });
+
+      this.save(data);
+
+      return {
+        success: true,
+        vehicle: v,
+        warning: upcoming.length > 0
+          ? `Warning: Vehicle has ${upcoming.length} upcoming approved booking(s) (${upcoming.map(b => b.id).join(', ')}). Existing bookings keep their original base.`
+          : null
+      };
+    },
+
+    saveVehicle: function (vData, reason = '', user = 'Khaled Ibrahim (Fleet Admin)') {
+      if (!vData || !vData.code) return { success: false, error: 'Vehicle code is required.' };
+      const data = this.load();
+      data.vehicles = data.vehicles || [];
+
+      let v = data.vehicles.find(item => item.code === vData.code);
+      let isNew = false;
+      let warning = null;
+
+      if (!v) {
+        isNew = true;
+        v = { code: vData.code };
+        data.vehicles.push(v);
+      } else if (v.home_site_id && vData.home_site_id && v.home_site_id !== vData.home_site_id) {
+        if (!reason || !reason.trim()) {
+          return { success: false, error: 'A reason is required when changing a vehicle home site.' };
+        }
+        const siteChangeResult = this.updateVehicleHomeSite(v.code, vData.home_site_id, reason, user);
+        if (!siteChangeResult.success) return siteChangeResult;
+        warning = siteChangeResult.warning;
+      }
+
+      v.plate = vData.plate || v.plate || 'BDR 0000';
+      v.model = vData.model || v.model || 'Unknown';
+      v.year = Number(vData.year) || v.year || 2023;
+      v.category = vData.category || v.category || 'Passenger Van';
+      v.type = vData.type || v.type || 'Van';
+      v.seats = Number(vData.seats) || v.seats || 4;
+      v.payloadKg = Number(vData.payloadKg) || v.payloadKg || 500;
+      v.fuelType = vData.fuelType || v.fuelType || 'Diesel';
+      v.ratePer100Km = Number(vData.ratePer100Km) || v.ratePer100Km || 10.0;
+      v.status = vData.status || v.status || 'Available';
+      v.odo = Number(vData.odo) || v.odo || 0;
+      if (vData.home_site_id) v.home_site_id = vData.home_site_id;
+      if (!v.location && v.home_site_id) {
+        const site = (data.sites || []).find(s => s.id === v.home_site_id);
+        if (site) v.location = site.name;
+      }
+
+      this.save(data);
+      return { success: true, vehicle: v, warning: warning };
+    },
+
+    saveDriver: function (dData, user = 'Khaled Ibrahim (Fleet Admin)') {
+      if (!dData) return { success: false, error: 'Driver data is required.' };
+      const data = this.load();
+      data.drivers = data.drivers || [];
+
+      let dId = (dData.id || '').trim();
+      let d = dId ? data.drivers.find(item => item.id === dId) : null;
+      let isNew = false;
+      if (!d) {
+        isNew = true;
+        if (!dId) {
+          dId = `DRV-${Math.floor(100 + Math.random() * 900)}`;
+        }
+        d = { id: dId };
+        data.drivers.push(d);
+      }
+
+      d.name = dData.name || d.name || 'Unnamed Driver';
+      d.home_site_id = dData.home_site_id || d.home_site_id || 'SITE-BUC';
+      d.licenseClass = dData.licenseClass || d.licenseClass || 'Class 2 (Professional 2nd)';
+      d.licenseNo = dData.licenseNo || d.licenseNo || 'EG-CAI-00000';
+      d.expires = dData.expires || d.expires || '2028-01-01';
+      d.status = dData.status || d.status || 'Available';
+      d.totalTrips = Number(dData.totalTrips) || d.totalTrips || 0;
+      d.allowedVehicles = dData.allowedVehicles || d.allowedVehicles || ['Sedan', 'Van'];
+
+      this.save(data);
+      return { success: true, driver: d };
+    },
+
+    updateDriverHomeSite: function (driverId, newHomeSiteId, user = 'Khaled Ibrahim (Fleet Admin)') {
+      const data = this.load();
+      const d = (data.drivers || []).find(item => item.id === driverId);
+      if (!d) return { success: false, error: 'Driver not found.' };
+
+      const site = (data.sites || []).find(s => s.id === newHomeSiteId);
+      if (!site) return { success: false, error: 'Target site not found.' };
+
+      d.home_site_id = newHomeSiteId;
+      this.save(data);
+      return { success: true, driver: d };
+    },
+
+    getMigrationReport: function () {
+      const data = this.load();
+      const vehicles = data.vehicles || [];
+      const drivers = data.drivers || [];
+
+      const unmatchedVehicles = vehicles.filter(v => !v.home_site_id);
+      const unmatchedDrivers = drivers.filter(d => !d.home_site_id);
+
+      return {
+        matchedVehiclesCount: vehicles.length - unmatchedVehicles.length,
+        unmatchedVehicles: unmatchedVehicles,
+        matchedDriversCount: drivers.length - unmatchedDrivers.length,
+        unmatchedDrivers: unmatchedDrivers
+      };
     },
 
     getSettings: function () {
@@ -1747,19 +2174,43 @@
         }
 
         let repositioningKm = 0;
-        const vLoc = (v.location || '').toLowerCase();
-        const dLoc = depPlace.toLowerCase();
+        const homeSite = (v.home_site_id ? this.getSite(v.home_site_id) : null) || findLocationByName(v.location);
+        const homeSiteName = homeSite ? homeSite.name : (v.location || 'Unknown Base');
 
-        if (vLoc && dLoc && !vLoc.includes(dLoc) && !dLoc.includes(vLoc)) {
-          const vKnown = findLocationByName(v.location);
-          const dKnown = findLocationByName(depPlace);
-          if (vKnown && dKnown) {
-            const key = `${vKnown.name}|${dKnown.name}`;
-            repositioningKm = KNOWN_DISTANCES[key]
-              ? KNOWN_DISTANCES[key].km
-              : calculateHaversineKm(vKnown.lat, vKnown.lng, dKnown.lat, dKnown.lng);
+        const depPoint = (Array.isArray(booking.itinerary) && booking.itinerary[0]) ? booking.itinerary[0] : null;
+        const depPlace = depPoint ? (depPoint.place_name || '') : '';
+        const depPlaceLower = depPlace.trim().toLowerCase();
+        const homeNameLower = homeSiteName.trim().toLowerCase();
+
+        const isExactSameSite = Boolean(homeSite && (
+          depPlaceLower === homeNameLower ||
+          (homeSite.id && depPoint.site_id === homeSite.id) ||
+          (typeof homeSite.lat === 'number' && depPoint && typeof depPoint.lat === 'number' &&
+            calculateHaversineKm(homeSite.lat, homeSite.lng, depPoint.lat, depPoint.lng) < 0.25)
+        ));
+
+        if (isExactSameSite) {
+          repositioningKm = 0;
+        } else if (homeSite) {
+          const distKey = `${homeSite.name}|${depPlace}`;
+          const reverseKey = `${depPlace}|${homeSite.name}`;
+          if (KNOWN_DISTANCES[distKey]) {
+            repositioningKm = KNOWN_DISTANCES[distKey].km;
+          } else if (KNOWN_DISTANCES[reverseKey]) {
+            repositioningKm = KNOWN_DISTANCES[reverseKey].km;
+          } else if (typeof homeSite.lat === 'number' && depPoint && typeof depPoint.lat === 'number') {
+            const straight = calculateHaversineKm(homeSite.lat, homeSite.lng, depPoint.lat, depPoint.lng);
+            repositioningKm = straight < 0.25 ? 0 : Math.round(straight * 1.25 * 10) / 10;
           } else {
-            repositioningKm = (vLoc.includes('cairo') && dLoc.includes('assiut')) ? 380 : 0;
+            const homeCity = (homeSite.city || '').toLowerCase();
+            if (homeCity && depPlaceLower.includes(homeCity)) {
+              repositioningKm = 10.0;
+            } else {
+              repositioningKm = (homeNameLower.includes('cairo') && depPlaceLower.includes('assiut')) ? 380 :
+                (homeNameLower.includes('assiut') && depPlaceLower.includes('cairo')) ? 380 :
+                (homeNameLower.includes('alexandria') && depPlaceLower.includes('cairo')) ? 218 :
+                (homeNameLower.includes('cairo') && depPlaceLower.includes('alexandria')) ? 218 : 50;
+            }
           }
         }
 
@@ -1800,7 +2251,10 @@
             loadFactor: loadFactor,
             fuelPrice: fuelPrice,
             fuelType: v.fuelType,
-            nominalRate: nominal
+            nominalRate: nominal,
+            homeSite: homeSite,
+            homeSiteName: homeSiteName,
+            isExactSameSite: isExactSameSite
           }
         };
       });
@@ -1809,9 +2263,20 @@
         if (a.eligible && !b.eligible) return -1;
         if (!a.eligible && b.eligible) return 1;
         if (a.eligible && b.eligible) {
+          const aExact = a.estimate.isExactSameSite ? 1 : 0;
+          const bExact = b.estimate.isExactSameSite ? 1 : 0;
+          if (aExact !== bExact) return bExact - aExact;
+
+          if (a.estimate.repositioningKm !== b.estimate.repositioningKm) {
+            return a.estimate.repositioningKm - b.estimate.repositioningKm;
+          }
+
+          if (a.estimate.costEGP !== b.estimate.costEGP) {
+            return a.estimate.costEGP - b.estimate.costEGP;
+          }
+
           if (a.vehicle.seats !== b.vehicle.seats) return a.vehicle.seats - b.vehicle.seats;
-          if (a.vehicle.payloadKg !== b.vehicle.payloadKg) return a.vehicle.payloadKg - b.vehicle.payloadKg;
-          return a.estimate.costEGP - b.estimate.costEGP;
+          return a.vehicle.code.localeCompare(b.vehicle.code);
         }
         return a.vehicle.code.localeCompare(b.vehicle.code);
       });
@@ -1887,6 +2352,14 @@
       evaluated.sort((a, b) => {
         if (a.eligible && !b.eligible) return -1;
         if (!a.eligible && b.eligible) return 1;
+        if (a.eligible && b.eligible) {
+          const vehHome = selectedVehicle ? selectedVehicle.home_site_id : null;
+          const aHome = (vehHome && a.driver.home_site_id === vehHome) ? 1 : 0;
+          const bHome = (vehHome && b.driver.home_site_id === vehHome) ? 1 : 0;
+          if (aHome !== bHome) return bHome - aHome;
+
+          return a.driver.name.localeCompare(b.driver.name);
+        }
         return a.driver.name.localeCompare(b.driver.name);
       });
 
@@ -2082,13 +2555,16 @@
         approved_at: toEgyptISOString(new Date())
       };
 
+      const homeSite = this.getSite(vMatch.vehicle.home_site_id);
+      const vehicleBase = homeSite || vMatch.vehicle.location;
+
       if (!b.return_with_vehicle && b.itinerary && b.itinerary.length > 0) {
-        b.deadhead = calculateDeadheadLeg(b.itinerary[b.itinerary.length - 1], vMatch.vehicle.location);
+        b.deadhead = calculateDeadheadLeg(b.itinerary[b.itinerary.length - 1], vehicleBase);
       } else {
         b.deadhead = null;
       }
 
-      b.hold_window = calculateHoldWindow(b, vMatch.vehicle.location);
+      b.hold_window = calculateHoldWindow(b, vehicleBase);
       b.estimate = calculateBookingEstimate(b, vMatch.vehicle);
 
       b.history.push({

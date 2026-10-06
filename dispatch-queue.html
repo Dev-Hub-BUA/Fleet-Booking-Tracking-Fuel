@@ -1029,9 +1029,12 @@
                     badgeHtml = `<span class="badge badge-danger">${escapeHtml(item.reasons.join(', '))}</span>`;
                   }
 
+                  const homeSiteObj = v.home_site_id ? FleetStore.getSite(v.home_site_id) : null;
+                  const homeSiteName = homeSiteObj ? homeSiteObj.name : (est.homeSiteName || v.location || 'Unknown Base');
+
                   const repositionText = est.repositioningKm > 0
-                    ? `<span style="color:#B45309; font-weight:600;">+${est.repositioningKm} km repositioning</span>`
-                    : '<span style="color:#047857;">On Site (0 km)</span>';
+                    ? `<span style="color:#B45309; font-weight:600;">${est.repositioningKm} km to departure</span>`
+                    : '<span style="color:#047857; font-weight:600;">0 km to departure</span>';
 
                   return `
                     <tr class="${trClass}" onclick="${item.eligible ? `handleSelectVehicle('${v.code}')` : ''}">
@@ -1046,8 +1049,8 @@
                       <td>${v.seats} seats · ${v.payloadKg.toLocaleString()} kg</td>
                       <td>${v.fuelType} · ${v.ratePer100Km} L/100km</td>
                       <td>
-                        <div>${escapeHtml(v.location)}</div>
-                        <div style="font-size:11px;">${repositionText}</div>
+                        <div style="font-weight:600; color:var(--navy-800);">Home site: ${escapeHtml(homeSiteName)}</div>
+                        <div style="font-size:11px; margin-top:2px;">${repositionText}</div>
                       </td>
                       <td>
                         <strong style="font-family:var(--font-mono);">${est.fuelLiters} L</strong>
@@ -1110,6 +1113,10 @@
                     badgeHtml = `<span class="badge badge-danger">${escapeHtml(item.reasons.join(', '))}</span>`;
                   }
 
+                  const dHomeSite = d.home_site_id ? FleetStore.getSite(d.home_site_id) : null;
+                  const dHomeSiteName = dHomeSite ? dHomeSite.name : 'Unassigned';
+                  const isMatchingVehicleSite = Boolean(chosenVehicleItem && chosenVehicleItem.vehicle && chosenVehicleItem.vehicle.home_site_id === d.home_site_id);
+
                   const inputType = requiresSecondDriver ? 'checkbox' : 'radio';
                   const totalTripHours = (dailySummary.reduce((sum, day) => sum + day.driveMinutes, 0) / 60).toFixed(1);
                   const tripsThisMo = Math.min(18, Math.max(3, Math.round((d.totalTrips || 10) / 25)));
@@ -1120,8 +1127,11 @@
                         <input type="${inputType}" name="d_choice" value="${d.id}" ${isChecked ? 'checked' : ''} ${item.eligible ? '' : 'disabled'} onchange="handleSelectDriver('${d.id}')" style="accent-color:var(--navy-800);">
                       </td>
                       <td>
-                        <strong>${escapeHtml(d.name)}</strong>
-                        <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">${d.licenseNo}</div>
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                          <strong>${escapeHtml(d.name)}</strong>
+                          ${isMatchingVehicleSite ? '<span class="badge badge-info" style="font-size:10px; padding:1px 6px;">Home Site Driver</span>' : ''}
+                        </div>
+                        <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">${d.licenseNo} · Home: ${escapeHtml(dHomeSiteName)}</div>
                       </td>
                       <td>
                         <div>${escapeHtml(d.licenseClass)}</div>
