@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل الدخول — منظومة أسطول سيرا للتعليم</title>
+  <title>Sign In — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/auth.js"></script>
@@ -46,7 +46,7 @@
     }
     .pwd-toggle-btn {
       position: absolute;
-      left: 12px;
+      right: 12px;
       background: none;
       border: none;
       color: var(--text-muted);
@@ -69,63 +69,64 @@
     }
   </style>
 </head>
-<body style="background: var(--bg-page); min-height: 100vh; display: flex; flex-direction: column; direction: rtl; text-align: right;">
+<body style="background: var(--bg-page); min-height: 100vh; display: flex; flex-direction: column;">
 
   <div style="flex: 1; display: flex; flex-wrap: wrap;">
-    <!-- Right Hero Information Section -->
+    <!-- Hero Information Section -->
     <section style="flex: 1 1 480px; background: linear-gradient(135deg, var(--cira-burgundy-deep) 0%, var(--cira-burgundy) 100%); color: #DCE4EF; padding: 56px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 36px; justify-content: space-between;">
       <div style="display: flex; flex-direction: column; gap: 28px;">
         <div style="display: flex; align-items: center; gap: 12px;">
           <div style="width: 48px; height: 48px; background: var(--cira-gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-condensed); font-weight: 900; font-size: 16px; color: var(--cira-burgundy);">CIRA</div>
           <div style="display: flex; flex-direction: column; line-height: 1.1;">
             <span style="font-family: var(--font-condensed); font-weight: 800; font-size: 24px; color: #FFFFFF;">CIRA EDUCATION</span>
-            <span style="font-size: 11px; letter-spacing: 0.16em; color: var(--cira-gold); text-transform: uppercase;">إدارة أسطول الحركة والنقل واللوجستيات</span>
+            <span style="font-size: 11px; letter-spacing: 0.16em; color: var(--cira-gold); text-transform: uppercase;">Fleet Transport &amp; Logistics Directorate</span>
           </div>
         </div>
 
         <div>
           <h1 style="margin: 0; font-family: var(--font-condensed); font-size: 40px; line-height: 1.2; color: #FFFFFF; font-weight: 800;">
-            بوابة العمليات المركزية لإدارة وحجز أسطول المؤسسة
+            Central Operations &amp; Fleet Dispatch Portal
           </h1>
           <p style="margin: 16px 0 0; font-size: 15.5px; line-height: 1.6; color: #E8E2DD;">
-            المنصة المركزية الذكية لخدمة جامعات ومدارس سيرا، تشمل التحقق من الصلاحيات الإدارية، جدولة أسطول النقل، التتبع اللحظي، ومطابقة استهلاك الوقود إلكترونياً.
+            The centralized intelligent platform serving CIRA universities and schools—encompassing role-based access control, automated fleet scheduling, live telemetry tracking, and digital fuel audit reconciliation.
           </p>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
           <div style="border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px; background: rgba(255,255,255,0.06);">
-            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">التحقق المؤسسي</strong>
-            <span style="font-size: 12.5px; opacity: 0.9;">صلاحيات مفصلة لكل دور وظيفي عبر نظام RBAC المحكم.</span>
+            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">Enterprise RBAC</strong>
+            <span style="font-size: 12.5px; opacity: 0.9;">Role-based permissions and access control across all academic and logistics personas.</span>
           </div>
           <div style="border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px; background: rgba(255,255,255,0.06);">
-            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">فترات التجهيز الإلزامية</strong>
-            <span style="font-size: 12.5px; opacity: 0.9;">تطبيق فترات التجهيز (30 دقيقة) والتعقيم والتبديل (45 دقيقة).</span>
+            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">Turnaround Buffers</strong>
+            <span style="font-size: 12.5px; opacity: 0.9;">Mandatory turnaround buffers (30 min inspection, 45 min sanitation and changeover).</span>
           </div>
           <div style="border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px; background: rgba(255,255,255,0.06);">
-            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">الرقابة والتتبع المباشر</strong>
-            <span style="font-size: 12.5px; opacity: 0.9;">متابعة التيليماتري، إشارات السير، وإنذارات الطوارئ SOS.</span>
+            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">Live Telemetry &amp; SOS</strong>
+            <span style="font-size: 12.5px; opacity: 0.9;">Continuous telemetry streaming, route signals, and emergency SOS handling.</span>
           </div>
           <div style="border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px; background: rgba(255,255,255,0.06);">
-            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">المطابقة المالية المقفلة</strong>
-            <span style="font-size: 12.5px; opacity: 0.9;">تطبيق حد فارق الوقود (±10%) وقفل الرحلات بفواتير معتمدة.</span>
+            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">Closed-Loop Audit</strong>
+            <span style="font-size: 12.5px; opacity: 0.9;">Enforces fuel variance threshold (±10%) and department budget chargebacks.</span>
           </div>
         </div>
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #D5CECB; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 16px;">
-        <span>شركة القاهرة للاستثمار والتنمية العقارية (سيرا للتعليم)</span>
+        <span>Cairo for Investment and Real Estate Development (CIRA Education)</span>
         <button type="button" onclick="document.getElementById('onboarding-modal').style.display='flex';" style="background: none; border: none; color: var(--cira-gold); cursor: pointer; text-decoration: underline; font-family: inherit; font-size: 13px;">
-          دليل التشغيل وإرشادات المنظومة
+          Operations Guide &amp; Guidelines
         </button>
       </div>
     </section>
 
     <!-- Left Sign In Section -->
+    <!-- Sign In Section -->
     <section style="flex: 1 1 480px; padding: 48px 36px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; background: #FFFFFF; overflow-y: auto;">
       <div style="width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 20px;">
         <div>
-          <h2 style="margin: 0; font-family: var(--font-condensed); font-size: 32px; color: var(--cira-burgundy); font-weight: 800;">تسجيل الدخول للمنظومة</h2>
-          <span style="font-size: 13.5px; color: var(--text-muted);">أدخل بيانات حسابك المؤسسي أو استخدم أحد حسابات الاختبار أدناه</span>
+          <h2 style="margin: 0; font-family: var(--font-condensed); font-size: 32px; color: var(--cira-burgundy); font-weight: 800;">Sign In to Fleet Portal</h2>
+          <span style="font-size: 13.5px; color: var(--text-muted);">Enter your institutional credentials or select a demo persona below</span>
         </div>
 
         <!-- Alert Notification Box -->
@@ -134,15 +135,15 @@
         <!-- Real Functional Login Form -->
         <form id="login-form" onsubmit="handleFormSubmit(event);" style="display: flex; flex-direction: column; gap: 14px;">
           <div class="form-group">
-            <label class="form-label" for="login-email">البريد الإلكتروني المؤسسي</label>
+            <label class="form-label" for="login-email">Institutional Email</label>
             <input type="email" id="login-email" class="form-input" required placeholder="name@cira.com.eg" value="sarah.mansour@buc.edu.eg" style="direction: ltr; text-align: left;">
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="login-pwd">كلمة المرور</label>
+            <label class="form-label" for="login-pwd">Password</label>
             <div class="pwd-wrapper">
-              <input type="password" id="login-pwd" class="form-input" required value="Cira@2026" style="direction: ltr; text-align: left; padding-left: 40px;">
-              <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility();" title="إظهار / إخفاء كلمة المرور" aria-label="Toggle password">
+              <input type="password" id="login-pwd" class="form-input" required value="Cira@2026" style="direction: ltr; text-align: left; padding-right: 40px;">
+              <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility();" title="Show / hide password" aria-label="Toggle password">
                 <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
@@ -151,35 +152,35 @@
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
               <input type="checkbox" id="remember-me" checked style="accent-color: var(--cira-burgundy); width: 16px; height: 16px;">
-              <span>تذكر بياناتي في هذا المتصفح</span>
+              <span>Remember me on this browser</span>
             </label>
-            <a href="#" onclick="showQuickAlert('تم إرسال رابط تأكيد الحساب لبريدك المؤسسي المسجل.', 'info'); return false;" style="color: var(--cira-burgundy); font-weight: 700; text-decoration: none;">نسيت كلمة المرور؟</a>
+            <a href="#" onclick="showQuickAlert('Password reset instructions sent to your registered institutional email.', 'info'); return false;" style="color: var(--cira-burgundy); font-weight: 700; text-decoration: none;">Forgot password?</a>
           </div>
 
           <button type="submit" id="submit-btn" class="btn btn-gold btn-lg" style="width: 100%; font-weight: 800; justify-content: center; min-height: 48px;">
-            <span id="btn-text">تسجيل الدخول ←</span>
+            <span id="btn-text">Sign In →</span>
           </button>
         </form>
 
         <div style="display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 12.5px;">
           <span style="flex: 1; height: 1px; background: var(--border);"></span>
-          أو الدخول المباشر بحساب المنظومة الموحد
+          Or continue with Single Sign-On
           <span style="flex: 1; height: 1px; background: var(--border);"></span>
         </div>
 
         <!-- SSO Primary Button -->
         <button type="button" class="btn btn-secondary" onclick="handleSSOLogin();" style="width: 100%; min-height: 44px; justify-content: center; font-size: 14px; font-weight: 700;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-          الدخول السريع عبر بوابة CIRA SSO (OIDC)
+          Quick Sign In via CIRA SSO (OIDC)
         </button>
 
         <!-- Test Accounts Section with One-Click Autofill -->
         <div style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: 6px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <span style="font-size: 13px; font-weight: 800; color: var(--cira-burgundy);">
-              حسابات الاختبار المعتمدة (Demo Accounts):
+              Approved Demo Accounts:
             </span>
-            <span class="copy-pill" title="كلمة المرور المشتركة">Pass: Cira@2026</span>
+            <span class="copy-pill" title="Shared Password">Pass: Cira@2026</span>
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -187,65 +188,65 @@
             <!-- Requester -->
             <div class="persona-card">
               <div class="persona-meta">
-                <span class="persona-role-badge">طالب مركبة · Requester</span>
-                <strong style="font-size: 13.5px; color: var(--text-main);">د. سارة منصور (كلية الصيدلة)</strong>
-                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: right;">sarah.mansour@buc.edu.eg</span>
+                <span class="persona-role-badge">Requester · Academic Faculty</span>
+                <strong style="font-size: 13.5px; color: var(--text-main);">Dr. Sarah Mansour (Faculty of Pharmacy)</strong>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: left;">sarah.mansour@buc.edu.eg</span>
               </div>
               <div style="display: flex; gap: 6px; flex-shrink: 0;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('sarah.mansour@buc.edu.eg', 'Cira@2026');" title="تعبئة الحقول في النموذج أعلاه">تعبئة</button>
-                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('sarah.mansour@buc.edu.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">دخول</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('sarah.mansour@buc.edu.eg', 'Cira@2026');" title="Autofill form fields">Autofill</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('sarah.mansour@buc.edu.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">Sign In</button>
               </div>
             </div>
 
             <!-- Dispatcher -->
             <div class="persona-card">
               <div class="persona-meta">
-                <span class="persona-role-badge">مسؤول الترحيل · Dispatcher</span>
-                <strong style="font-size: 13.5px; color: var(--text-main);">أ. خالد إبراهيم (غرفة العمليات المركزية)</strong>
-                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: right;">khaled.ibrahim@cira.com.eg</span>
+                <span class="persona-role-badge">Dispatcher · Operations</span>
+                <strong style="font-size: 13.5px; color: var(--text-main);">Khaled Ibrahim (Central Operations Desk)</strong>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: left;">khaled.ibrahim@cira.com.eg</span>
               </div>
               <div style="display: flex; gap: 6px; flex-shrink: 0;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('khaled.ibrahim@cira.com.eg', 'Cira@2026');">تعبئة</button>
-                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('khaled.ibrahim@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">دخول</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('khaled.ibrahim@cira.com.eg', 'Cira@2026');">Autofill</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('khaled.ibrahim@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">Sign In</button>
               </div>
             </div>
 
             <!-- Driver -->
             <div class="persona-card">
               <div class="persona-meta">
-                <span class="persona-role-badge">سائق أسطول · Driver</span>
-                <strong style="font-size: 13.5px; color: var(--text-main);">كابتن أحمد حسن (قسم الحركة والنقل)</strong>
-                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: right;">ahmed.hassan@cira.com.eg</span>
+                <span class="persona-role-badge">Driver · Field Transport</span>
+                <strong style="font-size: 13.5px; color: var(--text-main);">Capt. Ahmed Hassan (Fleet Pool)</strong>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: left;">ahmed.hassan@cira.com.eg</span>
               </div>
               <div style="display: flex; gap: 6px; flex-shrink: 0;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('ahmed.hassan@cira.com.eg', 'Cira@2026');">تعبئة</button>
-                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('ahmed.hassan@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">دخول</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('ahmed.hassan@cira.com.eg', 'Cira@2026');">Autofill</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('ahmed.hassan@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">Sign In</button>
               </div>
             </div>
 
             <!-- Fleet Admin -->
             <div class="persona-card">
               <div class="persona-meta">
-                <span class="persona-role-badge">مدير الأسطول · Fleet Admin</span>
-                <strong style="font-size: 13.5px; color: var(--text-main);">م. طارق فتحي (الإدارة العامة للأسطول)</strong>
-                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: right;">tarek.fathy@cira.com.eg</span>
+                <span class="persona-role-badge">Fleet Admin · Management</span>
+                <strong style="font-size: 13.5px; color: var(--text-main);">Eng. Tarek Fathy (Fleet Operations Directorate)</strong>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: left;">tarek.fathy@cira.com.eg</span>
               </div>
               <div style="display: flex; gap: 6px; flex-shrink: 0;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('tarek.fathy@cira.com.eg', 'Cira@2026');">تعبئة</button>
-                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('tarek.fathy@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">دخول</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('tarek.fathy@cira.com.eg', 'Cira@2026');">Autofill</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('tarek.fathy@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">Sign In</button>
               </div>
             </div>
 
             <!-- Auditor -->
             <div class="persona-card">
               <div class="persona-meta">
-                <span class="persona-role-badge">المراجع المالي · Auditor</span>
-                <strong style="font-size: 13.5px; color: var(--text-main);">أ. منى عادل (إدارة الرقابة المالية)</strong>
-                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: right;">mona.adel@cira.com.eg</span>
+                <span class="persona-role-badge">Auditor · Financial Compliance</span>
+                <strong style="font-size: 13.5px; color: var(--text-main);">Mona Adel (Financial Audit Bureau)</strong>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: left;">mona.adel@cira.com.eg</span>
               </div>
               <div style="display: flex; gap: 6px; flex-shrink: 0;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('mona.adel@cira.com.eg', 'Cira@2026');">تعبئة</button>
-                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('mona.adel@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">دخول</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('mona.adel@cira.com.eg', 'Cira@2026');">Autofill</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('mona.adel@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">Sign In</button>
               </div>
             </div>
 
@@ -259,29 +260,29 @@
   <div id="onboarding-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px;">
     <div style="background:#FFFFFF; border-radius:12px; max-width:620px; width:100%; padding:32px; box-shadow:var(--shadow-xl); position:relative; max-height:90vh; overflow-y:auto;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:16px;">
-        <h3 style="margin:0; color:var(--cira-burgundy); font-size:22px;">دليل استخدام منظومة الأسطول والترحيل</h3>
+        <h3 style="margin:0; color:var(--cira-burgundy); font-size:22px;">Fleet Operations &amp; Dispatch User Guide</h3>
         <button type="button" onclick="document.getElementById('onboarding-modal').style.display='none';" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted);">&times;</button>
       </div>
       <div style="margin-top:20px; display:flex; flex-direction:column; gap:16px; font-size:14px; line-height:1.6; color:var(--text-main);">
         <div>
-          <strong style="color:var(--cira-burgundy); display:block; font-size:15px;">1. طلب حجز مركبة (Requester)</strong>
-          <span>يقوم طالب المركبة بتقديم الطلب قبل موعد الرحلة بمدة لا تقل عن 4 ساعات مع بيان خط السير، ويتم حجز ميزانية تقديرية من كوتة الكلية.</span>
+          <strong style="color:var(--cira-burgundy); display:block; font-size:15px;">1. Vehicle Booking Request (Requester)</strong>
+          <span>Requesters submit mission bookings at least 4 hours in advance with full itinerary and route details; budget is provisionally reserved from the department quota.</span>
         </div>
         <div>
-          <strong style="color:var(--cira-burgundy); display:block; font-size:15px;">2. المراجعة والترحيل (Dispatcher)</strong>
-          <span>يقوم مسؤول الترحيل بالتحقق من عدم تعارض المركبة والسائق مع تطبيق فترات التجهيز (30 دقيقة) والتعقيم والتبديل (45 دقيقة).</span>
+          <strong style="color:var(--cira-burgundy); display:block; font-size:15px;">2. Review &amp; Dispatch (Dispatcher)</strong>
+          <span>The operations desk validates vehicle and driver availability, enforcing turnaround inspection (30 min) and sanitization buffers (45 min).</span>
         </div>
         <div>
-          <strong style="color:var(--cira-burgundy); display:block; font-size:15px;">3. تنفيذ الرحلة (Driver)</strong>
-          <span>يستلم السائق أمر التشغيل عبر متصفح الويب، ويجري فحص السلامة قبل الانطلاق، ويسجل قراءات العداد وإيصالات التزود بالوقود لحظياً.</span>
+          <strong style="color:var(--cira-burgundy); display:block; font-size:15px;">3. Trip Execution (Driver)</strong>
+          <span>Drivers access the mobile web manifest, complete pre-trip safety checklist, and log odometer readings and fuel receipts in real time.</span>
         </div>
         <div>
-          <strong style="color:var(--cira-burgundy); display:block; font-size:15px;">4. المطابقة والرقابة المالية (Auditor)</strong>
-          <span>تتم مطابقة المسافة الفعلية مقابل استهلاك الوقود المعتمد؛ وفي حال تجاوز الفارق نسبة ±10% يتم تفعيل علم المراجعة ولا تُقفل العهدة إلا بمبرر رسمي.</span>
+          <strong style="color:var(--cira-burgundy); display:block; font-size:15px;">4. Audit &amp; Financial Reconciliation (Auditor)</strong>
+          <span>Actual distance and fuel consumption are reconciled against standard allowances. Discrepancies exceeding ±10% trigger compliance flags requiring formal review.</span>
         </div>
       </div>
-      <div style="margin-top:24px; text-align:left;">
-        <button type="button" class="btn btn-primary" onclick="document.getElementById('onboarding-modal').style.display='none';">إغلاق الدليل</button>
+      <div style="margin-top:24px; text-align:right;">
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('onboarding-modal').style.display='none';">Close Guide</button>
       </div>
     </div>
   </div>
@@ -339,21 +340,21 @@
       const btnText = document.getElementById('btn-text');
 
       if (!email || !pwd) {
-        showQuickAlert('يرجى إدخال البريد الإلكتروني وكلمة المرور للمتابعة.', 'error');
+        showQuickAlert('Please enter your email and password to continue.', 'error');
         return;
       }
 
       submitBtn.disabled = true;
-      btnText.textContent = 'جاري التحقق من بيانات الاعتماد...';
+      btnText.textContent = 'Verifying credentials...';
 
       setTimeout(function () {
         const res = Auth.login(email, pwd);
         if (!res || !res.success) {
           submitBtn.disabled = false;
-          btnText.textContent = 'تسجيل الدخول ←';
-          showQuickAlert(res ? res.error : 'فشل تسجيل الدخول. تأكد من البريد وكلمة المرور.', 'error');
+          btnText.textContent = 'Sign In →';
+          showQuickAlert(res ? res.error : 'Login failed. Please check your email and password.', 'error');
         } else {
-          showQuickAlert(`تم التحقق بنجاح! مرحباً ${res.user.titleAr || res.user.name}. جاري توجيهك للوحة التحكم...`, 'success');
+          showQuickAlert(`Verification successful! Welcome, ${res.user.name}. Redirecting to dashboard...`, 'success');
         }
       }, 350);
     }
@@ -364,7 +365,7 @@
       const btnText = document.getElementById('btn-text');
 
       submitBtn.disabled = true;
-      btnText.textContent = 'جاري الاتصال بـ CIRA SSO...';
+      btnText.textContent = 'Connecting to CIRA SSO...';
 
       setTimeout(function () {
         Auth.login(email, 'Cira@2026');

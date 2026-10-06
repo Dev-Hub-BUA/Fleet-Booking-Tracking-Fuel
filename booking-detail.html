@@ -77,7 +77,7 @@
       <div class="stepper" style="margin-top: 10px;">
         <div class="step-item done">
       <div class="step-marker">
-        <div class="step-dot">✓</div>
+        <div class="step-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="step-line"></div>
       </div>
       <div class="step-content">
@@ -87,7 +87,7 @@
       </div>
     </div><div class="step-item done">
       <div class="step-marker">
-        <div class="step-dot">✓</div>
+        <div class="step-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="step-line"></div>
       </div>
       <div class="step-content">
@@ -97,7 +97,7 @@
       </div>
     </div><div class="step-item done">
       <div class="step-marker">
-        <div class="step-dot">✓</div>
+        <div class="step-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="step-line"></div>
       </div>
       <div class="step-content">
@@ -140,13 +140,15 @@
     </div>
 
     <div class="card" id="assigned-resources-card">
-      <h2 class="card-title">المركبة والسائق (Assigned Resources)</h2>
+      <h2 class="card-title">Assigned Resources</h2>
       <div id="assigned-resources-content">
         <div style="background: var(--bg-page); padding: 18px; border-radius: 8px; text-align: center;">
-          <div style="font-size: 28px; margin-bottom: 6px;">⏳</div>
-          <strong style="color: var(--navy-800); display: block; font-size: 15px;">قيد التخصيص بواسطة إدارة التشغيل</strong>
+          <div style="display:flex; justify-content:center; margin-bottom: 8px; color:var(--cira-gold);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <strong style="color: var(--navy-800); display: block; font-size: 15px;">Pending Assignment by Operations Desk</strong>
           <p style="font-size: 13px; color: var(--text-muted); margin: 6px 0 0;">
-            يقوم مدير التشغيل بتخصيص كود المركبة والسائق بعد مراجعة الجداول.
+            The operations dispatcher assigns the vehicle code and driver after schedule review.
           </p>
         </div>
       </div>
@@ -155,15 +157,15 @@
 
   <div style="display: flex; flex-direction: column; gap: 20px;">
     <div class="card">
-      <h2 class="card-title">بيانات المهمة والطلب</h2>
+      <h2 class="card-title">Trip & Request Details</h2>
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
-        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">طالب الحجز:</span><strong id="detail-req-name">Dr. Sarah Mansour</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">الجهة / الكلية:</span><strong id="detail-dept">Faculty of Pharmacy</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">الفئة المطلوبة:</span><strong id="detail-cat">فان ركاب / ميكروباص</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">حالة الاعتماد:</span><strong id="detail-status-text" style="color:var(--cira-burgundy);">Pending Review</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Requester:</span><strong id="detail-req-name">Dr. Sarah Mansour</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Department / Faculty:</span><strong id="detail-dept">Faculty of Pharmacy</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Vehicle Category:</span><strong id="detail-cat">Passenger Van / Minibus</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Approval Status:</span><strong id="detail-status-text" style="color:var(--cira-burgundy);">Pending Review</strong></div>
       </div>
       <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px;">
-        يتم تحديد السائق والمركبة رسمياً من قبل إدارة التشغيل والحركة المركزية.
+        The driver and vehicle are officially assigned by Central Fleet Operations.
       </div>
     </div>
 
@@ -250,7 +252,7 @@
 
       if (booking) {
         const pretitle = document.querySelector('.page-pretitle');
-        if (pretitle) pretitle.textContent = `${booking.id} · Lifecycle Status (${booking.statusAr || booking.status})`;
+        if (pretitle) pretitle.textContent = `${booking.id} · Lifecycle Status (${booking.status})`;
         const subtitle = document.querySelector('.page-subtitle');
         if (subtitle) subtitle.textContent = booking.route || (booking.origin + ' → ' + booking.destination);
 
@@ -259,19 +261,21 @@
         const deptEl = document.getElementById('detail-dept');
         if (deptEl) deptEl.textContent = booking.dept || 'Faculty of Pharmacy';
         const catEl = document.getElementById('detail-cat');
-        if (catEl) catEl.textContent = booking.vehicleCategory || 'فان ركاب / ميكروباص';
+        if (catEl) catEl.textContent = booking.vehicleCategory || 'Passenger Van / Minibus';
         const statusEl = document.getElementById('detail-status-text');
-        if (statusEl) statusEl.textContent = booking.statusAr || booking.status;
+        if (statusEl) statusEl.textContent = booking.status;
 
         const resContent = document.getElementById('assigned-resources-content');
         if (resContent) {
           if (booking.status === 'Pending') {
             resContent.innerHTML = `
               <div style="background: var(--bg-page); padding: 18px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 28px; margin-bottom: 6px;">⏳</div>
-                <strong style="color: var(--navy-800); display: block; font-size: 15px;">قيد التخصيص بواسطة إدارة التشغيل</strong>
+                <div style="display:flex; justify-content:center; margin-bottom: 8px; color:var(--cira-gold);">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <strong style="color: var(--navy-800); display: block; font-size: 15px;">Pending Assignment by Operations Desk</strong>
                 <p style="font-size: 13px; color: var(--text-muted); margin: 6px 0 0;">
-                  يقوم مدير التشغيل بمراجعة الجداول وتخصيص كود المركبة المحددة وبيانات السائق المعتمد. ستظهر لك البيانات هنا فور الاعتماد.
+                  The operations dispatcher reviews schedules to assign the specific vehicle code and certified driver. Details will appear here once approved.
                 </p>
               </div>
             `;
@@ -283,11 +287,11 @@
                 </div>
                 <div>
                   <h3 style="margin: 0; font-size: 16px; color: var(--navy-800);">${booking.vehicle || 'Hyundai H-1 (2023)'}</h3>
-                  <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">BDR 3307 · مخصصة ومعقمة</div>
+                  <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">BDR 3307 · Assigned &amp; Sanitized</div>
                 </div>
               </div>
               <div style="font-size: 14px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 12px;">
-                <strong>السائق المعتمد:</strong> ${booking.driver || 'Ahmed Hassan (Driver A)'} · +20 10 9988 7766
+                <strong>Certified Driver:</strong> ${booking.driver || 'Ahmed Hassan (Driver A)'} · +20 10 9988 7766
               </div>
             `;
           }

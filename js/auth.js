@@ -5,11 +5,11 @@
     'Requester': {
       id: 'USR-REQ-101',
       name: 'Dr. Sarah Mansour',
-      titleAr: 'د. سارة منصور',
+      titleAr: 'Dr. Sarah Mansour',
       role: 'Requester',
-      roleAr: 'طالب مركبة (أعضاء هيئة التدريس)',
+      roleAr: 'Vehicle Requester (Faculty)',
       dept: 'Faculty of Pharmacy',
-      deptAr: 'كلية الصيدلة — جامعة بدر',
+      deptAr: 'Faculty of Pharmacy — BUC',
       email: 'sarah.mansour@buc.edu.eg',
       password: 'Cira@2026',
       initials: 'SM'
@@ -17,11 +17,11 @@
     'Dispatcher': {
       id: 'USR-DSP-204',
       name: 'Khaled Ibrahim',
-      titleAr: 'أ. خالد إبراهيم',
+      titleAr: 'Khaled Ibrahim',
       role: 'Dispatcher',
-      roleAr: 'مسؤول الترحيل والعمليات',
+      roleAr: 'Operations & Dispatch Officer',
       dept: 'Logistics Command Desk',
-      deptAr: 'غرفة العمليات المركزية والترحيل',
+      deptAr: 'Central Operations & Dispatch Desk',
       email: 'khaled.ibrahim@cira.com.eg',
       password: 'Cira@2026',
       initials: 'KI'
@@ -29,11 +29,11 @@
     'Driver': {
       id: 'USR-DRV-309',
       name: 'Ahmed Hassan',
-      titleAr: 'كابتن أحمد حسن',
+      titleAr: 'Capt. Ahmed Hassan',
       role: 'Driver',
-      roleAr: 'سائق الأسطول الميداني',
+      roleAr: 'Field Fleet Driver',
       dept: 'Central Transport Pool',
-      deptAr: 'قسم الحركة والنقل الميداني',
+      deptAr: 'Field Transport & Fleet Pool',
       email: 'ahmed.hassan@cira.com.eg',
       password: 'Cira@2026',
       initials: 'AH'
@@ -41,11 +41,11 @@
     'Fleet admin': {
       id: 'USR-ADM-401',
       name: 'Eng. Tarek Fathy',
-      titleAr: 'م. طارق فتحي',
+      titleAr: 'Eng. Tarek Fathy',
       role: 'Fleet admin',
-      roleAr: 'مدير عام الأسطول واللوجستيات',
+      roleAr: 'General Manager of Fleet & Logistics',
       dept: 'Fleet Operations Directorate',
-      deptAr: 'الإدارة العامة للأسطول والمعدات',
+      deptAr: 'General Directorate of Fleet & Equipment',
       email: 'tarek.fathy@cira.com.eg',
       password: 'Cira@2026',
       initials: 'TF'
@@ -53,11 +53,11 @@
     'Auditor': {
       id: 'USR-AUD-505',
       name: 'Mona Adel',
-      titleAr: 'أ. منى عادل',
+      titleAr: 'Mona Adel',
       role: 'Auditor',
-      roleAr: 'المراجع المالي والرقابي',
+      roleAr: 'Financial & Compliance Auditor',
       dept: 'Financial Compliance Bureau',
-      deptAr: 'إدارة المراجعة والرقابة المالية',
+      deptAr: 'Financial Audit & Control Bureau',
       email: 'mona.adel@cira.com.eg',
       password: 'Cira@2026',
       initials: 'MA'
@@ -146,7 +146,7 @@
 
     authenticate: function (email, password) {
       if (!email || !password) {
-        return { success: false, error: 'يرجى إدخال البريد الإلكتروني وكلمة المرور للمتابعة.' };
+        return { success: false, error: 'Please enter your institutional email and password to continue.' };
       }
 
       const cleanEmail = String(email).trim().toLowerCase();
@@ -156,14 +156,14 @@
       if (!matchedUser) {
         return {
           success: false,
-          error: 'البريد الإلكتروني غير مسجل بالمنظومة. استخدم أحد حسابات الاختبار المعتمدة أدناه.'
+          error: 'Email address not found. Please use one of the approved demo accounts below.'
         };
       }
 
       if (cleanPwd !== matchedUser.password && cleanPwd !== '123456') {
         return {
           success: false,
-          error: 'كلمة المرور غير صحيحة. كلمة المرور المعتمدة لجميع حسابات الاختبار هي Cira@2026'
+          error: 'Incorrect password. Approved password for all demo accounts is Cira@2026'
         };
       }
 
@@ -251,7 +251,7 @@
       const reset = () => {
         clearTimeout(timeoutHandle);
         timeoutHandle = setTimeout(() => {
-          alert('انتهت جلسة العمل لدواعي الأمان المؤسسي بسبب عدم النشاط. يرجى إعادة تسجيل الدخول.\nYour session has expired due to inactivity.');
+          alert('Your session has expired due to inactivity. Please log in again.');
           Auth.logout();
         }, timeoutMinutes * 60 * 1000);
       };

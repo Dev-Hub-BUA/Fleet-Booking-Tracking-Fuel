@@ -30,7 +30,7 @@
           estFuelLiters: 14.1,
           estCostEGP: 289.05,
           status: 'Active',
-          statusAr: 'جارية الآن',
+          statusAr: 'Active',
           holdAmountEGP: 350.0,
           actualOdoStart: 84210,
           actualOdoEnd: null,
@@ -59,7 +59,7 @@
           estFuelLiters: 9.2,
           estCostEGP: 204.7,
           status: 'Completed',
-          statusAr: 'مكتملة ومطابقة',
+          statusAr: 'Completed',
           holdAmountEGP: 250.0,
           actualOdoStart: 51200,
           actualOdoEnd: 51242,
@@ -178,7 +178,7 @@
         estFuelLiters: parseFloat(payload.estFuelLiters || 14.1),
         estCostEGP: parseFloat(payload.estCostEGP || 289.05),
         status: 'Pending',
-        statusAr: 'قيد المراجعة والترحيل',
+        statusAr: 'Pending',
         holdAmountEGP: parseFloat(payload.holdAmountEGP || 350.0),
         actualOdoStart: null,
         actualOdoEnd: null,
@@ -217,7 +217,7 @@
       if (!b) return null;
 
       b.status = 'Dispatched';
-      b.statusAr = 'معتمدة ومرحّلة للسائق';
+      b.statusAr = 'Dispatched';
       b.vehicleCode = vehicleCode || 'V-122';
       b.vehicle = vehicleModel || (vehicleCode === 'V-130' ? 'Toyota HiAce (V-130)' : 'Hyundai H-1 (V-122)');
       b.driver = driverName || 'Ahmed Hassan (Driver A)';
@@ -244,7 +244,7 @@
       if (!b) return null;
 
       b.status = 'Active';
-      b.statusAr = 'جارية الآن على المسار';
+      b.statusAr = 'Active';
 
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
@@ -273,7 +273,7 @@
       b.fuelVariancePct = parseFloat(variancePct.toFixed(1));
 
       b.status = 'Closed';
-      b.statusAr = 'مغلقة — بانتظار الاعتماد المالي';
+      b.statusAr = 'Closed';
 
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
@@ -294,7 +294,7 @@
       if (!b) return null;
 
       b.status = 'Completed';
-      b.statusAr = 'مكتملة ومطابقة بالكامل ✓';
+      b.statusAr = 'Completed';
       b.auditorClearedAt = new Date().toISOString();
 
       data.auditTrail.unshift({

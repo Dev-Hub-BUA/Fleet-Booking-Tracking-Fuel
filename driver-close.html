@@ -97,7 +97,7 @@
             <span style="font-family:var(--font-mono); font-weight:700;">410.00 EGP</span>
           </div>
           <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-            20 L · Paid via University Fleet Card #4018 · Receipt Attached ✓
+            20 L · Paid via University Fleet Card #4018 · Receipt Attached
           </div>
         </div>
     </div>
@@ -180,7 +180,7 @@
         fuelCost: 297.25
       });
 
-      alert(`✓ تم إغلاق الرحلة (${closed ? closed.id : activeCloseTripId}) بنجاح!\n\n• قراءة العداد النهائية: ${closed ? closed.actualOdoEnd : '48,276'} كم\n• الوقود الفعلي: ${closed ? closed.actualFuelLitres : 14.5} لتر\n• نسبة الفارق: ${closed ? closed.fuelVariancePct : 2.8}% (ضمن النطاق المسموح ±10%)\n\nتم إحالة الرحلة تلقائياً إلى إدارة المراجعة المالية والرقابية (Stage 4).`);
+      alert(`Trip (${closed ? closed.id : activeCloseTripId}) closed successfully!\n\n• Final Odometer: ${closed ? closed.actualOdoEnd : '48,276'} km\n• Actual Fuel: ${closed ? closed.actualFuelLitres : 14.5} L\n• Fuel Variance: ${closed ? closed.fuelVariancePct : 2.8}% (within allowable ±10% threshold)\n\nTrip automatically forwarded to Internal Audit & Reconciliation (Stage 4).`);
       window.location.href = 'audit.html';
     }
 

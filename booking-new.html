@@ -82,7 +82,9 @@
           <label class="form-label">1 · Intermediate Stop (Pickup / Delivery)</label>
           <div style="display: flex; gap: 8px;">
             <input type="text" class="form-input" value="Supplier depot — Obour City">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="alert('Stop removed');">✕</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="alert('Stop removed');" style="display:inline-flex;align-items:center;justify-content:center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
         </div>
         <div class="form-group">
@@ -135,17 +137,18 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">4. فئة المركبة المطلوبة</h2>
+      <h2 class="card-title">4. Required Vehicle Category</h2>
       <div class="form-group">
-        <label class="form-label">اختر نوع المركبة المناسب للمهمة</label>
+        <label class="form-label">Select Vehicle Category for Mission</label>
         <select class="form-select" id="route-vehicle-cat" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background:#fff;">
-          <option value="Passenger Van (فان ركاب / ميكروباص)" selected>فان ركاب / ميكروباص (7 - 12 راكب) — مثل HiAce / H-1</option>
-          <option value="Sedan (سيارة صالون)">سيارة صالون / سيدان (1 - 4 ركاب) — مثل Corolla / Elantra</option>
-          <option value="Bus (حافلة وفود)">حافلة / ميني باص وفود (15 - 28 راكب) — مثل Coaster / MCV</option>
-          <option value="Heavy Cargo Truck (شاحنة نقل)">شاحنة نقل ومعدات ثقيلة — مثل Isuzu NPR</option>
+          <option value="Passenger Van" selected>Passenger Van / Minibus (7 - 12 passengers) — e.g. HiAce / H-1</option>
+          <option value="Sedan">Sedan (1 - 4 passengers) — e.g. Corolla / Elantra</option>
+          <option value="Bus">Delegation Bus / Minibus (15 - 28 passengers) — e.g. Coaster / MCV</option>
+          <option value="Heavy Cargo Truck">Heavy Cargo Truck &amp; Equipment — e.g. Isuzu NPR</option>
         </select>
-        <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 8px; line-height: 1.5;">
-          ℹ️ <strong>ملاحظة:</strong> يتم اختيار وتخصيص كود المركبة المحددة وبيانات السائق بواسطة <strong>مدير التشغيل</strong> عند مراجعة واعتماد الطلب.
+        <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; display:flex; align-items:center; gap:6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--navy-600);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span><strong>Note:</strong> The specific vehicle code and driver details are selected and assigned by the <strong>Operations Dispatcher</strong> upon review and approval.</span>
         </div>
       </div>
     </div>
@@ -154,27 +157,27 @@
   <div style="display: flex; flex-direction: column; gap: 20px;">
     <div class="card" style="background: #FFFFFF; border: 1px solid var(--border); box-shadow: var(--shadow-sm); padding: 24px;">
       <h3 style="margin: 0 0 14px; font-size: 18px; color: var(--cira-burgundy); font-weight: 800;">
-        إجراءات الحجز والاعتماد
+        Booking &amp; Approval Workflow
       </h3>
 
       <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; color: var(--text-main); line-height: 1.6;">
         <div style="display: flex; align-items: flex-start; gap: 10px;">
-          <span style="color: var(--success); font-weight: 700; font-size: 16px;">✓</span>
-          <span>يُحال الطلب مباشرة لغرفة العمليات المركزية لمراجعة الجداول وتوافر الأسطول.</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--success);flex-shrink:0;margin-top:3px;"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>The request is routed directly to Central Operations to review schedule and fleet availability.</span>
         </div>
         <div style="display: flex; align-items: flex-start; gap: 10px;">
-          <span style="color: var(--cira-gold); font-weight: 700; font-size: 16px;">✓</span>
-          <span>يتولى مدير التشغيل تخصيص المركبة المناسبة وتعيين السائق المعتمد وتطبيق فترات التجهيز.</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--cira-gold);flex-shrink:0;margin-top:3px;"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>The operations dispatcher assigns the suitable vehicle, certified driver, and ensures turnaround buffers.</span>
         </div>
         <div style="display: flex; align-items: flex-start; gap: 10px;">
-          <span style="color: var(--navy-600); font-weight: 700; font-size: 16px;">✓</span>
-          <span>تظهر بيانات المركبة المعينة والسائق في قائمة حجوزاتك فور اعتماد الطلب رسمياً.</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--navy-600);flex-shrink:0;margin-top:3px;"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Assigned vehicle and driver details will appear in your bookings list as soon as the request is approved.</span>
         </div>
       </div>
 
       <div style="border-top: 1px solid var(--border); margin-top: 24px; padding-top: 20px;">
         <button type="button" class="btn btn-gold btn-lg" style="width: 100%; font-weight: 800; font-size: 15px;" onclick="submitNewBooking();">
-          تقديم طلب الحجز للتشغيل →
+          Submit Booking Request to Operations →
         </button>
       </div>
     </div>
@@ -271,7 +274,7 @@
         holdAmountEGP: 350.0
       });
 
-      alert(`✓ تم تقديم طلب الحجز بنجاح!\n\n• رقم الحجز: ${newBooking.id}\n• خط السير: ${newBooking.route}\n• فئة المركبة المطلوبة: ${vehicleCat}\n\nتم إحالة الطلب مباشرة إلى مدير التشغيل لاختيار وتخصيص المركبة وتعيين السائق.`);
+      alert(`Booking request submitted successfully!\n\n• Booking ID: ${newBooking.id}\n• Route: ${newBooking.route}\n• Required Vehicle Category: ${vehicleCat}\n\nThe request has been routed directly to Fleet Operations for vehicle and driver assignment.`);
       window.location.href = 'bookings.html';
     }
   </script>

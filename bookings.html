@@ -68,8 +68,14 @@
     <span class="page-subtitle">Track status and fuel reconciliation records</span>
   </div>
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-    <button class="btn btn-secondary btn-sm" onclick="clearAllData()" style="color:#C62828;">🗑 Clear All Data</button>
-    <button class="btn btn-secondary btn-sm" onclick="resetDemoData()">🔄 Reset Demo Data</button>
+    <button class="btn btn-secondary btn-sm" onclick="clearAllData()" style="color:#C62828; display:inline-flex; align-items:center; gap:6px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      <span>Clear All Data</span>
+    </button>
+    <button class="btn btn-secondary btn-sm" onclick="resetDemoData()" style="display:inline-flex; align-items:center; gap:6px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      <span>Reset Demo Data</span>
+    </button>
     <a href="booking-new.html" class="btn btn-gold">+ New Booking</a>
   </div>
 </div>
@@ -149,15 +155,15 @@
     function getStatusBadge(status) {
       switch (status) {
         case 'Pending':
-          return '<span class="badge badge-warning">Pending Review (قيد المراجعة)</span>';
+          return '<span class="badge badge-warning">Pending Review</span>';
         case 'Dispatched':
-          return '<span class="badge badge-info">Dispatched (تم التعيين)</span>';
+          return '<span class="badge badge-info">Dispatched</span>';
         case 'Active':
-          return '<span class="badge badge-primary" style="background:var(--navy-600);color:#fff;">Active Run (جارية الآن)</span>';
+          return '<span class="badge badge-primary" style="background:var(--navy-600);color:#fff;">Active Run</span>';
         case 'Closed':
-          return '<span class="badge badge-warning" style="background:#FFF3E0;color:#E65100;">Audit Pending (بانتظار التسوية)</span>';
+          return '<span class="badge badge-warning" style="background:#FFF3E0;color:#E65100;">Audit Pending</span>';
         case 'Completed':
-          return '<span class="badge badge-success">Completed ✓ (مكتملة ومطابقة)</span>';
+          return '<span class="badge badge-success">Completed</span>';
         default:
           return `<span class="badge badge-neutral">${status || 'Draft'}</span>`;
       }
@@ -172,11 +178,13 @@
         tbody.innerHTML = `
           <tr>
             <td colspan="7" style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
-              <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
-              <strong style="display:block; font-size:16px; color:var(--navy-800); margin-bottom:4px;">لا توجد أي حجوزات مسجلة حالياً (البيانات فارغة)</strong>
-              <span style="font-size:13px;">اضغط على <strong>+ New Booking</strong> لبدء تقديم طلب حجز مركبة لمهمة عمل رسمية.</span>
+              <div style="display:flex; justify-content:center; margin-bottom: 12px; color:var(--text-muted);">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+              </div>
+              <strong style="display:block; font-size:16px; color:var(--navy-800); margin-bottom:4px;">No bookings currently recorded</strong>
+              <span style="font-size:13px;">Click <strong>+ New Booking</strong> to submit a vehicle booking request for an official mission.</span>
               <div style="margin-top:16px;">
-                <a href="booking-new.html" class="btn btn-gold">+ تقديم طلب حجز جديد</a>
+                <a href="booking-new.html" class="btn btn-gold">+ Submit New Booking</a>
               </div>
             </td>
           </tr>
@@ -187,11 +195,11 @@
       tbody.innerHTML = bookings.map(b => {
         let allocatedVehicleHtml = '';
         if (b.status === 'Pending') {
-          allocatedVehicleHtml = '<span class="badge badge-neutral" style="background:#F0F4F8; color:var(--text-muted); font-size:12px;">قيد التخصيص بواسطة التشغيل</span>';
+          allocatedVehicleHtml = '<span class="badge badge-neutral" style="background:#F0F4F8; color:var(--text-muted); font-size:12px;">Pending Assignment by Operations</span>';
         } else {
           allocatedVehicleHtml = `
             <strong>${b.vehicle || 'Hyundai H-1 (V-122)'}</strong>
-            <div style="font-size:12px;color:var(--text-muted); margin-top:2px;">السائق: ${b.driver || 'Ahmed Hassan'}</div>
+            <div style="font-size:12px;color:var(--text-muted); margin-top:2px;">Driver: ${b.driver || 'Ahmed Hassan'}</div>
           `;
         }
 
@@ -210,7 +218,7 @@
               <div>${b.date || 'Today'}</div>
               <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">${b.departureTime || '09:00'}–${b.expectedEnd || '14:00'}</div>
             </td>
-            <td><span style="font-size:13px; font-weight:600; color:var(--navy-700);">${b.vehicleCategory || 'فان ركاب / ميكروباص'}</span></td>
+            <td><span style="font-size:13px; font-weight:600; color:var(--navy-700);">${b.vehicleCategory || 'Passenger Van / Minibus'}</span></td>
             <td>${allocatedVehicleHtml}</td>
             <td>${getStatusBadge(b.status)}</td>
             <td>
@@ -225,14 +233,14 @@
     }
 
     function clearAllData() {
-      if (confirm('تأكيد: هل تريد مسح كافة الحجوزات والبيانات لبدء سيناريو تجريبي فارغ من الصفر؟')) {
+      if (confirm('Confirm: Do you want to clear all bookings and data to start a clean scenario from scratch?')) {
         FleetStore.clearAll();
         renderBookingsTable();
       }
     }
 
     function resetDemoData() {
-      if (confirm('هل تريد استعادة بيانات الديمو التلقائية؟')) {
+      if (confirm('Do you want to restore default demo data?')) {
         FleetStore.resetDemo();
         renderBookingsTable();
       }

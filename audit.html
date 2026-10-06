@@ -222,7 +222,7 @@
         tbody.innerHTML = `
           <tr>
             <td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted);">
-              لا توجد رحلات مغلقة بانتظار الاعتماد المالي حالياً.
+              No closed trips currently awaiting financial reconciliation.
             </td>
           </tr>
         `;
@@ -237,11 +237,11 @@
 
         const statusBadge = isClosed 
           ? '<span class="badge badge-warning" style="background:#FFF3E0;color:#E65100;">Awaiting Settlement</span>'
-          : '<span class="badge badge-success">Reconciled ✓</span>';
+          : '<span class="badge badge-success">Reconciled</span>';
 
         const actionBtn = isClosed
-          ? `<button class="btn btn-gold btn-sm" onclick="handleReconcileTrip('${b.id}')">Approve &amp; Settle ✓</button>`
-          : `<span style="font-size:12px;color:var(--success);font-weight:700;">Cleared ✓</span>`;
+          ? `<button class="btn btn-gold btn-sm" onclick="handleReconcileTrip('${b.id}')">Approve &amp; Settle</button>`
+          : `<span style="font-size:12px;color:var(--success);font-weight:700;">Cleared</span>`;
 
         return `
           <tr style="${isClosed ? 'background: #FFFDF7;' : ''}">
@@ -262,7 +262,7 @@
 
     function handleReconcileTrip(id) {
       const reconciled = FleetStore.reconcileTrip(id, 'Verified fuel receipt & odometer. Cleared within ±10% threshold.');
-      alert(`✓ تم اعتماد المطابقة المالية للرحلة (${id}) بنجاح!\n\n• نسبة الفارق: ${reconciled ? reconciled.fuelVariancePct : 0}%\n• الحالة: مكتملة ومطابقة بالكامل (Reconciled)\n• تم قيد الخصم النهائي على موازنة الكلية بنجاح.`);
+      alert(`Financial reconciliation approved for trip (${id}) successfully!\n\n• Fuel Variance: ${reconciled ? reconciled.fuelVariancePct : 0}%\n• Status: Reconciled\n• Final chargeback successfully debited against departmental budget.`);
       renderAuditLedger();
     }
 

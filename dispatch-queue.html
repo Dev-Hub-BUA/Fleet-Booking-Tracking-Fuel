@@ -113,8 +113,8 @@
           <span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">BK-2047 · Dr. Sarah Mansour (Pharmacy)</span>
           <h2 style="margin: 4px 0 0; font-size: 22px; color: var(--navy-800);">Campus → Obour → 10th of Ramadan</h2>
           <div style="margin-top: 6px; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
-            <span style="color: var(--text-muted);">الفئة المطلوبة من طالب الحجز:</span>
-            <span class="badge badge-info" id="detail-requested-cat">فان ركاب / ميكروباص</span>
+            <span style="color: var(--text-muted);">Requested Vehicle Category:</span>
+            <span class="badge badge-info" id="detail-requested-cat">Passenger Van / Minibus</span>
           </div>
         </div>
         <div style="display: flex; gap: 16px; font-size: 14px;">
@@ -127,7 +127,7 @@
       <div class="alert-banner alert-info" style="margin-top: 14px;">
         <div style="display:flex; align-items:center; gap:8px;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <span><strong>تخصيص مسؤول التشغيل:</strong> راجع المركبات المتاحة في فئة الطلب أدناه وحدد المركبة والسائق المناسب لاعتماد الرحلة وترحيلها.</span>
+          <span><strong>Dispatcher Assignment:</strong> Review available vehicles in the requested category below and select the appropriate vehicle and driver to approve and dispatch this trip.</span>
         </div>
       </div>
     </div>
@@ -213,7 +213,7 @@
     </div>
 
     <div id="dispatch-actions-box" style="display: flex; justify-content: flex-end; gap: 14px; align-items: center;">
-      <button class="btn btn-danger" onclick="alert('تم رفض الطلب وإخطار مقدم الحجز بالسبب.');">Reject Request</button>
+      <button class="btn btn-danger" onclick="alert('Request rejected and requester has been notified with the reason.');">Reject Request</button>
       <button class="btn btn-gold btn-lg" id="btn-approve-dispatch" onclick="handleApproveBooking();">
         Approve &amp; Assign Vehicle →
       </button>
@@ -293,7 +293,7 @@
         const metaEl = document.querySelector('.card span[style*="font-mono"]');
         if (metaEl) metaEl.textContent = `${booking.id} · ${booking.requesterName} (${booking.dept})`;
         const catBadge = document.getElementById('detail-requested-cat');
-        if (catBadge) catBadge.textContent = booking.vehicleCategory || 'فان ركاب / ميكروباص';
+        if (catBadge) catBadge.textContent = booking.vehicleCategory || 'Passenger Van / Minibus';
       }
     }
 
@@ -321,13 +321,13 @@
       const box = document.getElementById('dispatch-actions-box');
       if (box) {
         box.innerHTML = `
-          <div class="alert-banner alert-success" style="flex: 1; margin: 0;">
-            ✓ <strong>تم اعتماد وترحيل الحجز (${approved ? approved.id : activeBookingId}) بنجاح!</strong> 
-            تم تخصيص المركبة (${vehicleModel}) وتكليف السائق (${driverName}). أصبحت المركبة ظاهرة الآن في حساب طالب الحجز.
+          <div class="alert-banner alert-success" style="flex: 1; margin: 0; display:flex; align-items:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-inline-end:8px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>Booking (${approved ? approved.id : activeBookingId}) approved and dispatched successfully!</strong> Assigned vehicle (${vehicleModel}) and driver (${driverName}). The assignment is now visible in the requester's portal.</span>
           </div>
           <div style="display:flex; gap:10px;">
-            <a href="bookings.html" class="btn btn-secondary">عرض الحجوزات</a>
-            <a href="driver-trip.html" class="btn btn-gold">الانتقال لشاشة السائق (Stage 3) →</a>
+            <a href="bookings.html" class="btn btn-secondary">View Bookings</a>
+            <a href="driver-trip.html" class="btn btn-gold">Go to Driver View (Stage 3) →</a>
           </div>
         `;
       }

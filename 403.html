@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>403 — غير مصرح بالوصول | منظومة أسطول سيرا</title>
+  <title>403 — Access Denied | CIRA Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -19,29 +19,29 @@
 
     <span style="font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--danger); letter-spacing: 0.1em; text-transform: uppercase;">HTTP 403 · Access Denied</span>
     <h1 style="font-family: var(--font-condensed); font-size: 32px; color: var(--cira-burgundy); margin: 8px 0 12px; font-weight: 800;">
-      غير مصرح لك بالوصول إلى هذه الشاشة
+      Access Denied to This Resource
     </h1>
     <p style="font-size: 15px; color: var(--text-muted); line-height: 1.6; margin: 0 0 24px;">
-      حسابك المؤسسي الحالي لا يملك الصلاحيات الإدارية المطلوبة لفتح هذا المسار. تم تطبيق قيود الأمان (Role-Based Access Control) لحماية سجلات وبيانات المنظومة.
+      Your institutional account does not possess the administrative privileges required to access this resource. Role-Based Access Control (RBAC) restrictions are enforced to protect system data and fleet audit records.
     </p>
 
-    <div style="background: var(--navy-50); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 28px; text-align: right; font-size: 13.5px;">
+    <div style="background: var(--navy-50); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 28px; text-align: left; font-size: 13.5px;">
       <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-        <span style="color: var(--text-muted);">المسار المطلوب:</span>
+        <span style="color: var(--text-muted);">Requested Path:</span>
         <strong id="denied-path" style="font-family: var(--font-mono); direction: ltr;">-</strong>
       </div>
       <div style="display: flex; justify-content: space-between;">
-        <span style="color: var(--text-muted);">صلاحية الحساب الحالية:</span>
+        <span style="color: var(--text-muted);">Current Account Role:</span>
         <strong id="current-role" style="color: var(--cira-burgundy);">-</strong>
       </div>
     </div>
 
     <div style="display: flex; gap: 12px; justify-content: center;">
       <a href="home.html" class="btn btn-primary btn-lg" style="text-decoration: none; padding: 12px 24px; font-weight: 700;">
-        العودة للوحة التحكم الرئيسية
+        Return to Dashboard
       </a>
       <a href="help.html" class="btn btn-secondary btn-lg" style="text-decoration: none; padding: 12px 20px;">
-        طلب صلاحية من مكتب الدعم
+        Request Access from Support
       </a>
     </div>
   </div>
