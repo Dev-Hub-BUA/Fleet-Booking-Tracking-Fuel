@@ -86,42 +86,11 @@
           <th style="text-align:right;">Act Fuel</th>
           <th style="text-align:right;">Delta %</th>
           <th>Audit Status</th>
+          <th>Action</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-      <td style="font-family:var(--font-mono); font-weight:700;">BK-2045</td>
-      <td>President’s Office</td>
-      <td><strong>Campus → Cairo Airport T3</strong></td>
-      <td style="font-family:var(--font-mono); text-align:right;">7.2 L</td>
-      <td style="font-family:var(--font-mono); text-align:right;">7 L</td>
-      <td style="font-family:var(--font-mono); text-align:right; font-weight:700; color:var(--success);">-2.8%</td>
-      <td><span class="badge badge-success">Reconciled</span></td>
-    </tr><tr>
-      <td style="font-family:var(--font-mono); font-weight:700;">BK-2040</td>
-      <td>Faculty of Science</td>
-      <td><strong>Campus → Ain Sokhna Site</strong></td>
-      <td style="font-family:var(--font-mono); text-align:right;">68 L</td>
-      <td style="font-family:var(--font-mono); text-align:right;">71.5 L</td>
-      <td style="font-family:var(--font-mono); text-align:right; font-weight:700; color:var(--danger);">5.1%</td>
-      <td><span class="badge badge-warning">Flagged (Anomaly)</span></td>
-    </tr><tr>
-      <td style="font-family:var(--font-mono); font-weight:700;">BK-2038</td>
-      <td>University Admin</td>
-      <td><strong>Campus → Ministry of Higher Ed</strong></td>
-      <td style="font-family:var(--font-mono); text-align:right;">8.4 L</td>
-      <td style="font-family:var(--font-mono); text-align:right;">8.1 L</td>
-      <td style="font-family:var(--font-mono); text-align:right; font-weight:700; color:var(--success);">-3.6%</td>
-      <td><span class="badge badge-success">Reconciled</span></td>
-    </tr><tr>
-      <td style="font-family:var(--font-mono); font-weight:700;">BK-2022</td>
-      <td>Engineering Projects</td>
-      <td><strong>Depot → New Administrative Capital</strong></td>
-      <td style="font-family:var(--font-mono); text-align:right;">24.5 L</td>
-      <td style="font-family:var(--font-mono); text-align:right;">24 L</td>
-      <td style="font-family:var(--font-mono); text-align:right; font-weight:700; color:var(--success);">-2%</td>
-      <td><span class="badge badge-success">Reconciled</span></td>
-    </tr>
+      <tbody id="audit-ledger-tbody">
+        <!-- Rendered dynamically via FleetStore -->
       </tbody>
     </table>
   </div>
@@ -238,12 +207,69 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
+    function renderAuditLedger() {
+      const tbody = document.getElementById('audit-ledger-tbody');
+      if (!tbody) return;
+
+      const bookings = FleetStore.getBookings();
+      // Show trips that have reached Closed or Completed, or have actual fuel
+      const auditable = bookings.filter(b => b.status === 'Closed' || b.status === 'Completed' || b.actualFuelLitres);
+
+      if (auditable.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted);">
+              لا توجد رحلات مغلقة بانتظار الاعتماد المالي حالياً.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = auditable.map(b => {
+        const isClosed = (b.status === 'Closed');
+        const delta = b.fuelVariancePct !== null && b.fuelVariancePct !== undefined ? b.fuelVariancePct : 0;
+        const deltaColor = Math.abs(delta) <= 10 ? 'var(--success)' : 'var(--danger)';
+        const deltaSign = delta > 0 ? '+' : '';
+
+        const statusBadge = isClosed 
+          ? '<span class="badge badge-warning" style="background:#FFF3E0;color:#E65100;">Awaiting Settlement</span>'
+          : '<span class="badge badge-success">Reconciled ✓</span>';
+
+        const actionBtn = isClosed
+          ? `<button class="btn btn-gold btn-sm" onclick="handleReconcileTrip('${b.id}')">Approve &amp; Settle ✓</button>`
+          : `<span style="font-size:12px;color:var(--success);font-weight:700;">Cleared ✓</span>`;
+
+        return `
+          <tr style="${isClosed ? 'background: #FFFDF7;' : ''}">
+            <td style="font-family:var(--font-mono); font-weight:700;">${b.id}</td>
+            <td>${b.dept || 'Academic Dept'}</td>
+            <td><strong>${b.route || (b.origin + ' → ' + b.destination)}</strong></td>
+            <td style="font-family:var(--font-mono); text-align:right;">${b.estFuelLiters || 14.1} L</td>
+            <td style="font-family:var(--font-mono); text-align:right;">${b.actualFuelLitres || 14.5} L</td>
+            <td style="font-family:var(--font-mono); text-align:right; font-weight:700; color:${deltaColor};">
+              ${deltaSign}${delta}%
+            </td>
+            <td>${statusBadge}</td>
+            <td>${actionBtn}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function handleReconcileTrip(id) {
+      const reconciled = FleetStore.reconcileTrip(id, 'Verified fuel receipt & odometer. Cleared within ±10% threshold.');
+      alert(`✓ تم اعتماد المطابقة المالية للرحلة (${id}) بنجاح!\n\n• نسبة الفارق: ${reconciled ? reconciled.fuelVariancePct : 0}%\n• الحالة: مكتملة ومطابقة بالكامل (Reconciled)\n• تم قيد الخصم النهائي على موازنة الكلية بنجاح.`);
+      renderAuditLedger();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Auditor"])) return;
       Auth.renderAppShell('audit');
-      
+      renderAuditLedger();
     });
   </script>
 </body>

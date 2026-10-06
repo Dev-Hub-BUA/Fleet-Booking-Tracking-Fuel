@@ -165,12 +165,41 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
+    let activeCloseTripId = 'BK-2047';
+
+    function handleCompleteAndClose() {
+      const returnOdoInput = document.querySelector('input[value="48,276"]') || document.querySelectorAll('.form-input')[1];
+      const endOdoVal = returnOdoInput ? parseInt(returnOdoInput.value.replace(/\D/g, ''), 10) : 48276;
+
+      const closed = FleetStore.closeTrip(activeCloseTripId, {
+        endOdo: endOdoVal || 48276,
+        fuelLitres: 14.5,
+        fuelCost: 297.25
+      });
+
+      alert(`✓ تم إغلاق الرحلة (${closed ? closed.id : activeCloseTripId}) بنجاح!\n\n• قراءة العداد النهائية: ${closed ? closed.actualOdoEnd : '48,276'} كم\n• الوقود الفعلي: ${closed ? closed.actualFuelLitres : 14.5} لتر\n• نسبة الفارق: ${closed ? closed.fuelVariancePct : 2.8}% (ضمن النطاق المسموح ±10%)\n\nتم إحالة الرحلة تلقائياً إلى إدارة المراجعة المالية والرقابية (Stage 4).`);
+      window.location.href = 'audit.html';
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
-      if (!Auth.requireAuth(["Driver"])) return;
+      if (!Auth.requireAuth(["Driver", "Auditor", "Dispatcher"])) return;
       Auth.renderAppShell('close');
-      
+
+      const bookings = FleetStore.getBookings();
+      const trip = bookings.find(b => b.status === 'Active' || b.status === 'Dispatched') || bookings[0];
+      if (trip) {
+        activeCloseTripId = trip.id;
+        const pretitle = document.querySelector('.page-pretitle');
+        if (pretitle) pretitle.textContent = `${trip.id} · Trip Completion`;
+      }
+
+      const closeBtn = document.querySelector('button.btn-gold.btn-lg');
+      if (closeBtn) {
+        closeBtn.onclick = handleCompleteAndClose;
+      }
     });
   </script>
 </body>

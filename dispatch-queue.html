@@ -209,8 +209,8 @@
     </div>
 
     <div id="dispatch-actions-box" style="display: flex; justify-content: flex-end; gap: 14px; align-items: center;">
-      <button class="btn btn-danger" onclick="alert('Booking request rejected. Requester notified with reason.');">Reject Request</button>
-      <button class="btn btn-gold btn-lg" onclick="document.getElementById('dispatch-actions-box').innerHTML = '<div class=\'alert-banner alert-success\' style=\'flex:1;\'>✓ <strong>Approved &amp; Assigned:</strong> Vehicle V-122 and Driver A locked. Dispatched to driver dashboard.</div><a href=\'dispatch-map.html\' class=\'btn btn-primary\'>View on Map →</a>';">
+      <button class="btn btn-danger" onclick="alert('تم رفض الطلب وإخطار مقدم الحجز بالسبب.');">Reject Request</button>
+      <button class="btn btn-gold btn-lg" id="btn-approve-dispatch" onclick="handleApproveBooking();">
         Approve &amp; Assign Vehicle →
       </button>
     </div>
@@ -265,23 +265,62 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
+    let activeBookingId = 'BK-2047';
+
+    function selectQueueItem(id) {
+      activeBookingId = id;
+      document.querySelectorAll('.dispatch-queue-card').forEach(c => {
+        c.style.borderColor = 'var(--border)';
+        c.style.background = '#FFFFFF';
+      });
+      const sel = document.getElementById('qcard-' + id);
+      if (sel) {
+        sel.style.borderColor = 'var(--navy-600)';
+        sel.style.background = 'var(--navy-50)';
+      }
+
+      const booking = FleetStore.getBooking(id);
+      if (booking) {
+        const titleEl = document.querySelector('.card h2');
+        if (titleEl) titleEl.textContent = booking.route || (booking.origin + ' → ' + booking.destination);
+        const metaEl = document.querySelector('.card span[style*="font-mono"]');
+        if (metaEl) metaEl.textContent = `${booking.id} · ${booking.requesterName} (${booking.dept})`;
+      }
+    }
+
+    function handleApproveBooking() {
+      const approved = FleetStore.approveBooking(activeBookingId, 'V-122', 'Ahmed Hassan (Driver A)');
+      const box = document.getElementById('dispatch-actions-box');
+      if (box) {
+        box.innerHTML = `
+          <div class="alert-banner alert-success" style="flex: 1; margin: 0;">
+            ✓ <strong>تم اعتماد وترحيل الحجز (${approved ? approved.id : activeBookingId}) بنجاح!</strong> 
+            تم تخصيص المركبة V-122 والكابتن أحمد حسن. الرحلة الآن جاهزة للمرحلة 3 (بدء السائق).
+          </div>
+          <div style="display:flex; gap:10px;">
+            <a href="driver-trip.html" class="btn btn-gold">الانتقال لشاشة السائق (Stage 3) →</a>
+            <a href="dispatch-map.html" class="btn btn-primary">خريطة التيليماتري الحية</a>
+          </div>
+        `;
+      }
+    }
+
+    function initQueue() {
+      const bookings = FleetStore.getBookings();
+      const pending = bookings.filter(b => b.status === 'Pending' || b.status === 'Dispatched');
+      if (pending.length > 0) {
+        activeBookingId = pending[0].id;
+        selectQueueItem(pending[0].id);
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Dispatcher"])) return;
       Auth.renderAppShell('dispatch');
-      
-function selectQueueItem(id) {
-  document.querySelectorAll('.dispatch-queue-card').forEach(c => {
-    c.style.borderColor = 'var(--border)';
-    c.style.background = '#FFFFFF';
-  });
-  const sel = document.getElementById('qcard-' + id);
-  if (sel) {
-    sel.style.borderColor = 'var(--navy-600)';
-    sel.style.background = 'var(--navy-50)';
-  }
-}
+      initQueue();
     });
   </script>
 </body>

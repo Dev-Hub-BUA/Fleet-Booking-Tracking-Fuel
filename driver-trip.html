@@ -192,12 +192,36 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
+    let currentTripId = 'BK-2047';
+
+    function handleStartTrip() {
+      FleetStore.startTrip(currentTripId);
+      window.location.href = 'driver-run.html';
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Driver"])) return;
       Auth.renderAppShell('trip');
-      
+
+      const bookings = FleetStore.getBookings();
+      const myTrip = bookings.find(b => b.status === 'Dispatched' || b.status === 'Active') || bookings[0];
+      if (myTrip) {
+        currentTripId = myTrip.id;
+        const pretitle = document.querySelector('.page-pretitle');
+        if (pretitle) pretitle.textContent = `${myTrip.id} · Active Manifest (${myTrip.statusAr || myTrip.status})`;
+        const subtitle = document.querySelector('.page-subtitle');
+        if (subtitle) subtitle.textContent = `${myTrip.vehicleCode || 'V-122'} (${myTrip.vehicle || 'Hyundai H-1'}) · Lead: ${myTrip.requesterName} (${myTrip.dept})`;
+      }
+
+      const runBtn = document.querySelector('a[href="driver-run.html"]');
+      if (runBtn) {
+        runBtn.removeAttribute('href');
+        runBtn.style.cursor = 'pointer';
+        runBtn.onclick = handleStartTrip;
+      }
     });
   </script>
 </body>

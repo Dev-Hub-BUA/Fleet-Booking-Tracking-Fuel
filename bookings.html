@@ -67,7 +67,11 @@
     <h1 class="page-title">My Bookings</h1>
     <span class="page-subtitle">Track status and fuel reconciliation records</span>
   </div>
-  <a href="booking-new.html" class="btn btn-gold">+ New Booking</a>
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <button class="btn btn-secondary btn-sm" onclick="clearAllData()" style="color:#C62828;">🗑 Clear All Data</button>
+    <button class="btn btn-secondary btn-sm" onclick="resetDemoData()">🔄 Reset Demo Data</button>
+    <a href="booking-new.html" class="btn btn-gold">+ New Booking</a>
+  </div>
 </div>
 
 <div class="card" style="padding: 0; overflow: hidden;">
@@ -84,134 +88,8 @@
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-      <td><span style="font-family:var(--font-mono);font-weight:700;">BK-2047</span></td>
-      <td>
-        <strong>Campus → Obour → 10th of Ramadan</strong>
-        <div style="font-size:12px;color:var(--text-muted);">Industrial Lab Equipment Collection & Student Site Visit</div>
-      </td>
-      <td>
-        <div>Tue 13 Oct 2026</div>
-        <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">08:30–14:00</div>
-      </td>
-      <td>Hyundai H-1 (V-122)</td>
-      <td>
-        <span style="font-family:var(--font-mono);font-size:13px;">14.1 L / <strong>13.6 L</strong></span>
-      </td>
-      <td><span class="badge badge-info">Active</span></td>
-      <td>
-        <div style="display:flex;gap:6px;">
-          <a href="booking-detail.html" class="btn btn-secondary btn-sm">Details</a>
-          <a href="booking-track.html" class="btn btn-primary btn-sm">Live</a>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="font-family:var(--font-mono);font-weight:700;">BK-2045</span></td>
-      <td>
-        <strong>Campus → Cairo Airport T3 (VIP Guest)</strong>
-        <div style="font-size:12px;color:var(--text-muted);">Visiting International Delegation Reception</div>
-      </td>
-      <td>
-        <div>Mon 12 Oct 2026</div>
-        <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">14:00–17:00</div>
-      </td>
-      <td>Toyota Corolla (V-205)</td>
-      <td>
-        <span style="font-family:var(--font-mono);font-size:13px;">7.2 L / <strong>7.0 L</strong></span>
-      </td>
-      <td><span class="badge badge-success">Completed</span></td>
-      <td>
-        <div style="display:flex;gap:6px;">
-          <a href="booking-detail.html" class="btn btn-secondary btn-sm">Details</a>
-          
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="font-family:var(--font-mono);font-weight:700;">BK-2040</span></td>
-      <td>
-        <strong>Campus → Ain Sokhna Marine Research Station</strong>
-        <div style="font-size:12px;color:var(--text-muted);">Marine Ecology Fieldwork Sample Collection</div>
-      </td>
-      <td>
-        <div>Fri 09 Oct 2026</div>
-        <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">06:00–20:00</div>
-      </td>
-      <td>MCV 500 Bus (B-07)</td>
-      <td>
-        <span style="font-family:var(--font-mono);font-size:13px;">68.0 L / <strong>71.5 L</strong></span>
-      </td>
-      <td><span class="badge badge-success">Completed</span></td>
-      <td>
-        <div style="display:flex;gap:6px;">
-          <a href="booking-detail.html" class="btn btn-secondary btn-sm">Details</a>
-          
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="font-family:var(--font-mono);font-weight:700;">BK-2038</span></td>
-      <td>
-        <strong>Campus → Ministry of Higher Education</strong>
-        <div style="font-size:12px;color:var(--text-muted);">Official Accreditation Dossier Submission</div>
-      </td>
-      <td>
-        <div>Thu 08 Oct 2026</div>
-        <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">09:00–13:00</div>
-      </td>
-      <td>Hyundai Elantra (S-11)</td>
-      <td>
-        <span style="font-family:var(--font-mono);font-size:13px;">8.4 L / <strong>8.1 L</strong></span>
-      </td>
-      <td><span class="badge badge-success">Completed</span></td>
-      <td>
-        <div style="display:flex;gap:6px;">
-          <a href="booking-detail.html" class="btn btn-secondary btn-sm">Details</a>
-          
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="font-family:var(--font-mono);font-weight:700;">BK-2031</span></td>
-      <td>
-        <strong>Campus → Heliopolis Medical Complex</strong>
-        <div style="font-size:12px;color:var(--text-muted);">Clinical Internship Supervisor Round</div>
-      </td>
-      <td>
-        <div>Mon 05 Oct 2026</div>
-        <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">10:00–15:00</div>
-      </td>
-      <td>Nissan Urvan (V-108)</td>
-      <td>
-        <span style="font-family:var(--font-mono);font-size:13px;">11.0 L / <strong>—</strong></span>
-      </td>
-      <td><span class="badge badge-neutral">Cancelled</span></td>
-      <td>
-        <div style="display:flex;gap:6px;">
-          <a href="booking-detail.html" class="btn btn-secondary btn-sm">Details</a>
-          
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="font-family:var(--font-mono);font-weight:700;">BK-2022</span></td>
-      <td>
-        <strong>Depot → New Administrative Capital Site</strong>
-        <div style="font-size:12px;color:var(--text-muted);">Construction Surveying & Material Testing</div>
-      </td>
-      <td>
-        <div>Sun 27 Sep 2026</div>
-        <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">08:00–16:00</div>
-      </td>
-      <td>Isuzu NPR Truck (T-02)</td>
-      <td>
-        <span style="font-family:var(--font-mono);font-size:13px;">24.5 L / <strong>24.0 L</strong></span>
-      </td>
-      <td><span class="badge badge-success">Completed</span></td>
-      <td>
-        <div style="display:flex;gap:6px;">
-          <a href="booking-detail.html" class="btn btn-secondary btn-sm">Details</a>
-          
-        </div>
-      </td>
-    </tr>
+      <tbody id="bookings-table-body">
+        <!-- Rendered dynamically via FleetStore -->
       </tbody>
     </table>
   </div>
@@ -265,12 +143,99 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
+    function getStatusBadge(status) {
+      switch (status) {
+        case 'Pending':
+          return '<span class="badge badge-warning">Pending Review</span>';
+        case 'Dispatched':
+          return '<span class="badge badge-info">Dispatched</span>';
+        case 'Active':
+          return '<span class="badge badge-primary" style="background:var(--navy-600);color:#fff;">Active Run</span>';
+        case 'Closed':
+          return '<span class="badge badge-warning" style="background:#FFF3E0;color:#E65100;">Audit Pending</span>';
+        case 'Completed':
+          return '<span class="badge badge-success">Completed ✓</span>';
+        default:
+          return `<span class="badge badge-neutral">${status || 'Draft'}</span>`;
+      }
+    }
+
+    function renderBookingsTable() {
+      const tbody = document.getElementById('bookings-table-body');
+      if (!tbody) return;
+      const bookings = FleetStore.getBookings();
+
+      if (!bookings || bookings.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+              <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
+              <strong style="display:block; font-size:16px; color:var(--navy-800); margin-bottom:4px;">لا توجد أي حجوزات مسجلة حالياً (البيانات فارغة)</strong>
+              <span style="font-size:13px;">اضغط على <strong>+ New Booking</strong> لبدء المرحلة الأولى (Stage 1) وتقديم أول حجز رسمي.</span>
+              <div style="margin-top:16px;">
+                <a href="booking-new.html" class="btn btn-gold">+ تقديم طلب حجز جديد</a>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = bookings.map(b => {
+        const estActFuel = b.actualFuelLitres 
+          ? `${b.estFuelLiters || '—'} L / <strong>${b.actualFuelLitres} L</strong>`
+          : `${b.estFuelLiters || '—'} L / <span style="color:var(--text-muted);">—</span>`;
+
+        const trackBtn = (b.status === 'Active' || b.status === 'Dispatched')
+          ? `<a href="booking-track.html?id=${b.id}" class="btn btn-gold btn-sm">Track</a>`
+          : '';
+
+        return `
+          <tr>
+            <td><span style="font-family:var(--font-mono);font-weight:700;">${b.id}</span></td>
+            <td>
+              <strong>${b.route || (b.origin + ' → ' + b.destination)}</strong>
+              <div style="font-size:12px;color:var(--text-muted);">${b.purpose || 'Official Delegation'}</div>
+            </td>
+            <td>
+              <div>${b.date || 'Today'}</div>
+              <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">${b.departureTime || '09:00'}–${b.expectedEnd || '14:00'}</div>
+            </td>
+            <td>${b.vehicle || 'Pending Allocation'}</td>
+            <td><span style="font-family:var(--font-mono);font-size:13px;">${estActFuel}</span></td>
+            <td>${getStatusBadge(b.status)}</td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <a href="booking-detail.html?id=${b.id}" class="btn btn-secondary btn-sm">Details</a>
+                ${trackBtn}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function clearAllData() {
+      if (confirm('تأكيد: هل تريد مسح كافة الحجوزات والبيانات لبدء سيناريو تجريبي فارغ من الصفر؟')) {
+        FleetStore.clearAll();
+        renderBookingsTable();
+      }
+    }
+
+    function resetDemoData() {
+      if (confirm('هل تريد استعادة بيانات الديمو التلقائية؟')) {
+        FleetStore.resetDemo();
+        renderBookingsTable();
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Requester"])) return;
       Auth.renderAppShell('bookings');
-      
+      renderBookingsTable();
     });
   </script>
 </body>

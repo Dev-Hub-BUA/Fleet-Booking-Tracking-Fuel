@@ -144,12 +144,19 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Driver"])) return;
       Auth.renderAppShell('run');
-      
+
+      const bookings = FleetStore.getBookings();
+      const trip = bookings.find(b => b.status === 'Active' || b.status === 'Dispatched') || bookings[0];
+      if (trip) {
+        const pretitle = document.querySelector('.page-pretitle');
+        if (pretitle) pretitle.textContent = `${trip.id} · Navigation Active`;
+      }
     });
   </script>
 </body>

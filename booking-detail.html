@@ -253,25 +253,38 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      if (!Auth.requireAuth(["Requester", "Dispatcher", "Auditor"])) return;
+      if (!Auth.requireAuth(["Requester", "Dispatcher", "Auditor", "Driver", "Fleet admin"])) return;
       Auth.renderAppShell('bookings');
-      
-function sendChat() {
-  const input = document.getElementById('chat-msg-input');
-  const container = document.getElementById('chat-messages-container');
-  if (input && input.value.trim()) {
-    const bubble = document.createElement('div');
-    bubble.style.cssText = 'align-self: flex-end; max-width: 85%; background: var(--navy-100); padding: 10px 14px; border-radius: 10px; margin-top: 6px;';
-    bubble.innerHTML = '<div style="font-size: 11px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">Dr. Sarah Mansour (You) · Just now</div><div style="font-size: 14px;">' + input.value.trim() + '</div>';
-    container.appendChild(bubble);
-    input.value = '';
-    container.scrollTop = container.scrollHeight;
-  }
-}
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqId = urlParams.get('id');
+      const booking = reqId ? FleetStore.getBooking(reqId) : FleetStore.getBookings()[0];
+
+      if (booking) {
+        const pretitle = document.querySelector('.page-pretitle');
+        if (pretitle) pretitle.textContent = `${booking.id} · Lifecycle Status (${booking.statusAr || booking.status})`;
+        const subtitle = document.querySelector('.page-subtitle');
+        if (subtitle) subtitle.textContent = booking.route || (booking.origin + ' → ' + booking.destination);
+      }
     });
+
+    function sendChat() {
+      const input = document.getElementById('chat-msg-input');
+      const container = document.getElementById('chat-messages-container');
+      if (input && input.value.trim()) {
+        const user = Auth.getUser() || { name: 'You' };
+        const bubble = document.createElement('div');
+        bubble.style.cssText = 'align-self: flex-end; max-width: 85%; background: var(--navy-100); padding: 10px 14px; border-radius: 10px; margin-top: 6px;';
+        bubble.innerHTML = '<div style="font-size: 11px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">' + user.name + ' · Just now</div><div style="font-size: 14px;">' + input.value.trim() + '</div>';
+        container.appendChild(bubble);
+        input.value = '';
+        container.scrollTop = container.scrollHeight;
+      }
+    }
   </script>
 </body>
 </html>

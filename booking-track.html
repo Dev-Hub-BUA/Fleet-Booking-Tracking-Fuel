@@ -181,12 +181,26 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      if (!Auth.requireAuth(["Requester"])) return;
+      if (!Auth.requireAuth(["Requester", "Dispatcher"])) return;
       Auth.renderAppShell('track');
-      
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqId = urlParams.get('id');
+      const bookings = FleetStore.getBookings();
+      const trip = (reqId ? bookings.find(b => b.id === reqId) : null) || bookings.find(b => b.status === 'Active' || b.status === 'Dispatched') || bookings[0];
+
+      if (trip) {
+        const pretitle = document.querySelector('.page-pretitle');
+        if (pretitle) pretitle.textContent = `${trip.id} · Real-Time Telemetry (${trip.statusAr || trip.status})`;
+        const cardTitle = document.querySelector('.card strong');
+        // Update driver / vehicle details if elements exist
+        const vehicleInfo = document.querySelector('.card div strong');
+        if (vehicleInfo && trip.vehicle) vehicleInfo.textContent = trip.vehicle;
+      }
     });
   </script>
 </body>

@@ -87,7 +87,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">B · Destination</label>
-          <input type="text" class="form-input" value="Plant 3 — 10th of Ramadan">
+          <input type="text" class="form-input" id="route-dest" value="Plant 3 — 10th of Ramadan Industrial Zone">
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px;">
           <button type="button" class="btn btn-secondary btn-sm" onclick="alert('Added stop waypoint');">+ Add Stop</button>
@@ -103,15 +103,15 @@
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
         <div class="form-group">
           <label class="form-label">Date</label>
-          <input type="date" class="form-input" value="2026-10-13">
+          <input type="date" class="form-input" id="route-date" value="2026-10-14">
         </div>
         <div class="form-group">
           <label class="form-label">Departure</label>
-          <input type="time" class="form-input" value="08:30">
+          <input type="time" class="form-input" id="route-time-dep" value="09:00">
         </div>
         <div class="form-group">
           <label class="form-label">Expected End</label>
-          <input type="time" class="form-input" value="14:00">
+          <input type="time" class="form-input" id="route-time-end" value="15:00">
         </div>
       </div>
     </div>
@@ -121,15 +121,15 @@
       <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
         <div class="form-group">
           <label class="form-label">Passengers</label>
-          <input type="number" class="form-input" value="4">
+          <input type="number" class="form-input" id="route-pax" value="4">
         </div>
         <div class="form-group">
           <label class="form-label">Cargo Weight (kg)</label>
-          <input type="number" class="form-input" value="350">
+          <input type="number" class="form-input" id="route-cargo" value="350">
         </div>
         <div class="form-group" style="grid-column: span 2;">
           <label class="form-label">Mission Purpose</label>
-          <textarea class="form-textarea">Industrial Lab Equipment Collection & Student Site Visit</textarea>
+          <textarea class="form-textarea" id="route-purpose">Industrial Lab Equipment Collection & Student Site Visit</textarea>
         </div>
       </div>
     </div>
@@ -143,21 +143,21 @@
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 10px;">
         <div>
           <span style="font-size: 12px; color: #9FB0C8; display: block;">Distance</span>
-          <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700;">61.4 km</span>
+          <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700;" id="est-dist">61.4 km</span>
         </div>
         <div>
           <span style="font-size: 12px; color: #9FB0C8; display: block;">Fuel</span>
-          <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700;">14.1 L</span>
+          <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700;" id="est-fuel">14.1 L</span>
         </div>
         <div>
           <span style="font-size: 12px; color: #9FB0C8; display: block;">Est. Cost</span>
-          <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--gold-500);">EGP 289.05</span>
+          <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--gold-500);" id="est-cost">EGP 289.05</span>
         </div>
       </div>
 
       <div style="border-top: 1px solid rgba(255,255,255,0.15); margin-top: 16px; padding-top: 16px; font-size: 13px; color: #DCE4EF; display: flex; flex-direction: column; gap: 8px;">
         <div><strong>Pre-Auth Hold:</strong> EGP 350.00</div>
-        <div><strong>Hold Window:</strong> 08:00 – 14:30 (Includes preparation & return buffers)</div>
+        <div><strong>Hold Window:</strong> 08:30 – 15:30 (Includes preparation &amp; return buffers)</div>
         <div><strong>Fuel Basis:</strong> Diesel EGP 20.50/L (Price Book v3)</div>
       </div>
 
@@ -165,7 +165,7 @@
         ✓ <strong>Faculty Quota Check:</strong> EGP 14,200 remaining in Pharmacy Operations budget. Request is authorized.
       </div>
 
-      <button type="button" class="btn btn-gold btn-lg" style="margin-top: 16px; width: 100%;" onclick="alert('Booking request submitted successfully! Forwarded to Dispatch Operations.'); window.location.href='bookings.html';">
+      <button type="button" class="btn btn-gold btn-lg" style="margin-top: 16px; width: 100%; font-weight:800;" onclick="submitNewBooking();">
         Submit for Approval →
       </button>
     </div>
@@ -220,13 +220,46 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Requester"])) return;
       Auth.renderAppShell('booking-new');
-      
     });
+
+    function submitNewBooking() {
+      const origin = document.getElementById('route-origin').value.trim();
+      const dest = document.getElementById('route-dest').value.trim();
+      const date = document.getElementById('route-date').value;
+      const depTime = document.getElementById('route-time-dep').value;
+      const endTime = document.getElementById('route-time-end').value;
+      const pax = document.getElementById('route-pax').value;
+      const cargo = document.getElementById('route-cargo').value;
+      const purpose = document.getElementById('route-purpose').value.trim();
+
+      const user = Auth.getUser() || { name: 'Dr. Sarah Mansour', dept: 'Faculty of Pharmacy' };
+
+      const newBooking = FleetStore.createBooking({
+        origin: origin,
+        destination: dest,
+        date: date,
+        departureTime: depTime,
+        expectedEnd: endTime,
+        passengers: pax,
+        cargoWeightKg: cargo,
+        purpose: purpose,
+        requesterName: user.name,
+        dept: user.dept,
+        distanceKm: 61.4,
+        estFuelLiters: 14.1,
+        estCostEGP: 289.05,
+        holdAmountEGP: 350.0
+      });
+
+      alert(`✓ تم تقديم طلب الحجز بنجاح!\n\n• رقم الحجز: ${newBooking.id}\n• خط السير: ${newBooking.route}\n• التكلفة التقديرية: ${newBooking.estCostEGP} EGP\n\nتم إحالة الطلب مباشرة إلى مسؤول الترحيل للاعتماد.`);
+      window.location.href = 'bookings.html';
+    }
   </script>
 </body>
 </html>
