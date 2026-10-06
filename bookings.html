@@ -76,7 +76,10 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       <span>Reset Demo Data</span>
     </button>
-    <a href="booking-new.html" class="btn btn-gold">+ New Booking</a>
+    <a href="booking-new.html" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>New Booking</span>
+    </a>
   </div>
 </div>
 
@@ -182,9 +185,12 @@
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
               </div>
               <strong style="display:block; font-size:16px; color:var(--navy-800); margin-bottom:4px;">No bookings currently recorded</strong>
-              <span style="font-size:13px;">Click <strong>+ New Booking</strong> to submit a vehicle booking request for an official mission.</span>
+              <span style="font-size:13px;">Submit a vehicle booking request for your official mission.</span>
               <div style="margin-top:16px;">
-                <a href="booking-new.html" class="btn btn-gold">+ Submit New Booking</a>
+                <a href="booking-new.html" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>Submit New Booking</span>
+                </a>
               </div>
             </td>
           </tr>
@@ -204,7 +210,7 @@
         }
 
         const trackBtn = (b.status === 'Active' || b.status === 'Dispatched')
-          ? `<a href="booking-track.html?id=${b.id}" class="btn btn-gold btn-sm">Track</a>`
+          ? `<a href="booking-track.html?id=${b.id}" class="btn btn-gold btn-sm" style="display:inline-flex; align-items:center; gap:4px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg><span>Track</span></a>`
           : '';
 
         return `
@@ -223,7 +229,7 @@
             <td>${getStatusBadge(b.status)}</td>
             <td>
               <div style="display:flex;gap:6px;">
-                <a href="booking-detail.html?id=${b.id}" class="btn btn-secondary btn-sm">Details</a>
+                <a href="booking-detail.html?id=${b.id}" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:4px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg><span>Details</span></a>
                 ${trackBtn}
               </div>
             </td>
