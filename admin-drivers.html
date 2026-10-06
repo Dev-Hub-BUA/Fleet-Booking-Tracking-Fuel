@@ -376,10 +376,17 @@
         const siteName = site ? site.name : 'Unassigned';
         const siteCity = site ? site.city : '';
 
-        const isExpired = new Date(d.expires) < new Date();
-        const complianceBadge = isExpired
-          ? '<span class="badge badge-danger">Expired</span>'
-          : '<span class="badge badge-success">Valid</span>';
+        const expiryDate = new Date(d.expires);
+        const today = new Date();
+        const diffDays = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        let complianceBadge = '';
+        if (diffDays < 0) {
+          complianceBadge = '<span class="badge badge-danger">Expired</span>';
+        } else if (diffDays <= 30) {
+          complianceBadge = `<span class="badge badge-warning" title="${diffDays} days remaining">Expiring (< 30d)</span>`;
+        } else {
+          complianceBadge = '<span class="badge badge-success">Valid</span>';
+        }
 
         let statusBadge = '<span class="badge badge-success">Available</span>';
         if (d.status === 'On trip') statusBadge = '<span class="badge badge-success">On Shift</span>';

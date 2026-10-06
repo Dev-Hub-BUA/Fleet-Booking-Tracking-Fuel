@@ -980,7 +980,23 @@
       estimate: estimate,
       history: history,
       messages: messages,
-      return_match_savings: raw.return_match_savings || null
+      return_match_savings: raw.return_match_savings || null,
+      actuals: raw.actuals || null,
+      actualFuelLitres: raw.actualFuelLitres !== undefined ? raw.actualFuelLitres : (raw.actuals ? raw.actuals.fuel_liters : undefined),
+      actualOdoStart: raw.actualOdoStart !== undefined ? raw.actualOdoStart : (raw.actuals ? raw.actuals.odometer_start : undefined),
+      actualOdoEnd: raw.actualOdoEnd !== undefined ? raw.actualOdoEnd : (raw.actuals ? raw.actuals.odometer_end : undefined),
+      fuelVariancePct: raw.fuelVariancePct !== undefined ? raw.fuelVariancePct : undefined,
+      reconciled: Boolean(raw.reconciled),
+      reconciled_at: raw.reconciled_at || null,
+      reconciled_notes: raw.reconciled_notes || null,
+      passenger_events: Array.isArray(raw.passenger_events) ? raw.passenger_events : [],
+      fuel_logs: Array.isArray(raw.fuel_logs) ? raw.fuel_logs : [],
+      start_odometer_km: raw.start_odometer_km !== undefined ? raw.start_odometer_km : (raw.start_odometer ? raw.start_odometer.km : null),
+      start_odometer_photo_id: raw.start_odometer_photo_id || (raw.start_odometer ? raw.start_odometer.photo_id : null),
+      start_odometer_note: raw.start_odometer_note || '',
+      end_odometer_km: raw.end_odometer_km !== undefined ? raw.end_odometer_km : (raw.end_odometer ? raw.end_odometer.km : (raw.actuals ? raw.actuals.odometer_end : null)),
+      end_odometer_photo_id: raw.end_odometer_photo_id || (raw.end_odometer ? raw.end_odometer.photo_id : null),
+      end_odometer_note: raw.end_odometer_note || ''
     };
   }
 
@@ -1740,6 +1756,9 @@
 
       // Migrate existing vehicle and driver home sites
       (parsed.vehicles || []).forEach(v => {
+        if (v.last_odometer_km === undefined) {
+          v.last_odometer_km = Number(v.odo || 0);
+        }
         if (!v.home_site_id) {
           const loc = (v.location || '').toLowerCase();
           const base = (v.base || '').toLowerCase();
@@ -3570,58 +3589,505 @@
       return updatedCanonical;
     },
 
-    startTrip: function (id) {
+    startTrip: function (id, driverName = 'Driver') {
+      return this.startTripWithOdometer(id, {
+        odometer_km: 0,
+        photo_id: null,
+        note: 'Direct start'
+      }, driverName);
+    },
+
+    startTripWithOdometer: function (id, payload = {}, driverName = 'Driver') {
       const data = this.load();
       const b = data.bookings.find(item => item.id === id);
       if (!b) return null;
 
+      const odoKm = Number(payload.odometer_km !== undefined ? payload.odometer_km : (payload.odo || 0));
+      const photoId = payload.photo_id || payload.start_odometer_photo_id || null;
+      const note = payload.note || payload.start_odometer_note || '';
+
+      const vCode = b.assignment ? b.assignment.vehicle_id : null;
+      const v = vCode ? (data.vehicles || []).find(veh => veh.code === vCode || veh.id === vCode) : null;
+      const lastOdo = v ? Number(v.last_odometer_km !== undefined ? v.last_odometer_km : (v.odo || 0)) : 0;
+      const diff = odoKm - lastOdo;
+
+      if (v && (diff < 0 || diff > 500) && !note && odoKm > 0) {
+        throw new Error(`Odometer discrepancy (${lastOdo} -> ${odoKm} km, diff ${diff} km) requires an explanatory note.`);
+      }
+
       b.status = 'Active';
+      b.start_odometer_km = odoKm;
+      b.start_odometer_photo_id = photoId;
+      b.start_odometer_note = note;
+      b.actualOdoStart = odoKm;
+
+      if (v) {
+        v.status = 'On trip';
+        if (odoKm > 0) {
+          v.last_odometer_km = odoKm;
+          v.odo = odoKm;
+        }
+      }
+
+      if (Array.isArray(b.itinerary) && b.itinerary[0]) {
+        b.itinerary[0].actual_status = 'Departed';
+        b.itinerary[0].actual_time = toEgyptISOString(new Date());
+      }
+
       b.history.push({
         status: 'Active',
         at: toEgyptISOString(new Date()),
-        by: 'Driver',
-        note: 'Trip started. Live GPS telemetry streaming to Dispatch Map Hub.'
+        by: driverName,
+        note: `Trip started. Verified departure odometer: ${odoKm} km. Live photo: ${photoId || 'None'}${note ? '. Note: ' + note : ''}.`
       });
 
       data.auditTrail = data.auditTrail || [];
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
-        user: 'Driver',
-        action: 'Start Trip & GPS Run',
+        user: driverName,
+        action: 'Start Trip & Verify Departure Odometer',
         ref: id,
-        details: 'Trip started. Live GPS telemetry streaming to Dispatch Map Hub.'
+        details: `Trip started. Departure odometer: ${odoKm} km verified with live photo ${photoId || 'None'}.`
       });
 
       this.save(data);
       return b;
     },
 
-    closeTrip: function (id, payload) {
+    advanceTripWaypoint: function (id, stopIndex, actionName, driverName = 'Driver') {
       const data = this.load();
       const b = data.bookings.find(item => item.id === id);
       if (!b) return null;
 
-      b.status = 'Closed';
+      if (Array.isArray(b.itinerary) && b.itinerary[stopIndex]) {
+        b.itinerary[stopIndex].actual_status = actionName;
+        b.itinerary[stopIndex].actual_time = toEgyptISOString(new Date());
+      }
+
       b.history.push({
-        status: 'Closed',
+        status: b.status,
         at: toEgyptISOString(new Date()),
-        by: 'Driver',
-        note: `Trip closed. End Odo: ${payload.endOdo || 'Recorded'}. Fuel: ${payload.fuelLitres || 'Recorded'}L.`
+        by: driverName,
+        note: `Waypoint #${stopIndex + 1} (${(b.itinerary && b.itinerary[stopIndex] && b.itinerary[stopIndex].place_name) || 'Stop'}): ${actionName}`
+      });
+
+      this.save(data);
+      return b;
+    },
+
+    closeTrip: function (id, payload, driverName = 'Driver') {
+      const data = this.load();
+      const b = data.bookings.find(item => item.id === id);
+      if (!b) return null;
+
+      const startOdo = Number(payload.start_odometer_km !== undefined ? payload.start_odometer_km : (payload.startOdo !== undefined ? payload.startOdo : (payload.odometer_start !== undefined ? payload.odometer_start : (b.start_odometer_km || 0))));
+      const endOdo = Number(payload.end_odometer_km !== undefined ? payload.end_odometer_km : (payload.endOdo !== undefined ? payload.endOdo : (payload.odometer_end !== undefined ? payload.odometer_end : startOdo)));
+      const kmTravelled = Math.max(0, endOdo - startOdo);
+      const fuelLiters = Number(payload.fuelLiters !== undefined ? payload.fuelLiters : (payload.fuelLitres || 0));
+      const receiptAmount = Number(payload.receiptAmount !== undefined ? payload.receiptAmount : (payload.cost_egp || 0));
+      const endPhotoId = payload.end_odometer_photo_id || null;
+      const endNote = payload.end_odometer_note || '';
+
+      b.status = 'Completed';
+      b.end_odometer_km = endOdo;
+      b.end_odometer_photo_id = endPhotoId;
+      b.end_odometer_note = endNote;
+      b.actuals = {
+        odometer_start: startOdo,
+        odometer_end: endOdo,
+        km_travelled: kmTravelled,
+        fuel_liters: fuelLiters,
+        receipt_amount_egp: receiptAmount,
+        notes: payload.notes || 'Trip closed by driver',
+        end_odometer_photo_id: endPhotoId
+      };
+
+      b.history.push({
+        status: 'Completed',
+        at: toEgyptISOString(new Date()),
+        by: driverName,
+        note: `Trip completed. Odometer: ${startOdo} → ${endOdo} (${kmTravelled} km). End photo: ${endPhotoId || 'None'}. Fuel added: ${fuelLiters} L. Notes: ${payload.notes || 'None'}.`
       });
 
       data.auditTrail = data.auditTrail || [];
       data.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
-        user: 'Driver',
-        action: 'Close Trip & Fuel Receipt',
+        user: driverName,
+        action: 'Close Trip & Submit Actuals',
         ref: id,
-        details: 'Trip closed.'
+        details: `Trip completed with ${kmTravelled} km recorded, return odometer photo ${endPhotoId || 'None'}, and ${fuelLiters} L fuel reported.`
       });
+
+      data.notifications = data.notifications || [];
+      data.notifications.unshift({
+        id: 'NOTIF-' + Date.now(),
+        targetRole: 'Auditor',
+        title: `Trip ${id} Completed`,
+        message: `${driverName} submitted return odometer photo and fuel receipt for trip ${id}. Ready for compliance audit.`,
+        time: 'Just now',
+        read: false,
+        link: 'audit.html'
+      });
+
+      const estLit = (b.estimate && b.estimate.fuel_liters) || b.estFuelLiters || 14.1;
+      b.actualFuelLitres = fuelLiters;
+      b.actualOdoStart = startOdo;
+      b.actualOdoEnd = endOdo;
+      b.fuelVariancePct = estLit > 0 ? Number((((fuelLiters - estLit) / estLit) * 100).toFixed(1)) : 0;
+
+      const vCode = (b.assignment && b.assignment.vehicle_id) || b.vehicleCode;
+      if (vCode) {
+        const v = (data.vehicles || []).find(veh => veh.code === vCode || veh.id === vCode);
+        if (v) {
+          v.status = 'Available';
+          if (endOdo > 0) {
+            v.last_odometer_km = endOdo;
+            v.odo = endOdo;
+          }
+        }
+      }
+      if (b.assignment && Array.isArray(b.assignment.driver_ids)) {
+        b.assignment.driver_ids.forEach(dId => {
+          const drv = (data.drivers || []).find(d => d.id === dId);
+          if (drv) drv.status = 'Available';
+        });
+      }
 
       this.save(data);
       return b;
+    },
+
+    addPassengerEvent: function (id, eventData = {}) {
+      const data = this.load();
+      const b = data.bookings.find(item => item.id === id);
+      if (!b) return null;
+
+      if (eventData.type === 'boarded' && b.status !== 'Active') {
+        throw new Error('Requester cannot board before the driver has started the trip.');
+      }
+
+      b.passenger_events = b.passenger_events || [];
+      const newEvent = {
+        id: 'PEV-' + Date.now() + '-' + Math.floor(100 + Math.random() * 900),
+        type: eventData.type,
+        at: toEgyptISOString(new Date()),
+        by: (eventData.user && eventData.user.id) || (b.requester && b.requester.id) || 'USR-REQ-101',
+        requester_name: (eventData.user && eventData.user.name) || (b.requester && b.requester.name) || 'Demo Requester 1',
+        lat: eventData.lat !== undefined ? eventData.lat : null,
+        lng: eventData.lng !== undefined ? eventData.lng : null,
+        reason: eventData.reason || '',
+        note: eventData.note || '',
+        status: 'awaiting_driver'
+      };
+
+      b.passenger_events.push(newEvent);
+
+      const typeDisplay = eventData.type === 'boarded'
+        ? 'Boarded vehicle'
+        : (eventData.type === 'stopped'
+          ? `Stopped / got off (${eventData.reason || 'Stop'})`
+          : (eventData.type === 'moving'
+            ? 'Back in vehicle / moving again'
+            : 'Trip finished'));
+
+      const nowTimeStr = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+      b.history.push({
+        status: b.status,
+        at: toEgyptISOString(new Date()),
+        by: `${newEvent.requester_name} (Requester)`,
+        note: `Passenger check-in: ${typeDisplay}. Awaiting driver confirmation.`
+      });
+
+      data.notifications = data.notifications || [];
+      const assignedDriverId = (b.assignment && Array.isArray(b.assignment.driver_ids) && b.assignment.driver_ids[0]) || null;
+      data.notifications.unshift({
+        id: 'NOTIF-' + Date.now(),
+        targetRole: 'Driver',
+        driver_id: assignedDriverId,
+        title: `Passenger Check-In (${b.id})`,
+        message: `${newEvent.requester_name} reports: ${typeDisplay} at ${nowTimeStr}. Please confirm.`,
+        time: 'Just now',
+        read: false,
+        link: `driver-run.html?id=${b.id}`
+      });
+
+      this.save(data);
+      return newEvent;
+    },
+
+    confirmPassengerEvent: function (id, eventId, isConfirmed, driverNote = '', adjustedTime = null) {
+      const data = this.load();
+      const b = data.bookings.find(item => item.id === id);
+      if (!b || !Array.isArray(b.passenger_events)) return null;
+
+      const evt = b.passenger_events.find(e => e.id === eventId);
+      if (!evt) return null;
+
+      const driverName = driverNote ? (driverNote.by || 'Demo Driver 01') : 'Demo Driver 01';
+
+      if (isConfirmed) {
+        evt.status = 'confirmed';
+        evt.confirmed_at = adjustedTime || evt.at;
+        evt.driver_note = typeof driverNote === 'string' ? driverNote : (driverNote.note || '');
+        evt.confirmed_by = driverName;
+
+        b.history.push({
+          status: b.status,
+          at: toEgyptISOString(new Date()),
+          by: driverName,
+          note: `Driver confirmed passenger check-in: ${evt.type} at ${new Date(evt.confirmed_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}.`
+        });
+      } else {
+        const noteStr = typeof driverNote === 'string' ? driverNote : (driverNote.note || 'Driver noted status/time mismatch');
+        evt.status = 'disputed';
+        evt.dispute_note = noteStr;
+        evt.disputed_at = toEgyptISOString(new Date());
+        evt.disputed_by = driverName;
+
+        b.history.push({
+          status: b.status,
+          at: toEgyptISOString(new Date()),
+          by: driverName,
+          note: `FLAGGED DISPUTE: Driver disputed passenger check-in (${evt.type}). Note: ${noteStr}`
+        });
+
+        data.notifications = data.notifications || [];
+        data.notifications.unshift({
+          id: 'NOTIF-' + Date.now(),
+          targetRole: 'Dispatcher',
+          title: `Disputed Check-In (${b.id})`,
+          message: `${driverName} disputed passenger ${evt.type} report: "${noteStr}"`,
+          time: 'Just now',
+          read: false,
+          link: 'audit.html'
+        });
+
+        data.notifications.unshift({
+          id: 'NOTIF-' + (Date.now() + 1),
+          targetRole: 'Auditor',
+          title: `Disputed Check-In (${b.id})`,
+          message: `Audit flag: Driver disputed passenger ${evt.type} milestone on trip ${b.id}.`,
+          time: 'Just now',
+          read: false,
+          link: 'audit.html'
+        });
+      }
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: driverName,
+        action: isConfirmed ? 'Confirm Passenger Check-In' : 'Dispute Passenger Check-In',
+        ref: id,
+        details: isConfirmed
+          ? `Confirmed ${evt.type} event at ${evt.confirmed_at}.`
+          : `Disputed ${evt.type} event. Reason/note: ${evt.dispute_note}`
+      });
+
+      this.save(data);
+      return evt;
+    },
+
+    calculatePassengerTimeline: function (events = [], trip = null) {
+      if (!Array.isArray(events) || events.length === 0) {
+        return {
+          segments: [],
+          totalMovingMin: 0,
+          totalStoppedMin: 0,
+          totalMovingStr: '0m',
+          totalStoppedStr: '0m',
+          stopCount: 0,
+          disputedCount: 0,
+          disputedEvents: []
+        };
+      }
+
+      const sorted = [...events].sort((a, b) => new Date(a.confirmed_at || a.at).getTime() - new Date(b.confirmed_at || b.at).getTime());
+      const disputedEvents = sorted.filter(e => e.status === 'disputed');
+
+      const segments = [];
+      let totalMovingMin = 0;
+      let totalStoppedMin = 0;
+      let stopCount = 0;
+
+      for (let i = 0; i < sorted.length; i++) {
+        const cur = sorted[i];
+        const next = sorted[i + 1];
+        const curTime = new Date(cur.confirmed_at || cur.at);
+        const curTimeStr = curTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+        if (cur.type === 'boarded' || cur.type === 'moving') {
+          let endTime = next ? new Date(next.confirmed_at || next.at) : null;
+          let isOngoing = false;
+          if (!endTime) {
+            if (trip && trip.status === 'Active') {
+              endTime = new Date();
+              isOngoing = true;
+            } else {
+              endTime = curTime;
+            }
+          }
+          const diffMin = Math.max(1, Math.round((endTime.getTime() - curTime.getTime()) / 60000));
+          totalMovingMin += diffMin;
+          const endTimeStr = endTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+          const durHours = Math.floor(diffMin / 60);
+          const durMins = diffMin % 60;
+          const durStr = durHours > 0 ? `${durHours}h${durMins.toString().padStart(2, '0')}` : `${durMins}m`;
+
+          segments.push({
+            type: 'moving',
+            start_str: curTimeStr,
+            end_str: isOngoing ? 'Ongoing' : endTimeStr,
+            duration_str: durStr,
+            duration_min: diffMin,
+            status: cur.status,
+            display: `Moving ${curTimeStr}–${isOngoing ? 'Ongoing' : endTimeStr} (${durStr})`
+          });
+        } else if (cur.type === 'stopped') {
+          stopCount++;
+          let endTime = next ? new Date(next.confirmed_at || next.at) : null;
+          let isOngoing = false;
+          if (!endTime) {
+            if (trip && trip.status === 'Active') {
+              endTime = new Date();
+              isOngoing = true;
+            } else {
+              endTime = curTime;
+            }
+          }
+          const diffMin = Math.max(1, Math.round((endTime.getTime() - curTime.getTime()) / 60000));
+          totalStoppedMin += diffMin;
+          const endTimeStr = endTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+          const durHours = Math.floor(diffMin / 60);
+          const durMins = diffMin % 60;
+          const durStr = durHours > 0 ? `${durHours}h${durMins.toString().padStart(2, '0')}` : `${durMins}m`;
+          const reasonLabel = cur.reason ? `, ${cur.reason}` : '';
+
+          segments.push({
+            type: 'stopped',
+            reason: cur.reason || 'General stop',
+            note: cur.note || '',
+            start_str: curTimeStr,
+            end_str: isOngoing ? 'Ongoing' : endTimeStr,
+            duration_str: durStr,
+            duration_min: diffMin,
+            status: cur.status,
+            display: `Stopped ${curTimeStr}–${isOngoing ? 'Ongoing' : endTimeStr} (${durStr}${reasonLabel})`
+          });
+        }
+      }
+
+      function formatDuration(mins) {
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        if (h > 0) return `${h}h ${m}m`;
+        return `${m}m`;
+      }
+
+      return {
+        segments: segments,
+        totalMovingMin: totalMovingMin,
+        totalStoppedMin: totalStoppedMin,
+        totalMovingStr: formatDuration(totalMovingMin),
+        totalStoppedStr: formatDuration(totalStoppedMin),
+        stopCount: stopCount,
+        disputedCount: disputedEvents.length,
+        disputedEvents: disputedEvents
+      };
+    },
+
+    addFuelLog: function (id, logData, driverName = 'Driver') {
+      const data = this.load();
+      const b = data.bookings.find(item => item.id === id);
+      if (!b) return null;
+
+      b.fuel_logs = b.fuel_logs || [];
+      const photos = logData.photos || {};
+
+      const fuelLog = {
+        id: 'FLOG-' + Date.now(),
+        logged_at: toEgyptISOString(new Date()),
+        driver: driverName,
+        station_name: logData.station_name || 'Service Station',
+        liters: Number(logData.liters || 0),
+        amount_paid_egp: Number(logData.amount || 0),
+        odometer_km: Number(logData.odometer_km || 0),
+        lat: logData.lat !== undefined ? logData.lat : null,
+        lng: logData.lng !== undefined ? logData.lng : null,
+        photos: {
+          gauge_before: photos.gauge_before || null,
+          pump_display: photos.pump_display || null,
+          gauge_after: photos.gauge_after || null,
+          receipt: photos.receipt || null,
+          odometer: photos.odometer || null
+        },
+        mismatch_flagged: false,
+        mismatch_notes: ''
+      };
+
+      b.fuel_logs.push(fuelLog);
+
+      b.history.push({
+        status: b.status,
+        at: toEgyptISOString(new Date()),
+        by: driverName,
+        note: `Refuel logged: ${fuelLog.liters} L at ${fuelLog.station_name} (Odo: ${fuelLog.odometer_km} km). 5 live verification photos recorded.`
+      });
+
+      data.notifications = data.notifications || [];
+      data.notifications.unshift({
+        id: 'NOTIF-' + Date.now(),
+        targetRole: 'Dispatcher',
+        title: `Fuel Added on Trip ${b.id}`,
+        message: `${driverName} logged ${fuelLog.liters} L refuel at ${fuelLog.station_name}. All 5 verification photos recorded.`,
+        time: 'Just now',
+        read: false,
+        link: 'audit.html'
+      });
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: driverName,
+        action: 'Log Vehicle Refuel',
+        ref: id,
+        details: `Logged ${fuelLog.liters} L refuel at ${fuelLog.station_name} with 5 verified photos.`
+      });
+
+      this.save(data);
+      return fuelLog;
+    },
+
+    flagFuelMismatch: function (bookingId, fuelLogId, mismatchNotes = '', auditorName = 'Auditor') {
+      const data = this.load();
+      const b = data.bookings.find(item => item.id === bookingId);
+      if (!b || !Array.isArray(b.fuel_logs)) return null;
+
+      const log = b.fuel_logs.find(fl => fl.id === fuelLogId);
+      if (!log) return null;
+
+      log.mismatch_flagged = !log.mismatch_flagged;
+      log.mismatch_notes = log.mismatch_flagged ? (mismatchNotes || 'Typed liters differ from pump display photo') : '';
+      log.flagged_by = auditorName;
+      log.flagged_at = toEgyptISOString(new Date());
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: auditorName,
+        action: log.mismatch_flagged ? 'Flag Fuel Quantity Mismatch' : 'Clear Fuel Mismatch Flag',
+        ref: bookingId,
+        details: `Fuel log ${fuelLogId}: ${log.mismatch_flagged ? log.mismatch_notes : 'Mismatch cleared.'}`
+      });
+
+      this.save(data);
+      return log;
     },
 
     reconcileTrip: function (id, auditorNotes) {
@@ -3630,6 +4096,10 @@
       if (!b) return null;
 
       b.status = 'Completed';
+      b.reconciled = true;
+      b.reconciled_at = toEgyptISOString(new Date());
+      b.reconciled_notes = auditorNotes || 'Audit cleared';
+
       b.history.push({
         status: 'Completed',
         at: toEgyptISOString(new Date()),
@@ -3649,6 +4119,162 @@
 
       this.save(data);
       return b;
+    },
+
+    reportIncident: function (payload) {
+      const data = this.load();
+      data.incidents = data.incidents || [];
+
+      const incidentId = 'INC-' + Math.floor(1000 + Math.random() * 9000);
+      const entry = {
+        id: incidentId,
+        booking_id: payload.booking_id,
+        vehicle_id: payload.vehicle_id,
+        type: payload.type || 'Mechanical Breakdown',
+        notes: payload.notes || '',
+        place_name: payload.place_name || '',
+        lat: Number(payload.lat) || 30.0444,
+        lng: Number(payload.lng) || 31.2357,
+        replacement_vehicle_id: payload.replacement_vehicle_id || null,
+        replacement_driver_id: payload.replacement_driver_id || null,
+        reported_at: toEgyptISOString(new Date()),
+        reported_by: payload.reported_by || 'Demo Ops Manager'
+      };
+
+      data.incidents.unshift(entry);
+
+      const b = (data.bookings || []).find(item => item.id === payload.booking_id);
+      if (b) {
+        if (payload.replacement_vehicle_id) {
+          b.assignment = b.assignment || {};
+          const prevVehicle = b.assignment.vehicle_id;
+          b.assignment.vehicle_id = payload.replacement_vehicle_id;
+          if (payload.replacement_driver_id) {
+            b.assignment.driver_ids = [payload.replacement_driver_id];
+          }
+          b.history.push({
+            status: b.status,
+            at: toEgyptISOString(new Date()),
+            by: payload.reported_by || 'Operations',
+            note: `Incident ${incidentId} reported (${entry.type}). Assigned replacement vehicle ${payload.replacement_vehicle_id} in place of ${prevVehicle}.`
+          });
+        } else {
+          b.history.push({
+            status: b.status,
+            at: toEgyptISOString(new Date()),
+            by: payload.reported_by || 'Operations',
+            note: `Incident ${incidentId} reported: ${entry.type}. ${entry.notes}`
+          });
+        }
+      }
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: payload.reported_by || 'Operations',
+        action: 'Report Incident & Rescue Triage',
+        ref: payload.booking_id,
+        details: `Incident ${incidentId} logged on ${payload.vehicle_id}: ${entry.type}. Replacement: ${payload.replacement_vehicle_id || 'None'}.`
+      });
+
+      data.notifications = data.notifications || [];
+      data.notifications.unshift({
+        id: 'NOTIF-' + Date.now(),
+        targetRole: 'Dispatcher',
+        title: `Incident: ${payload.vehicle_id}`,
+        message: `${entry.type} reported on booking ${payload.booking_id}. Rescue action dispatched.`,
+        time: 'Just now',
+        read: false,
+        link: 'incident.html?id=' + payload.booking_id
+      });
+
+      this.save(data);
+      return entry;
+    },
+
+    getDriverShift: function (driverId) {
+      const data = this.load();
+      data.driverShifts = data.driverShifts || {};
+      return data.driverShifts[driverId] || { active: true, startedAt: '07:45', dutyHours: 3.5 };
+    },
+
+    startDriverShift: function (driverId, driverName = 'Driver') {
+      const data = this.load();
+      data.driverShifts = data.driverShifts || {};
+      const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      data.driverShifts[driverId] = {
+        active: true,
+        startedAt: nowStr,
+        dutyHours: 0.5
+      };
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: driverName,
+        action: 'Start Duty Shift',
+        ref: driverId,
+        details: `Driver ${driverName} clocked in for duty shift at ${nowStr}.`
+      });
+
+      this.save(data);
+      return data.driverShifts[driverId];
+    },
+
+    endDriverShift: function (driverId, driverName = 'Driver') {
+      const data = this.load();
+      data.driverShifts = data.driverShifts || {};
+      const cur = data.driverShifts[driverId] || { startedAt: '07:45', dutyHours: 4.0 };
+      const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      data.driverShifts[driverId] = {
+        active: false,
+        startedAt: cur.startedAt,
+        endedAt: nowStr,
+        dutyHours: cur.dutyHours || 4.5
+      };
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: driverName,
+        action: 'End Duty Shift',
+        ref: driverId,
+        details: `Driver ${driverName} clocked out of duty shift at ${nowStr}.`
+      });
+
+      this.save(data);
+      return data.driverShifts[driverId];
+    },
+
+    getNotifications: function (targetRole) {
+      const data = this.load();
+      const list = data.notifications || [];
+      if (!targetRole || targetRole === 'all') return list;
+      return list.filter(n => !n.targetRole || n.targetRole === targetRole || n.targetRole === 'all');
+    },
+
+    markNotificationRead: function (notifId) {
+      const data = this.load();
+      const notif = (data.notifications || []).find(n => n.id === notifId);
+      if (notif) {
+        notif.read = true;
+        this.save(data);
+      }
+      return notif;
+    },
+
+    markAllNotificationsRead: function (targetRole) {
+      const data = this.load();
+      (data.notifications || []).forEach(n => {
+        if (!targetRole || targetRole === 'all' || n.targetRole === targetRole) {
+          n.read = true;
+        }
+      });
+      this.save(data);
+      return true;
     }
   };
 

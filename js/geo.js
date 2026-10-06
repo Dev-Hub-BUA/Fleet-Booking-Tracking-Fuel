@@ -228,6 +228,67 @@ const GeoService = (function () {
     });
   }
 
+  const activeLeafletMaps = new Set();
+
+  function registerActiveMap(map) {
+    if (!map) return;
+    activeLeafletMaps.add(map);
+  }
+
+  function invalidateAllMaps() {
+    activeLeafletMaps.forEach(map => {
+      try {
+        if (map && typeof map.invalidateSize === 'function') {
+          map.invalidateSize();
+        }
+      } catch (e) {}
+    });
+  }
+
+  if (typeof window !== 'undefined') {
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(invalidateAllMaps, 100);
+    });
+
+    window.addEventListener('orientationchange', () => {
+      setTimeout(invalidateAllMaps, 200);
+    });
+
+    document.addEventListener('click', (e) => {
+      const isTabOrModal = e.target.closest('[data-tab], .tab-btn, .filter-tab-btn, .queue-tab-btn, .timeline-toggle-btn, .btn-nav-toggle, [onclick*="Modal"], [onclick*="modal"]');
+      if (isTabOrModal) {
+        setTimeout(invalidateAllMaps, 150);
+        setTimeout(invalidateAllMaps, 350);
+      }
+    });
+
+    if (typeof MutationObserver !== 'undefined') {
+      const modalObserver = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          if (m.type === 'attributes' && (m.attributeName === 'class' || m.attributeName === 'style')) {
+            const target = m.target;
+            if (target.classList && (target.classList.contains('open') || target.classList.contains('modal-overlay') || target.classList.contains('active'))) {
+              setTimeout(invalidateAllMaps, 150);
+              break;
+            }
+          }
+        }
+      });
+      const attachObserver = () => {
+        if (document.body) {
+          modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class', 'style'] });
+        }
+      };
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachObserver);
+      } else {
+        attachObserver();
+      }
+    }
+  }
+
   class GeoMapInstance {
     constructor(el, options = {}) {
       this.el = el;
@@ -242,6 +303,7 @@ const GeoService = (function () {
     initMap() {
       if (this.el._leaflet_map) {
         this.leaflet = this.el._leaflet_map;
+        registerActiveMap(this.leaflet);
         return;
       }
 
@@ -259,6 +321,7 @@ const GeoService = (function () {
         attributionControl: true
       });
       this.el._leaflet_map = this.leaflet;
+      registerActiveMap(this.leaflet);
 
       const tile = createTileLayer();
       if (tile) tile.addTo(this.leaflet);
@@ -815,6 +878,7 @@ const GeoService = (function () {
       const container = document.getElementById('geomap-picker-leaflet-map');
       if (!locationPickerMap) {
         locationPickerMap = L.map(container, { attributionControl: true }).setView([locationPickerState.lat, locationPickerState.lng], 13);
+        registerActiveMap(locationPickerMap);
         const tile = createTileLayer();
         if (tile) tile.addTo(locationPickerMap);
 
@@ -951,7 +1015,8 @@ const GeoService = (function () {
     drawItineraryMap,
     formatCoordKey,
     GeoMap,
-    GeoRoute
+    GeoRoute,
+    invalidateAllMaps
   };
 })();
 
@@ -960,4 +1025,5 @@ if (typeof window !== 'undefined') {
   window.GeoMap = GeoService.GeoMap;
   window.GeoRoute = GeoService.GeoRoute;
   window.drawItineraryMap = GeoService.drawItineraryMap;
+  window.invalidateAllMaps = GeoService.invalidateAllMaps;
 }

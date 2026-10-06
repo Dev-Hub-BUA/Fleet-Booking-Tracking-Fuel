@@ -63,88 +63,138 @@
 
     <main class="main-content" role="main">
       <div class="page-header">
-  <div class="page-title-group">
-    <span class="page-pretitle">INC-2026-084 · Critical Response</span>
-    <h1 class="page-title">Incident Triage Desk</h1>
-    <span class="page-subtitle">Mechanical Breakdown · Coolant Line Rupture & Overheating</span>
-  </div>
-</div>
-
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 24px; align-items: start;">
-  <div style="display: flex; flex-direction: column; gap: 20px;">
-    <div class="card" style="border-left: 4px solid var(--danger);">
-      <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <span class="badge badge-danger">Medium Severity</span>
-        <span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">13 Oct 2026 · 09:12</span>
-      </div>
-      <h2 style="margin: 0; font-size: 20px; color: var(--navy-800);">MCV 500 Bus (45 Seats) (B-03)</h2>
-      <div style="font-size: 14px; color: var(--text-muted);">
-        <div><strong>Driver:</strong> Demo Driver 10 · +20 000 000 0000</div>
-        <div><strong>Location:</strong> Cairo–Ismailia Desert Road, Km 42 (Opposite Shurouk City Gate 3)</div>
-      </div>
-      <div class="alert-banner alert-success" style="font-size: 13px; display:flex; align-items:center; gap:8px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--success);flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-        <span><strong>Passenger Safety:</strong> All passengers evacuated safely to roadside shaded rest area behind crash barriers.</span>
-      </div>
-    </div>
-
-    <!-- Interactive Scene Map Card -->
-    <div class="card" style="padding: 0; overflow: hidden;">
-      <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #FFFFFF;">
-        <div>
-          <strong style="font-size: 13.5px; color: var(--navy-800);">Incident Scene Coordinates</strong>
-          <div id="incident-location-text" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Cairo–Ismailia Desert Road, Km 42 (30.1500° N, 31.6500° E)</div>
+        <div class="page-title-group">
+          <span class="page-pretitle" id="incident-header-pretitle">Active Trip Triage &amp; Roadside SOS</span>
+          <h1 class="page-title">Incident Triage Desk</h1>
+          <span class="page-subtitle">Report road incidents, emergency breakdowns, and dispatch replacement fleet relief</span>
         </div>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="pickIncidentLocation()" style="display:inline-flex; align-items:center; gap:6px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <span>Pick on Real Map</span>
-        </button>
       </div>
-      <div id="incident-leaflet-map" style="width: 100%; height: 260px; background: #E2E8F0;"></div>
-    </div>
 
-    <div class="card">
-      <h3 class="card-title">Driver Safety Protocol Verification</h3>
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Hazard warning flashers activated immediately</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Vehicle pulled completely onto right shoulder off active lanes</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Reflective warning triangles placed 50m behind coach</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Passengers escorted behind guardrails into safe zone</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>First-aid kit checked (No injuries reported)</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Heavy recovery tow vehicle requested & dispatched</span></label>
-      </div>
-    </div>
-  </div>
+      <form id="incident-triage-form" onsubmit="handleReportIncident(event)">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 24px; align-items: start;">
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Booking & Vehicle Context -->
+            <div class="card" style="border-left: 4px solid var(--danger);">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+                <span class="badge badge-danger" id="incident-severity-badge">Incident Triage</span>
+                <span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);" id="incident-timestamp-display">Active</span>
+              </div>
+              
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label" for="incident-select-booking" style="font-weight: 700; color: var(--navy-800);">Active Booking *</label>
+                <select id="incident-select-booking" class="form-input" required onchange="handleSelectBooking(this.value)">
+                  <!-- Populated dynamically with active/dispatched trips -->
+                </select>
+              </div>
 
-  <div style="display: flex; flex-direction: column; gap: 20px;">
-    <div class="card">
-      <h3 class="card-title">Recovery &amp; Tow Dispatch</h3>
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-        <div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong>Al-Ahram Heavy Recovery & Towing</strong>
-              <div style="font-size: 12px; color: var(--text-muted);">ETA: 18 mins · Service: Priority Dispatch</div>
+              <div id="incident-booking-info" style="font-size: 13.5px; color: var(--text-main); display: flex; flex-direction: column; gap: 6px; padding: 10px; background: var(--bg-page); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                <div><strong>Assigned Vehicle:</strong> <span id="incident-vehicle-text">Loading…</span></div>
+                <div><strong>Assigned Driver:</strong> <span id="incident-driver-text">Loading…</span></div>
+                <div><strong>Route Corridor:</strong> <span id="incident-route-text">Loading…</span></div>
+              </div>
             </div>
-            <button class="btn btn-danger btn-sm" onclick="this.textContent = 'Dispatched'; this.disabled = true; alert('Heavy recovery tow truck dispatched: Al-Ahram Heavy Recovery & Towing');">
-              Dispatch Tow
-            </button>
-          </div><div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong>Cairo Highway Patrol Emergency Recovery</strong>
-              <div style="font-size: 12px; color: var(--text-muted);">ETA: 25 mins · Rate: Official Service</div>
+
+            <!-- Incident Details -->
+            <div class="card">
+              <h3 class="card-title">Incident Particulars</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                <div class="form-group">
+                  <label class="form-label" for="incident-type-select">Incident Classification *</label>
+                  <select id="incident-type-select" class="form-input" required>
+                    <option value="Mechanical Breakdown: Coolant Line Rupture">Coolant Rupture / Overheating</option>
+                    <option value="Mechanical Breakdown: Transmission / Clutch Failure">Transmission Failure</option>
+                    <option value="Flat Tyre / Blowout">Flat Tyre / Blowout</option>
+                    <option value="Traffic Collision / Minor Impact">Road Collision / Fender Bender</option>
+                    <option value="Electrical / Battery Failure">Electrical / Battery Failure</option>
+                    <option value="Medical Emergency / Passenger Illness">Medical Emergency</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="incident-severity-select">Severity Level *</label>
+                  <select id="incident-severity-select" class="form-input" required>
+                    <option value="Medium Severity">Medium (Relief Needed)</option>
+                    <option value="Critical SOS">Critical / Highway SOS</option>
+                    <option value="Low Severity">Low (Minor Delay)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="incident-notes-input">Incident Notes &amp; Safety Dispatch Details *</label>
+                <textarea id="incident-notes-input" class="form-input" rows="3" required placeholder="Describe vehicle breakdown symptoms, passenger safety status, exact mile marker…">Vehicle pulled safely to roadside shoulder. Engine temperature spiked past normal threshold. No injuries.</textarea>
+              </div>
             </div>
-            <button class="btn btn-danger btn-sm" onclick="this.textContent = 'Dispatched'; this.disabled = true; alert('Heavy recovery tow truck dispatched: Cairo Highway Patrol Emergency Recovery');">
-              Dispatch Tow
-            </button>
+
+            <!-- Interactive Scene Map Card -->
+            <div class="card" style="padding: 0; overflow: hidden;">
+              <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #FFFFFF;">
+                <div>
+                  <strong style="font-size: 13.5px; color: var(--navy-800);">Incident Scene Coordinates</strong>
+                  <div id="incident-location-text" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Cairo–Ismailia Desert Road, Km 42 (30.1500° N, 31.6500° E)</div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="pickIncidentLocation()" style="display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span>Pick on Real Map</span>
+                </button>
+              </div>
+              <div id="incident-leaflet-map" style="width: 100%; height: 240px; background: #E2E8F0;"></div>
+            </div>
           </div>
-      </div>
-    </div>
 
-    <div class="card">
-      <h3 class="card-title">Replacement Relief Coach</h3>
-      <div style="font-size: 14px; display: flex; flex-direction: column; gap: 8px;">
-        <div><strong>Assigned Coach:</strong> MCV 500 Bus (45 Seats) (B-07)</div>
-        <div><strong>Relief Driver:</strong> Demo Driver 08</div>
-        <div><strong>Status:</strong> <span class="badge badge-info">Dispatched from Badr Campus at 09:20</span></div>
-      </div>
-    </div>
-  </div>
-</div>
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Replacement Vehicle & Relief Assignment -->
+            <div class="card" style="border-left: 4px solid var(--primary);">
+              <h3 class="card-title">Assign Replacement Relief Resource</h3>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: -6px; margin-bottom: 14px;">
+                Dispatch an available vehicle from the fleet to recover passengers and complete the trip itinerary.
+              </p>
+
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label class="form-label" for="incident-replace-vehicle">Replacement Vehicle (Free &amp; Available)</label>
+                <select id="incident-replace-vehicle" class="form-input">
+                  <option value="">None (Recovery tow only)</option>
+                  <!-- Populated dynamically with available vehicles -->
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="incident-replace-driver">Relief Driver (Available)</label>
+                <select id="incident-replace-driver" class="form-input">
+                  <option value="">None (Existing driver continues)</option>
+                  <!-- Populated dynamically with available drivers -->
+                </select>
+              </div>
+            </div>
+
+            <!-- Driver Safety Verification -->
+            <div class="card">
+              <h3 class="card-title">Safety Protocol Verification</h3>
+              <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13.5px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                  <input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;">
+                  <span>Hazard warning flashers activated &amp; vehicle on right shoulder</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                  <input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;">
+                  <span>Reflective warning triangles positioned behind vehicle</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                  <input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;">
+                  <span>Passengers escorted to safe zone behind highway barriers</span>
+                </label>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
+              <a href="home.html" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-danger btn-lg" style="display:inline-flex; align-items:center; gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>Dispatch Incident Rescue</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
     </main>
   </div>
 
@@ -202,6 +252,7 @@
   <script src="js/main.js"></script>
   <script>
     let incidentMapInstance = null;
+    let selectedBooking = null;
     let currentIncidentCoords = {
       lat: 30.1500,
       lng: 31.6500,
@@ -213,14 +264,19 @@
         center: [currentIncidentCoords.lat, currentIncidentCoords.lng],
         zoom: 13
       });
+      updateSceneMarker();
+    }
 
-      incidentMapInstance.setVehicle('B-03', {
+    function updateSceneMarker() {
+      if (!incidentMapInstance) return;
+      const vCode = selectedBooking && selectedBooking.assignment ? selectedBooking.assignment.vehicle_id : 'Vehicle';
+      incidentMapInstance.setVehicle(vCode, {
         lat: currentIncidentCoords.lat,
         lng: currentIncidentCoords.lng,
         heading: 75,
         speed: 0,
         status: 'Incident',
-        label: 'MCV 500 Bus (B-03) · Incident Site'
+        label: `${vCode} · Incident Site`
       });
     }
 
@@ -240,22 +296,135 @@
 
         if (incidentMapInstance) {
           incidentMapInstance.leaflet.setView([currentIncidentCoords.lat, currentIncidentCoords.lng], 14);
-          incidentMapInstance.setVehicle('B-03', {
-            lat: currentIncidentCoords.lat,
-            lng: currentIncidentCoords.lng,
-            heading: 75,
-            speed: 0,
-            status: 'Incident',
-            label: 'MCV 500 Bus (B-03) · Incident Site'
-          });
+          updateSceneMarker();
         }
       }
+    }
+
+    function populateBookingSelect(preferredId) {
+      const select = document.getElementById('incident-select-booking');
+      if (!select) return;
+
+      const bookings = FleetStore.getBookings() || [];
+      const activeTrips = bookings.filter(b => b.status === 'Active' || b.status === 'Dispatched' || b.status === 'Approved');
+      const list = activeTrips.length > 0 ? activeTrips : bookings.slice(0, 5);
+
+      select.innerHTML = list.map(b => {
+        const vId = b.assignment ? b.assignment.vehicle_id : (b.vehicleCode || 'Unassigned');
+        const dept = (b.requester && b.requester.department) || b.dept || 'Campus Logistics';
+        return `<option value="${b.id}">${b.id} · ${vId} (${dept}) — [${b.status}]</option>`;
+      }).join('');
+
+      const targetId = preferredId || (list[0] ? list[0].id : null);
+      if (targetId) {
+        select.value = targetId;
+        handleSelectBooking(targetId);
+      }
+    }
+
+    function populateReplacementResources() {
+      const vSelect = document.getElementById('incident-replace-vehicle');
+      const dSelect = document.getElementById('incident-replace-driver');
+
+      const vehicles = FleetStore.getVehicles() || [];
+      const freeVehicles = vehicles.filter(v => v.status === 'Available');
+
+      if (vSelect) {
+        vSelect.innerHTML = '<option value="">None (Recovery tow only)</option>' +
+          freeVehicles.map(v => `<option value="${v.id}">${v.name} (${v.id}) · ${v.seats} seats · ${v.type}</option>`).join('');
+      }
+
+      const drivers = FleetStore.getDrivers() || [];
+      const freeDrivers = drivers.filter(d => d.status === 'Available');
+
+      if (dSelect) {
+        dSelect.innerHTML = '<option value="">None (Existing driver continues)</option>' +
+          freeDrivers.map(d => `<option value="${d.id}">${d.name} (${d.id}) · ${d.licenseClass}</option>`).join('');
+      }
+    }
+
+    function handleSelectBooking(bId) {
+      const b = FleetStore.getBooking(bId);
+      if (!b) return;
+      selectedBooking = b;
+
+      const vId = b.assignment ? b.assignment.vehicle_id : (b.vehicleCode || 'N/A');
+      const vehicle = FleetStore.getVehicles().find(v => v.id === vId);
+      const vDesc = vehicle ? `${vehicle.name} (${vehicle.id}) · Plate: ${vehicle.plate}` : vId;
+      document.getElementById('incident-vehicle-text').textContent = vDesc;
+
+      const dIds = b.assignment && Array.isArray(b.assignment.driver_ids) ? b.assignment.driver_ids : [];
+      const driver = dIds[0] ? FleetStore.getDrivers().find(d => d.id === dIds[0]) : null;
+      document.getElementById('incident-driver-text').textContent = driver ? `${driver.name} (${driver.id})` : (dIds[0] || 'Unassigned');
+
+      const origin = (b.itinerary && b.itinerary[0] && b.itinerary[0].place_name) || b.origin || 'Main Campus';
+      const dest = (b.itinerary && b.itinerary.length > 1 && b.itinerary[b.itinerary.length - 1].place_name) || b.destination || 'Cairo';
+      document.getElementById('incident-route-text').textContent = `${origin} → ${dest}`;
+
+      document.getElementById('incident-timestamp-display').textContent = `${b.status} · ${b.id}`;
+
+      if (b.itinerary && b.itinerary.length > 1 && b.itinerary[1].lat && b.itinerary[1].lng) {
+        currentIncidentCoords.lat = b.itinerary[1].lat;
+        currentIncidentCoords.lng = b.itinerary[1].lng;
+        currentIncidentCoords.place_name = b.itinerary[1].place_name || currentIncidentCoords.place_name;
+        const textEl = document.getElementById('incident-location-text');
+        if (textEl) {
+          textEl.textContent = `${currentIncidentCoords.place_name} (${currentIncidentCoords.lat.toFixed(4)}° N, ${currentIncidentCoords.lng.toFixed(4)}° E)`;
+        }
+        if (incidentMapInstance) {
+          incidentMapInstance.leaflet.setView([currentIncidentCoords.lat, currentIncidentCoords.lng], 13);
+          updateSceneMarker();
+        }
+      }
+    }
+
+    function handleReportIncident(e) {
+      e.preventDefault();
+      if (!selectedBooking) return;
+
+      const bookingId = selectedBooking.id;
+      const vehicleId = selectedBooking.assignment ? selectedBooking.assignment.vehicle_id : 'Vehicle';
+      const incidentType = document.getElementById('incident-type-select').value;
+      const severity = document.getElementById('incident-severity-select').value;
+      const notes = document.getElementById('incident-notes-input').value;
+      const replaceVehicleId = document.getElementById('incident-replace-vehicle').value || null;
+      const replaceDriverId = document.getElementById('incident-replace-driver').value || null;
+
+      const payload = {
+        booking_id: bookingId,
+        vehicle_id: vehicleId,
+        type: `${severity}: ${incidentType}`,
+        notes: notes,
+        place_name: currentIncidentCoords.place_name,
+        lat: currentIncidentCoords.lat,
+        lng: currentIncidentCoords.lng,
+        replacement_vehicle_id: replaceVehicleId,
+        replacement_driver_id: replaceDriverId,
+        reported_by: 'Demo Ops Manager'
+      };
+
+      const result = FleetStore.reportIncident(payload);
+
+      let msg = `Incident successfully logged (${result.id})!\n\nBooking: ${bookingId}\nVehicle: ${vehicleId}\nType: ${payload.type}`;
+      if (replaceVehicleId) {
+        msg += `\n\nReplacement Relief Dispatched: Vehicle ${replaceVehicleId}` + (replaceDriverId ? ` with Driver ${replaceDriverId}` : '');
+      }
+      msg += '\n\nNotification sent to Dispatch Desk and Auditor.';
+
+      alert(msg);
+      window.location.href = 'home.html';
     }
 
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Dispatcher", "Fleet admin"])) return;
       Auth.renderAppShell('incident');
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqBookingId = urlParams.get('id');
+
       initIncidentSceneMap();
+      populateReplacementResources();
+      populateBookingSelect(reqBookingId);
     });
   </script>
 </body>

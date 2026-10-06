@@ -62,6 +62,10 @@
           <span class="page-subtitle" id="run-header-subtitle">Follow authorized corridor toward next scheduled waypoint</span>
         </div>
         <div style="display:flex; gap:10px; align-items:center;">
+          <button type="button" class="btn btn-secondary" onclick="openAddFuelModal()" style="display:flex; align-items:center; gap:6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v6h6"/><path d="M21 12A9 9 0 0 0 6 5.3L3 8"/><path d="M21 22v-6h-6"/><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"/></svg>
+            <span>Add Fuel</span>
+          </button>
           <a href="driver-trip.html" class="btn btn-secondary" style="display:flex; align-items:center; gap:6px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
             <span>Manifest</span>
@@ -72,6 +76,9 @@
           </button>
         </div>
       </div>
+
+      <!-- Live Passenger Check-In Card Container (Real-Time Driver Confirmation) -->
+      <div id="driver-passenger-checkin-container"></div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; align-items: start;">
         <div class="card" style="text-align: center; padding: 36px;">
@@ -106,7 +113,7 @@
               <span class="badge badge-success" id="run-gps-badge">High Precision (±2.5m · Live)</span>
             </div>
           </div>
-          <a href="driver-close.html" class="btn btn-secondary" style="margin-top: 18px; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
+          <a href="driver-close.html" id="btn-run-close" class="btn btn-secondary" style="margin-top: 18px; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
             <span>Arrived at Final Destination · Close Trip</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </a>
@@ -172,8 +179,109 @@
     </div>
   </footer>
 
+  <!-- Mandatory 5-Photo Add Fuel Modal -->
+  <div class="modal-overlay" id="add-fuel-modal">
+    <div class="modal-box" style="max-width:680px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="font-size:18px;">Log Vehicle Refuelling (5 Live Photos Required)</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAddFuelModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="max-height:75vh; overflow-y:auto;">
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">
+          All 5 live camera photos must be recorded before submitting fuel log. File uploads are strictly disabled.
+        </p>
+
+        <!-- 5 Photo Slots Grid -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:10px; margin-bottom:18px;">
+          <div style="border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center; background:var(--bg-page);">
+            <div style="font-size:11px; font-weight:700; color:var(--navy-800); min-height:28px;">1. Gauge Before *</div>
+            <div id="fuel-slot-preview-1" style="display:none; margin:6px 0;">
+              <img id="fuel-img-1" src="" style="width:100%; height:60px; object-fit:cover; border-radius:4px;">
+              <div style="font-size:10px; color:var(--success); font-weight:700;">Verified</div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" style="width:100%; font-size:11px; padding:4px 6px; margin-top:6px;" onclick="captureFuelPhoto(1, 'gauge_before', '1. Fuel Gauge BEFORE Refuelling')">
+              <span id="fuel-btn-label-1">Take Photo</span>
+            </button>
+          </div>
+
+          <div style="border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center; background:var(--bg-page);">
+            <div style="font-size:11px; font-weight:700; color:var(--navy-800); min-height:28px;">2. Pump Display *</div>
+            <div id="fuel-slot-preview-2" style="display:none; margin:6px 0;">
+              <img id="fuel-img-2" src="" style="width:100%; height:60px; object-fit:cover; border-radius:4px;">
+              <div style="font-size:10px; color:var(--success); font-weight:700;">Verified</div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" style="width:100%; font-size:11px; padding:4px 6px; margin-top:6px;" onclick="captureFuelPhoto(2, 'pump_display', '2. Pump Display (Liters + Amount)')">
+              <span id="fuel-btn-label-2">Take Photo</span>
+            </button>
+          </div>
+
+          <div style="border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center; background:var(--bg-page);">
+            <div style="font-size:11px; font-weight:700; color:var(--navy-800); min-height:28px;">3. Gauge After *</div>
+            <div id="fuel-slot-preview-3" style="display:none; margin:6px 0;">
+              <img id="fuel-img-3" src="" style="width:100%; height:60px; object-fit:cover; border-radius:4px;">
+              <div style="font-size:10px; color:var(--success); font-weight:700;">Verified</div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" style="width:100%; font-size:11px; padding:4px 6px; margin-top:6px;" onclick="captureFuelPhoto(3, 'gauge_after', '3. Fuel Gauge AFTER Refuelling')">
+              <span id="fuel-btn-label-3">Take Photo</span>
+            </button>
+          </div>
+
+          <div style="border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center; background:var(--bg-page);">
+            <div style="font-size:11px; font-weight:700; color:var(--navy-800); min-height:28px;">4. Receipt *</div>
+            <div id="fuel-slot-preview-4" style="display:none; margin:6px 0;">
+              <img id="fuel-img-4" src="" style="width:100%; height:60px; object-fit:cover; border-radius:4px;">
+              <div style="font-size:10px; color:var(--success); font-weight:700;">Verified</div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" style="width:100%; font-size:11px; padding:4px 6px; margin-top:6px;" onclick="captureFuelPhoto(4, 'receipt', '4. Official Station Receipt')">
+              <span id="fuel-btn-label-4">Take Photo</span>
+            </button>
+          </div>
+
+          <div style="border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center; background:var(--bg-page);">
+            <div style="font-size:11px; font-weight:700; color:var(--navy-800); min-height:28px;">5. Odometer *</div>
+            <div id="fuel-slot-preview-5" style="display:none; margin:6px 0;">
+              <img id="fuel-img-5" src="" style="width:100%; height:60px; object-fit:cover; border-radius:4px;">
+              <div style="font-size:10px; color:var(--success); font-weight:700;">Verified</div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" style="width:100%; font-size:11px; padding:4px 6px; margin-top:6px;" onclick="captureFuelPhoto(5, 'odometer', '5. Odometer Reading')">
+              <span id="fuel-btn-label-5">Take Photo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Typed Data Fields -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label" for="fuel-station-name">Gas Station Name &amp; Location *</label>
+            <input type="text" id="fuel-station-name" class="form-input" placeholder="e.g. Wataniya - Alex Desert Rd" required oninput="validateFuelForm()">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fuel-odo-km">Odometer at Pump (km) *</label>
+            <input type="number" id="fuel-odo-km" class="form-input" placeholder="e.g. 48310" required oninput="validateFuelForm()">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fuel-liters-input">Liters Added *</label>
+            <input type="number" id="fuel-liters-input" step="0.1" class="form-input" placeholder="e.g. 35.5" required oninput="validateFuelForm()">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fuel-amount-input">Amount Paid (EGP) *</label>
+            <input type="number" id="fuel-amount-input" step="0.25" class="form-input" placeholder="Receipt total amount" required oninput="validateFuelForm()">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeAddFuelModal()">Cancel</button>
+        <button type="button" class="btn btn-gold" id="btn-submit-fuel-log" onclick="submitFuelLog()" disabled>
+          Submit Verified Fuel Log
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/media.js"></script>
+  <script src="js/camera.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="js/geo.js"></script>
   <script src="js/telemetry.js"></script>
@@ -184,9 +292,192 @@
     let activeRunTrip = null;
     let unsubscribeTelemetry = null;
     let routeCoords = [];
+    let fuelPhotos = {
+      gauge_before: null,
+      pump_display: null,
+      gauge_after: null,
+      receipt: null,
+      odometer: null
+    };
 
     function triggerSosAlert() {
       alert('EMERGENCY SOS DISPATCHED: Highway recovery and central operations command desk alerted with live GPS coordinates.');
+    }
+
+    function checkPassengerEvents() {
+      if (!activeRunTrip) return;
+      const trip = FleetStore.getBooking(activeRunTrip.id);
+      if (!trip) return;
+      activeRunTrip = trip;
+
+      const container = document.getElementById('driver-passenger-checkin-container');
+      if (!container) return;
+
+      const pendingEvents = (trip.passenger_events || []).filter(e => e.status === 'awaiting_driver');
+      if (pendingEvents.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      const evt = pendingEvents[pendingEvents.length - 1];
+      const timeStr = new Date(evt.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      const typeDisplay = evt.type === 'boarded'
+        ? 'Boarded vehicle'
+        : (evt.type === 'stopped'
+          ? `Stopped / got off (${evt.reason || 'Stop'})`
+          : (evt.type === 'moving'
+            ? 'Back in vehicle / moving again'
+            : 'Trip finished'));
+
+      container.innerHTML = `
+        <div class="card" style="background:#FFFBEB; border:2px solid #F59E0B; padding:16px; margin-bottom:20px; animation:fadeIn 0.2s ease-out;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:40px; height:40px; border-radius:50%; background:#F59E0B; color:#FFF; display:flex; align-items:center; justify-content:center;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:#B45309; text-transform:uppercase; letter-spacing:0.04em;">Passenger Check-In Notification</div>
+                <div style="font-size:16px; font-weight:700; color:#78350F;">
+                  Passenger reports: ${typeDisplay} at ${timeStr}
+                </div>
+                ${evt.reason ? `<div style="font-size:13px; color:#92400E; margin-top:2px;">Reason: <strong>${escapeHtml(evt.reason)}</strong> ${evt.note ? `("${escapeHtml(evt.note)}")` : ''}</div>` : ''}
+              </div>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button type="button" class="btn btn-success" style="font-weight:700;" onclick="confirmPassengerCheckIn('${evt.id}', true)">Confirm</button>
+              <button type="button" class="btn btn-secondary" style="color:#B91C1C; border-color:#FCA5A5; font-weight:700;" onclick="confirmPassengerCheckIn('${evt.id}', false)">Not correct</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function confirmPassengerCheckIn(eventId, isConfirmed) {
+      if (!activeRunTrip) return;
+      const user = Auth.getCurrentUser();
+      const driverName = user ? user.name : 'Demo Driver 01';
+
+      if (isConfirmed) {
+        FleetStore.confirmPassengerEvent(activeRunTrip.id, eventId, true, { by: driverName, note: 'Confirmed by driver' });
+        checkPassengerEvents();
+      } else {
+        const note = prompt('Please enter explanation note for disputed event (required):');
+        if (!note || !note.trim()) {
+          alert('Explanation note is required to dispute passenger report.');
+          return;
+        }
+        FleetStore.confirmPassengerEvent(activeRunTrip.id, eventId, false, note.trim());
+        checkPassengerEvents();
+      }
+    }
+
+    function openAddFuelModal() {
+      if (!activeRunTrip) return;
+      fuelPhotos = {
+        gauge_before: null,
+        pump_display: null,
+        gauge_after: null,
+        receipt: null,
+        odometer: null
+      };
+
+      for (let i = 1; i <= 5; i++) {
+        const prev = document.getElementById(`fuel-slot-preview-${i}`);
+        if (prev) prev.style.display = 'none';
+        const lbl = document.getElementById(`fuel-btn-label-${i}`);
+        if (lbl) lbl.textContent = 'Take Photo';
+      }
+
+      const vehicles = FleetStore.getVehicles();
+      const vCode = activeRunTrip.assignment ? activeRunTrip.assignment.vehicle_id : null;
+      const v = vCode ? vehicles.find(veh => veh.code === vCode || veh.id === vCode) : null;
+      const curOdo = v ? Number(v.last_odometer_km || v.odo || 0) : '';
+
+      const odoInput = document.getElementById('fuel-odo-km');
+      if (odoInput && curOdo) odoInput.value = curOdo;
+
+      validateFuelForm();
+      document.getElementById('add-fuel-modal').classList.add('open');
+    }
+
+    function closeAddFuelModal() {
+      document.getElementById('add-fuel-modal').classList.remove('open');
+    }
+
+    async function captureFuelPhoto(slotNum, kind, title) {
+      if (!activeRunTrip) return;
+      const photoId = await Camera.capture({
+        title: title,
+        hint: 'Capture clear live photo. Gallery uploads strictly prohibited.',
+        booking_id: activeRunTrip.id,
+        kind: kind
+      });
+
+      if (photoId) {
+        fuelPhotos[kind] = photoId;
+        const imgUrl = await Media.getUrl(photoId);
+        const imgEl = document.getElementById(`fuel-img-${slotNum}`);
+        if (imgEl && imgUrl) {
+          imgEl.src = imgUrl;
+        }
+        document.getElementById(`fuel-slot-preview-${slotNum}`).style.display = 'block';
+        document.getElementById(`fuel-btn-label-${slotNum}`).textContent = 'Retake';
+        validateFuelForm();
+      }
+    }
+
+    function validateFuelForm() {
+      const station = (document.getElementById('fuel-station-name').value || '').trim();
+      const odo = Number(document.getElementById('fuel-odo-km').value || 0);
+      const liters = Number(document.getElementById('fuel-liters-input').value || 0);
+      const amount = Number(document.getElementById('fuel-amount-input').value || 0);
+
+      const hasAllPhotos = Boolean(
+        fuelPhotos.gauge_before &&
+        fuelPhotos.pump_display &&
+        fuelPhotos.gauge_after &&
+        fuelPhotos.receipt &&
+        fuelPhotos.odometer
+      );
+
+      const isValid = Boolean(hasAllPhotos && station && odo > 0 && liters > 0 && amount > 0);
+      const submitBtn = document.getElementById('btn-submit-fuel-log');
+      if (submitBtn) {
+        submitBtn.disabled = !isValid;
+      }
+    }
+
+    function submitFuelLog() {
+      if (!activeRunTrip) return;
+      const station = (document.getElementById('fuel-station-name').value || '').trim();
+      const odo = Number(document.getElementById('fuel-odo-km').value || 0);
+      const liters = Number(document.getElementById('fuel-liters-input').value || 0);
+      const amount = Number(document.getElementById('fuel-amount-input').value || 0);
+      const user = Auth.getCurrentUser();
+      const driverName = user ? user.name : 'Demo Driver 01';
+
+      try {
+        FleetStore.addFuelLog(activeRunTrip.id, {
+          station_name: station,
+          odometer_km: odo,
+          liters: liters,
+          amount: amount,
+          photos: fuelPhotos
+        }, driverName);
+
+        closeAddFuelModal();
+        alert(`Fuel log saved: ${liters} L refuel at ${station} recorded with all 5 mandatory photos.`);
+      } catch (err) {
+        alert(err.message || 'Error recording fuel log.');
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function (m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
     }
 
     function updateRunTelemetry(ping) {
@@ -215,8 +506,12 @@
     }
 
     async function initRunPage() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqTripId = urlParams.get('id');
       const bookings = FleetStore.getBookings() || [];
-      const trip = bookings.find(b => b.status === 'Active' || b.status === 'Dispatched') || bookings[0];
+      const trip = (reqTripId ? FleetStore.getBooking(reqTripId) : null) ||
+                   bookings.find(b => b.status === 'Active' || b.status === 'Dispatched') ||
+                   bookings[0];
 
       if (!trip) {
         document.querySelector('.main-content').innerHTML = `
@@ -234,6 +529,11 @@
       document.getElementById('run-header-pretitle').textContent = `${trip.id} · Navigation Active`;
       const vId = trip.assignment ? trip.assignment.vehicle_id : 'Vehicle';
       document.getElementById('run-vehicle-val').textContent = vId;
+
+      const closeBtn = document.getElementById('btn-run-close');
+      if (closeBtn) {
+        closeBtn.href = `driver-close.html?id=${trip.id}`;
+      }
 
       runMapInstance = GeoMap.create('driver-run-map');
       const itineraryRes = await runMapInstance.drawItinerary(trip.itinerary, {
@@ -258,6 +558,10 @@
           updateRunTelemetry(ping);
         }
       });
+
+      checkPassengerEvents();
+      window.addEventListener('storage', checkPassengerEvents);
+      setInterval(checkPassengerEvents, 3000);
     }
 
     document.addEventListener('DOMContentLoaded', function () {

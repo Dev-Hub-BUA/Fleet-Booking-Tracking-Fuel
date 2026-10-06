@@ -89,6 +89,27 @@
 
         <!-- Right Side Live Telemetry Panel -->
         <div style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 16px;">
+          <!-- Passenger Check-In Card -->
+          <div class="card" id="pax-checkin-card" style="border: 2px solid var(--navy-800); background: #FAFBFD;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <h3 class="card-title" style="margin:0; font-size:15px; display:flex; align-items:center; gap:6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Passenger Trip Check-Ins</span>
+              </h3>
+              <span id="pax-checkin-live-badge" class="badge badge-neutral" style="font-size:11px;">Standby</span>
+            </div>
+            <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:12px;">
+              Press the relevant button to notify your driver of boarding, stops, or completion.
+            </p>
+
+            <div id="pax-checkin-actions-container" style="display:flex; flex-direction:column; gap:8px;">
+              <!-- Dynamically populated -->
+            </div>
+
+            <div id="pax-last-status-banner" style="display:none; margin-top:12px; padding:10px; border-radius:6px; font-size:12.5px; background:var(--bg-page); border:1px solid var(--border);">
+            </div>
+          </div>
+
           <div class="card">
             <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); text-transform: uppercase;" id="live-mission-code">MISSION RUN</span>
             <h2 style="font-family: var(--font-condensed); font-size: 32px; line-height: 1.1; color: var(--navy-800); margin: 6px 0 12px;" id="live-eta-headline">Awaiting Dispatch</h2>
@@ -194,8 +215,50 @@
     </div>
   </footer>
 
+  <!-- Stop Reason Modal for Passenger -->
+  <div class="modal-overlay" id="pax-stop-modal">
+    <div class="modal-box" style="max-width:440px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="font-size:17px;">Report Vehicle Stop</h3>
+        <button type="button" class="modal-close-btn" onclick="closePaxStopModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom:12px;">
+          <label class="form-label">Reason for Stop *</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <label style="border:1px solid var(--border); padding:10px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px;">
+              <input type="radio" name="pax_stop_reason" value="Meeting" checked>
+              <span>Meeting</span>
+            </label>
+            <label style="border:1px solid var(--border); padding:10px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px;">
+              <input type="radio" name="pax_stop_reason" value="Break">
+              <span>Break / Rest</span>
+            </label>
+            <label style="border:1px solid var(--border); padding:10px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px;">
+              <input type="radio" name="pax_stop_reason" value="Fuel">
+              <span>Fuel / Service</span>
+            </label>
+            <label style="border:1px solid var(--border); padding:10px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px;">
+              <input type="radio" name="pax_stop_reason" value="Other">
+              <span>Other</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="pax-stop-note">Optional Note</label>
+          <input type="text" id="pax-stop-note" class="form-input" placeholder="e.g. Science Faculty building">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closePaxStopModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="submitPaxStop()">Confirm Stop</button>
+      </div>
+    </div>
+  </div>
+
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/media.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="js/geo.js"></script>
   <script src="js/telemetry.js"></script>
@@ -206,6 +269,165 @@
     let currentTrip = null;
     let unsubscribeTelemetry = null;
     let fullRouteGeometry = [];
+
+    function renderPassengerCheckInCard() {
+      if (!currentTrip) return;
+      const trip = FleetStore.getBooking(currentTrip.id);
+      if (!trip) return;
+      currentTrip = trip;
+
+      const actionsContainer = document.getElementById('pax-checkin-actions-container');
+      const badgeEl = document.getElementById('pax-checkin-live-badge');
+      const statusBanner = document.getElementById('pax-last-status-banner');
+      if (!actionsContainer) return;
+
+      if (badgeEl) {
+        badgeEl.textContent = trip.status;
+        badgeEl.className = trip.status === 'Active' ? 'badge badge-success' : 'badge badge-neutral';
+      }
+
+      if (trip.status !== 'Active') {
+        actionsContainer.innerHTML = `
+          <div style="font-size:12.5px; color:var(--text-muted); padding:10px 12px; background:#F1F5F9; border-radius:6px; line-height:1.5;">
+            Driver has not started the trip yet (current status: <strong>${trip.status}</strong>). Live boarding check-in activates automatically once the trip becomes Active.
+          </div>
+          <button type="button" class="btn btn-secondary btn-lg" disabled style="width:100%; opacity:0.6; cursor:not-allowed;">
+            I boarded (Awaiting Driver Start)
+          </button>
+        `;
+        if (statusBanner) statusBanner.style.display = 'none';
+        return;
+      }
+
+      const events = trip.passenger_events || [];
+      const lastEvent = events.length > 0 ? events[events.length - 1] : null;
+
+      let buttonsHtml = '';
+
+      if (!lastEvent) {
+        buttonsHtml = `
+          <button type="button" class="btn btn-gold btn-lg" style="width:100%; font-weight:700; font-size:16px; padding:14px;" onclick="handlePaxCheckIn('boarded')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle; margin-right:6px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <span>I boarded</span>
+          </button>
+        `;
+      } else if (lastEvent.type === 'boarded' || lastEvent.type === 'moving') {
+        buttonsHtml = `
+          <button type="button" class="btn btn-primary btn-lg" style="width:100%; font-weight:700; padding:12px;" onclick="openPaxStopModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle; margin-right:6px;"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6"/></svg>
+            <span>Stopped / got off</span>
+          </button>
+          <button type="button" class="btn btn-secondary" style="width:100%; margin-top:4px;" onclick="handlePaxCheckIn('finished')">
+            Trip finished
+          </button>
+        `;
+      } else if (lastEvent.type === 'stopped') {
+        buttonsHtml = `
+          <button type="button" class="btn btn-gold btn-lg" style="width:100%; font-weight:700; padding:12px;" onclick="handlePaxCheckIn('moving')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle; margin-right:6px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Back in the vehicle / moving again</span>
+          </button>
+          <button type="button" class="btn btn-secondary" style="width:100%; margin-top:4px;" onclick="handlePaxCheckIn('finished')">
+            Trip finished
+          </button>
+        `;
+      } else if (lastEvent.type === 'finished') {
+        buttonsHtml = `
+          <div class="badge badge-success" style="padding:10px 14px; font-size:13px; text-align:center; display:block;">
+            Trip marked finished by passenger
+          </div>
+        `;
+      }
+
+      actionsContainer.innerHTML = buttonsHtml;
+
+      if (lastEvent && statusBanner) {
+        statusBanner.style.display = 'block';
+        const timeStr = new Date(lastEvent.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        const typeDisplay = lastEvent.type === 'boarded'
+          ? 'Boarded vehicle'
+          : (lastEvent.type === 'stopped'
+            ? `Stopped (${lastEvent.reason || 'Stop'}${lastEvent.note ? ': ' + lastEvent.note : ''})`
+            : (lastEvent.type === 'moving'
+              ? 'Back in vehicle / moving again'
+              : 'Trip finished'));
+
+        let badgeStr = '';
+        if (lastEvent.status === 'awaiting_driver') {
+          badgeStr = `<span class="badge badge-warning" style="font-size:11px;">Awaiting Driver Confirmation</span>`;
+        } else if (lastEvent.status === 'confirmed') {
+          badgeStr = `<span class="badge badge-success" style="font-size:11px;">Confirmed by Driver</span>`;
+        } else if (lastEvent.status === 'disputed') {
+          badgeStr = `<span class="badge badge-danger" style="font-size:11px;">Disputed: "${escapeHtml(lastEvent.dispute_note || 'Discrepancy')}"</span>`;
+        }
+
+        statusBanner.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+            <div>
+              <div style="font-weight:700; color:var(--navy-800);">${typeDisplay}</div>
+              <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">Logged at ${timeStr}</div>
+            </div>
+            <div>${badgeStr}</div>
+          </div>
+        `;
+      }
+    }
+
+    async function handlePaxCheckIn(type, reason = '', note = '') {
+      if (!currentTrip) return;
+      const user = Auth.getCurrentUser();
+      let lat = null;
+      let lng = null;
+
+      try {
+        if (navigator.geolocation) {
+          const pos = await new Promise((res, rej) => {
+            navigator.geolocation.getCurrentPosition(res, rej, { timeout: 2000, maximumAge: 30000 });
+          });
+          lat = Number(pos.coords.latitude.toFixed(6));
+          lng = Number(pos.coords.longitude.toFixed(6));
+        }
+      } catch (e) {}
+
+      if (lat === null && currentTrip.itinerary && currentTrip.itinerary[0]) {
+        lat = currentTrip.itinerary[0].lat;
+        lng = currentTrip.itinerary[0].lng;
+      }
+
+      try {
+        FleetStore.addPassengerEvent(currentTrip.id, {
+          type: type,
+          reason: reason,
+          note: note,
+          lat: lat,
+          lng: lng,
+          user: user
+        });
+
+        renderPassengerCheckInCard();
+      } catch (err) {
+        alert(err.message || 'Error recording passenger check-in.');
+      }
+    }
+
+    function openPaxStopModal() {
+      const noteInput = document.getElementById('pax-stop-note');
+      if (noteInput) noteInput.value = '';
+      document.getElementById('pax-stop-modal').classList.add('open');
+    }
+
+    function closePaxStopModal() {
+      document.getElementById('pax-stop-modal').classList.remove('open');
+    }
+
+    function submitPaxStop() {
+      const reasonRadio = document.querySelector('input[name="pax_stop_reason"]:checked');
+      const reason = reasonRadio ? reasonRadio.value : 'Meeting';
+      const note = (document.getElementById('pax-stop-note').value || '').trim();
+
+      closePaxStopModal();
+      handlePaxCheckIn('stopped', reason, note);
+    }
 
     function escapeHtml(str) {
       if (!str) return '';
@@ -409,6 +631,10 @@
         document.getElementById('live-distance-val').textContent = 'Awaiting Dispatch';
         document.getElementById('live-ping-val').textContent = 'Vehicle stationary at base';
       }
+
+      renderPassengerCheckInCard();
+      window.addEventListener('storage', renderPassengerCheckInCard);
+      setInterval(renderPassengerCheckInCard, 3000);
     }
 
     document.addEventListener('DOMContentLoaded', function () {

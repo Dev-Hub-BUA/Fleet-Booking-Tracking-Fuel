@@ -73,20 +73,34 @@
   </button>
 </div>
 
+<!-- Section 1: Fuel Variance Exception List -->
 <div class="card" style="margin-bottom: 24px;">
-  <h2 class="card-title">1. Trip Fuel &amp; Mileage Reconciliation Ledger</h2>
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+    <div>
+      <h2 class="card-title" style="margin:0;">1. Fuel Variance Compliance &amp; Reconciliation Ledger</h2>
+      <div style="font-size:13px; color:var(--text-muted); margin-top:2px;">
+        Trips where actual vs. estimate variance exceeds the ±10% compliance threshold are highlighted in red (no financial rates displayed to Auditor).
+      </div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button type="button" class="btn btn-sm btn-primary" id="btn-var-all" onclick="filterVariance('all', this)">All Closed Trips</button>
+      <button type="button" class="btn btn-sm btn-secondary" id="btn-var-flagged" onclick="filterVariance('flagged', this)">Flagged &gt; ±10% Only</button>
+    </div>
+  </div>
+
   <div class="table-wrapper">
     <table class="data-table">
       <thead>
         <tr>
           <th>Trip</th>
           <th>Department</th>
-          <th>Route</th>
-          <th style="text-align:right;">Est Fuel</th>
-          <th style="text-align:right;">Act Fuel</th>
+          <th>Route Corridor</th>
+          <th style="text-align:right;">Trip Km (Act / Plan)</th>
+          <th style="text-align:right;">Est Fuel (L)</th>
+          <th style="text-align:right;">Act Fuel (L)</th>
           <th style="text-align:right;">Delta %</th>
-          <th>Audit Status</th>
-          <th>Action</th>
+          <th>Compliance Status</th>
+          <th>Audit Action</th>
         </tr>
       </thead>
       <tbody id="audit-ledger-tbody">
@@ -96,64 +110,87 @@
   </div>
 </div>
 
+<!-- Section 2: Passenger Movement & Stop-Duration Compliance Audit -->
+<div class="card" style="margin-bottom: 24px;">
+  <div style="margin-bottom: 14px;">
+    <h2 class="card-title" style="margin: 0;">2. Passenger Movement &amp; Stop-Duration Compliance Audit</h2>
+    <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+      Verified passenger boarding, interim stops, moving segment durations, and driver-disputed anomalies.
+    </div>
+  </div>
+
+  <div id="audit-passenger-timeline-container" style="display:flex; flex-direction:column; gap:14px;">
+    <!-- Rendered dynamically -->
+  </div>
+</div>
+
+<!-- Section 3: In-Trip Refuel Verification Ledger (5 Live Photos) -->
+<div class="card" style="margin-bottom: 24px;">
+  <div style="margin-bottom: 14px;">
+    <h2 class="card-title" style="margin: 0;">3. In-Trip Refuel Verification Ledger (5 Mandatory Live Photos)</h2>
+    <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+      Auditors inspect 5 live camera photos per refuelling (before gauge, pump display, after gauge, receipt, odometer). Click thumbnails to inspect.
+    </div>
+  </div>
+
+  <div id="audit-fuel-logs-container">
+    <!-- Rendered dynamically -->
+  </div>
+</div>
+
+<!-- Section 4: Audit History with Date, User, Action Filters -->
 <div class="card">
-  <h2 class="card-title">2. Immutable System Action Log (WORM Hash Chain)</h2>
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+    <div>
+      <h2 class="card-title" style="margin:0;">4. Immutable System Action Log &amp; Booking History</h2>
+      <div style="font-size:13px; color:var(--text-muted); margin-top:2px;">
+        Chronological audit events recorded across all vehicle requests and system milestones.
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters: Date, User, Action -->
+  <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; background:var(--bg-page); padding:12px 16px; border-radius:var(--radius-sm); border:1px solid var(--border); margin-bottom:16px;">
+    <div style="display:flex; align-items:center; gap:6px;">
+      <label for="audit-filter-date" style="font-size:12.5px; font-weight:700; color:var(--navy-800);">Date:</label>
+      <input type="date" id="audit-filter-date" onchange="renderAuditActionLog()" style="padding:6px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:12.5px;">
+    </div>
+
+    <div style="display:flex; align-items:center; gap:6px;">
+      <label for="audit-filter-user" style="font-size:12.5px; font-weight:700; color:var(--navy-800);">User / Actor:</label>
+      <input type="text" id="audit-filter-user" placeholder="Filter by name/actor…" oninput="renderAuditActionLog()" style="padding:6px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:12.5px; width:180px;">
+    </div>
+
+    <div style="display:flex; align-items:center; gap:6px;">
+      <label for="audit-filter-action" style="font-size:12.5px; font-weight:700; color:var(--navy-800);">Action:</label>
+      <select id="audit-filter-action" onchange="renderAuditActionLog()" style="padding:6px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:12.5px;">
+        <option value="All">All Actions</option>
+        <option value="APPROV">Approval / Dispatch</option>
+        <option value="SUBMIT">Booking Submission</option>
+        <option value="TRIP">Trip Milestones (Start / Stop)</option>
+        <option value="CLOSE">Close Trip / Actuals</option>
+        <option value="RECONCILE">Audit Reconciliation</option>
+        <option value="INCIDENT">Incident / Rescue</option>
+        <option value="SHIFT">Duty Shift</option>
+      </select>
+    </div>
+
+    <button type="button" class="btn btn-secondary btn-sm" onclick="resetAuditFilters()" style="margin-left:auto;">Reset Filters</button>
+  </div>
+
   <div class="table-wrapper">
     <table class="data-table">
       <thead>
         <tr>
-          <th>Event ID</th>
           <th>Timestamp</th>
-          <th>Entity</th>
-          <th>Actor</th>
-          <th>Action</th>
-          <th>Details</th>
+          <th>Entity / Ref</th>
+          <th>Actor / User</th>
+          <th>Action Type</th>
+          <th>Audit Details</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8812</td>
-      <td style="font-family:var(--font-mono); font-size:13px;">13 Oct 2026 · 08:31:04</td>
-      <td style="font-family:var(--font-mono);">BK-2047 · V-122</td>
-      <td><strong>System (GPS Geo-Trigger)</strong></td>
-      <td><span class="badge badge-info">TRIP_ACTIVATED</span></td>
-      <td style="font-size:13px; color:var(--text-muted);">Vehicle departed campus perimeter. Real-time telemetry streaming started.</td>
-    </tr><tr>
-      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8811</td>
-      <td style="font-family:var(--font-mono); font-size:13px;">13 Oct 2026 · 08:20:19</td>
-      <td style="font-family:var(--font-mono);">BK-2047 · V-122</td>
-      <td><strong>Demo Driver 01 (D-101)</strong></td>
-      <td><span class="badge badge-info">ASSIGNMENT_ACCEPTED</span></td>
-      <td style="font-size:13px; color:var(--text-muted);">Pre-trip checklist validated. Duty hour window confirmed 6.5h / 8h.</td>
-    </tr><tr>
-      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8810</td>
-      <td style="font-family:var(--font-mono); font-size:13px;">12 Oct 2026 · 14:20:44</td>
-      <td style="font-family:var(--font-mono);">BK-2047 · V-114 → V-122</td>
-      <td><strong>Demo Ops Manager (USR-DSP-204)</strong></td>
-      <td><span class="badge badge-info">VEHICLE_SUBSTITUTION</span></td>
-      <td style="font-size:13px; color:var(--text-muted);">Automated conflict detector identified 45-min buffer overlap on V-114. Swapped to V-122.</td>
-    </tr><tr>
-      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8809</td>
-      <td style="font-family:var(--font-mono); font-size:13px;">12 Oct 2026 · 14:20:30</td>
-      <td style="font-family:var(--font-mono);">BK-2047</td>
-      <td><strong>Demo Ops Manager (USR-DSP-204)</strong></td>
-      <td><span class="badge badge-info">REQUEST_APPROVED</span></td>
-      <td style="font-size:13px; color:var(--text-muted);">Booking approved for Faculty of Pharmacy (CC-410). Vehicle turnaround hold window locked.</td>
-    </tr><tr>
-      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8808</td>
-      <td style="font-family:var(--font-mono); font-size:13px;">12 Oct 2026 · 11:40:12</td>
-      <td style="font-family:var(--font-mono);">BK-2047</td>
-      <td><strong>Demo Requester 1 (USR-REQ-101)</strong></td>
-      <td><span class="badge badge-info">BOOKING_SUBMITTED</span></td>
-      <td style="font-size:13px; color:var(--text-muted);">Initial request submitted via web portal: 61.4 km, estimated fuel 14.1 L Diesel.</td>
-    </tr><tr>
-      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8807</td>
-      <td style="font-family:var(--font-mono); font-size:13px;">12 Oct 2026 · 09:15:00</td>
-      <td style="font-family:var(--font-mono);">Price Book v3</td>
-      <td><strong>Demo Fleet Admin (USR-ADM-401)</strong></td>
-      <td><span class="badge badge-info">PRICE_BOOK_AUDIT</span></td>
-      <td style="font-size:13px; color:var(--text-muted);">Quarterly fuel prices cross-checked against official Egyptian Petroleum pricing gazette.</td>
-    </tr>
+      <tbody id="audit-events-tbody">
+        <!-- Rendered dynamically via FleetStore -->
       </tbody>
     </table>
   </div>
@@ -206,70 +243,444 @@
     </div>
   </footer>
 
+  <!-- High-Res Photo Viewer Modal -->
+  <div class="modal-overlay" id="image-viewer-modal">
+    <div class="modal-box" style="max-width:700px; background:#0B132B; color:#FFFFFF;">
+      <div class="modal-header" style="background:#1C2541; border-bottom:1px solid #3A506B;">
+        <h3 class="modal-title" id="image-viewer-title" style="color:#CE9F51; font-size:17px;">Live Camera Photo Proof</h3>
+        <button type="button" class="modal-close-btn" onclick="closeImageViewerModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:16px; text-align:center; background:#0B132B;">
+        <img id="image-viewer-img" src="" alt="Enlarged Verification Photo" style="max-width:100%; max-height:480px; object-fit:contain; border-radius:6px; border:1px solid #3A506B;">
+        <div id="image-viewer-meta" style="margin-top:10px; font-size:12px; font-family:var(--font-mono); color:#94A3B8;"></div>
+      </div>
+      <div class="modal-footer" style="background:#1C2541; border-top:1px solid #3A506B;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeImageViewerModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/media.js"></script>
   <script src="js/main.js"></script>
   <script>
+    let currentVarianceFilter = 'all';
+
+    function filterVariance(mode, btn) {
+      currentVarianceFilter = mode;
+      document.getElementById('btn-var-all').className = mode === 'all' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary';
+      document.getElementById('btn-var-flagged').className = mode === 'flagged' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary';
+      renderAuditLedger();
+    }
+
     function renderAuditLedger() {
       const tbody = document.getElementById('audit-ledger-tbody');
       if (!tbody) return;
 
-      const bookings = FleetStore.getBookings();
-      // Show trips that have reached Closed or Completed, or have actual fuel
-      const auditable = bookings.filter(b => b.status === 'Closed' || b.status === 'Completed' || b.actualFuelLitres);
+      const bookings = FleetStore.getBookings() || [];
+      const auditable = bookings.filter(b => b.status === 'Closed' || b.status === 'Completed' || b.actualFuelLitres !== undefined || (b.actuals && b.actuals.fuel_liters));
 
-      if (auditable.length === 0) {
+      let list = auditable.map(b => {
+        let estLit = (b.estimate && b.estimate.fuel_liters) || b.estFuelLiters || 14.1;
+        let actLit = (b.actuals && b.actuals.fuel_liters) || b.actualFuelLitres || 14.5;
+        let delta = b.fuelVariancePct !== undefined && b.fuelVariancePct !== null
+          ? b.fuelVariancePct
+          : (estLit > 0 ? Number((((actLit - estLit) / estLit) * 100).toFixed(1)) : 0);
+
+        const route = (b.itinerary && b.itinerary.length >= 2)
+          ? `${b.itinerary[0].place_name} → ${b.itinerary[b.itinerary.length - 1].place_name}`
+          : (b.route || `${b.origin || 'Main Campus'} → ${b.destination || 'Cairo'}`);
+
+        const plannedKm = b.route_legs ? b.route_legs.reduce((acc, l) => acc + (l.distance_km || 0), 0) : 61.4;
+        const actKm = (b.actuals && b.actuals.km_travelled !== undefined)
+          ? b.actuals.km_travelled
+          : ((b.actualOdoEnd !== undefined && b.actualOdoStart !== undefined) ? Math.max(0, b.actualOdoEnd - b.actualOdoStart) : 61);
+
+        return {
+          id: b.id,
+          dept: (b.requester && b.requester.department) || b.dept || 'Campus Logistics',
+          route: route,
+          actKm: actKm,
+          plannedKm: plannedKm,
+          estFuel: estLit,
+          actFuel: actLit,
+          delta: delta,
+          isFlagged: Math.abs(delta) > 10.0,
+          reconciled: Boolean(b.reconciled)
+        };
+      });
+
+      if (currentVarianceFilter === 'flagged') {
+        list = list.filter(item => item.isFlagged);
+      }
+
+      if (list.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted);">
-              No closed trips currently awaiting financial reconciliation.
+            <td colspan="9" style="text-align:center; padding:32px; color:var(--text-muted);">
+              ${currentVarianceFilter === 'flagged' ? 'No fuel variances exceeding ±10% threshold.' : 'No closed trips awaiting audit verification.'}
             </td>
           </tr>
         `;
         return;
       }
 
-      tbody.innerHTML = auditable.map(b => {
-        const isClosed = (b.status === 'Closed');
-        const delta = b.fuelVariancePct !== null && b.fuelVariancePct !== undefined ? b.fuelVariancePct : 0;
-        const deltaColor = Math.abs(delta) <= 10 ? 'var(--success)' : 'var(--danger)';
-        const deltaSign = delta > 0 ? '+' : '';
+      tbody.innerHTML = list.map(item => {
+        const deltaColor = item.isFlagged ? 'var(--danger)' : 'var(--success)';
+        const deltaSign = item.delta > 0 ? '+' : '';
+        const complianceBadge = item.isFlagged
+          ? '<span class="badge badge-danger">Variance &gt; ±10%</span>'
+          : '<span class="badge badge-success">Compliant (&le; ±10%)</span>';
 
-        const statusBadge = isClosed 
-          ? '<span class="badge badge-warning" style="background:#FFF3E0;color:#E65100;">Awaiting Settlement</span>'
-          : '<span class="badge badge-success">Reconciled</span>';
-
-        const actionBtn = isClosed
-          ? `<button class="btn btn-gold btn-sm" onclick="handleReconcileTrip('${b.id}')">Approve &amp; Settle</button>`
-          : `<span style="font-size:12px;color:var(--success);font-weight:700;">Cleared</span>`;
+        const actionHtml = item.reconciled
+          ? '<span style="font-size:12px; color:var(--success); font-weight:700;">Reconciled &amp; Cleared</span>'
+          : `<button type="button" class="btn btn-gold btn-sm" onclick="handleReconcileTrip('${item.id}')">Approve &amp; Settle</button>`;
 
         return `
-          <tr style="${isClosed ? 'background: #FFFDF7;' : ''}">
-            <td style="font-family:var(--font-mono); font-weight:700;">${b.id}</td>
-            <td>${b.dept || 'Academic Dept'}</td>
-            <td><strong>${b.route || (b.origin + ' → ' + b.destination)}</strong></td>
-            <td style="font-family:var(--font-mono); text-align:right;">${b.estFuelLiters || 14.1} L</td>
-            <td style="font-family:var(--font-mono); text-align:right;">${b.actualFuelLitres || 14.5} L</td>
+          <tr style="${item.isFlagged ? 'background: #FFF8F8;' : ''}">
+            <td style="font-family:var(--font-mono); font-weight:700;">${item.id}</td>
+            <td>${escapeHtml(item.dept)}</td>
+            <td><strong>${escapeHtml(item.route)}</strong></td>
+            <td style="font-family:var(--font-mono); text-align:right;">${item.actKm.toLocaleString()} km <span style="color:var(--text-muted); font-size:11.5px;">/ ${item.plannedKm.toFixed(1)} km</span></td>
+            <td style="font-family:var(--font-mono); text-align:right;">${item.estFuel.toFixed(1)} L</td>
+            <td style="font-family:var(--font-mono); text-align:right;">${item.actFuel.toFixed(1)} L</td>
             <td style="font-family:var(--font-mono); text-align:right; font-weight:700; color:${deltaColor};">
-              ${deltaSign}${delta}%
+              ${deltaSign}${item.delta}%
             </td>
-            <td>${statusBadge}</td>
-            <td>${actionBtn}</td>
+            <td>${complianceBadge}</td>
+            <td>${actionHtml}</td>
           </tr>
         `;
       }).join('');
     }
 
+    async function openImageViewer(photoId, title) {
+      if (!photoId) return;
+      const modal = document.getElementById('image-viewer-modal');
+      const imgEl = document.getElementById('image-viewer-img');
+      const titleEl = document.getElementById('image-viewer-title');
+      const metaEl = document.getElementById('image-viewer-meta');
+
+      titleEl.textContent = title || 'Live Photo Verification';
+      imgEl.src = '';
+      metaEl.textContent = 'Loading verified photo blob from IndexedDB…';
+      modal.classList.add('open');
+
+      const url = await Media.getUrl(photoId);
+      const rec = await Media.get(photoId);
+      if (url) {
+        imgEl.src = url;
+      }
+      if (rec) {
+        metaEl.textContent = `ID: ${rec.id} · Kind: ${rec.kind} · Taken: ${rec.taken_at} · GPS: ${rec.lat}, ${rec.lng} · Taken By: ${rec.by_user_id}`;
+      } else {
+        metaEl.textContent = `Photo ID: ${photoId}`;
+      }
+    }
+
+    function closeImageViewerModal() {
+      document.getElementById('image-viewer-modal').classList.remove('open');
+    }
+
+    function toggleFuelMismatch(bookingId, fuelLogId) {
+      const b = FleetStore.getBooking(bookingId);
+      if (!b || !b.fuel_logs) return;
+      const log = b.fuel_logs.find(fl => fl.id === fuelLogId);
+      if (!log) return;
+
+      const auditorUser = Auth.getCurrentUser();
+      const auditorName = auditorUser ? auditorUser.name : 'Demo Auditor';
+
+      if (!log.mismatch_flagged) {
+        const notes = prompt('Enter auditor mismatch observation (e.g. Pump photo reads 32.0 L but typed is 35.5 L):', 'Typed liters differ from pump display photo');
+        if (!notes) return;
+        FleetStore.flagFuelMismatch(bookingId, fuelLogId, notes, auditorName);
+      } else {
+        FleetStore.flagFuelMismatch(bookingId, fuelLogId, '', auditorName);
+      }
+
+      renderFuelLogsAudit();
+      renderAuditActionLog();
+    }
+
+    function renderPassengerTimelineAudit() {
+      const container = document.getElementById('audit-passenger-timeline-container');
+      if (!container) return;
+
+      const bookings = FleetStore.getBookings() || [];
+      const withPax = bookings.filter(b => Array.isArray(b.passenger_events) && b.passenger_events.length > 0);
+
+      if (withPax.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:24px; color:var(--text-muted); background:var(--bg-page); border-radius:8px;">
+            No passenger check-in events recorded across active or completed trips.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = withPax.map(b => {
+        const tl = FleetStore.calculatePassengerTimeline(b.passenger_events, b);
+        const paxName = (b.requester && b.requester.name) || 'Passenger';
+        const paxDept = (b.requester && b.requester.department) || 'Department';
+
+        const disputeBadges = tl.disputedEvents.map(e => `
+          <div style="background:#FEE2E2; border:1px solid #EF4444; border-radius:6px; padding:8px 12px; margin-top:8px; color:#991B1B; font-size:12.5px;">
+            <strong>FLAGGED DISPUTE (${e.type}):</strong> Driver disputed passenger report — "${escapeHtml(e.dispute_note || 'Status/time mismatch')}" (${new Date(e.disputed_at || e.at).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })})
+          </div>
+        `).join('');
+
+        const segmentsHtml = tl.segments.map(s => {
+          const isStop = s.type === 'stopped';
+          const bg = isStop ? '#FEF3C7' : '#F0FDF4';
+          const border = isStop ? '#F59E0B' : '#10B981';
+          const color = isStop ? '#92400E' : '#065F46';
+          return `<span style="background:${bg}; border:1px solid ${border}; color:${color}; padding:4px 8px; border-radius:4px; font-size:12px; font-weight:600;">${escapeHtml(s.display)}</span>`;
+        }).join(' ');
+
+        return `
+          <div style="border:1px solid var(--border); border-radius:8px; padding:16px; background:#FFFFFF;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+              <div>
+                <strong style="color:var(--navy-800); font-size:15px;">${b.id} · ${escapeHtml(paxName)} (${escapeHtml(paxDept)})</strong>
+                <span class="badge ${b.status === 'Completed' ? 'badge-success' : 'badge-info'}" style="margin-left:8px;">${b.status}</span>
+              </div>
+              <div style="font-size:12px; font-family:var(--font-mono); color:var(--text-muted);">
+                ${b.start_date || '2026-10-18'}
+              </div>
+            </div>
+
+            <div style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+              ${segmentsHtml || '<span style="color:var(--text-muted); font-size:12.5px;">Awaiting movement segments…</span>'}
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; background:var(--bg-page); padding:10px; border-radius:6px; font-size:12.5px;">
+              <div><span style="color:var(--text-muted);">Total Moving Time:</span> <strong>${tl.totalMovingStr}</strong></div>
+              <div><span style="color:var(--text-muted);">Total Stopped Time:</span> <strong>${tl.totalStoppedStr}</strong></div>
+              <div><span style="color:var(--text-muted);">Total Stops:</span> <strong>${tl.stopCount} stops</strong></div>
+              <div><span style="color:var(--text-muted);">Disputed Events:</span> <strong style="color:${tl.disputedCount > 0 ? 'var(--danger)' : 'var(--success)'};">${tl.disputedCount}</strong></div>
+            </div>
+
+            ${disputeBadges}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderFuelLogsAudit() {
+      const container = document.getElementById('audit-fuel-logs-container');
+      if (!container) return;
+
+      const bookings = FleetStore.getBookings() || [];
+      const withFuel = [];
+      bookings.forEach(b => {
+        if (Array.isArray(b.fuel_logs) && b.fuel_logs.length > 0) {
+          b.fuel_logs.forEach(fl => {
+            withFuel.push({ booking: b, log: fl });
+          });
+        }
+      });
+
+      if (withFuel.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:24px; color:var(--text-muted); background:var(--bg-page); border-radius:8px;">
+            No in-trip fuel purchase logs submitted yet.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = withFuel.map(item => {
+        const b = item.booking;
+        const fl = item.log;
+        const estLit = (b.estimate && b.estimate.fuel_liters) || 14.1;
+        const photos = fl.photos || {};
+
+        function renderPhotoThumb(photoId, label) {
+          if (!photoId) {
+            return `<div style="width:72px; height:54px; background:#E2E8F0; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#64748B;">No Photo</div>`;
+          }
+          return `
+            <div style="cursor:pointer; text-align:center;" onclick="openImageViewer('${photoId}', '${b.id} — ${label}')">
+              <div style="width:72px; height:54px; border-radius:4px; border:1px solid var(--border); overflow:hidden; background:#000; position:relative;">
+                <img id="thumb-${photoId}" src="" alt="${label}" style="width:100%; height:100%; object-fit:cover;">
+                <span style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); color:#CE9F51; font-size:8px; padding:1px 3px; border-radius:2px;">LIVE</span>
+              </div>
+              <div style="font-size:9.5px; color:var(--text-muted); margin-top:2px; max-width:72px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${label}</div>
+            </div>
+          `;
+        }
+
+        setTimeout(async () => {
+          ['gauge_before', 'pump_display', 'gauge_after', 'receipt', 'odometer'].forEach(async k => {
+            const pId = photos[k];
+            if (pId) {
+              const u = await Media.getUrl(pId);
+              const el = document.getElementById(`thumb-${pId}`);
+              if (el && u) el.src = u;
+            }
+          });
+        }, 10);
+
+        const mismatchBadge = fl.mismatch_flagged
+          ? `<span class="badge badge-danger">Fuel Mismatch Flagged</span>`
+          : `<span class="badge badge-success">Quantities Aligned</span>`;
+
+        const mismatchActionBtn = fl.mismatch_flagged
+          ? `<button type="button" class="btn btn-danger btn-sm" onclick="toggleFuelMismatch('${b.id}', '${fl.id}')">Mismatch Flagged (Click to Clear)</button>`
+          : `<button type="button" class="btn btn-secondary btn-sm" onclick="toggleFuelMismatch('${b.id}', '${fl.id}')">Flag Quantity Mismatch</button>`;
+
+        return `
+          <div style="border:1px solid ${fl.mismatch_flagged ? '#EF4444' : 'var(--border)'}; border-radius:8px; padding:16px; margin-bottom:12px; background:#FFFFFF;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; border-bottom:1px solid var(--border-light); padding-bottom:8px;">
+              <div>
+                <strong style="color:var(--navy-800); font-size:15px;">Trip ${b.id} · Refuel Log (${escapeHtml(fl.station_name)})</strong>
+                <span style="font-size:12px; color:var(--text-muted); margin-left:8px;">Logged by ${escapeHtml(fl.driver || 'Driver')} · Odo: ${fl.odometer_km.toLocaleString()} km</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                ${mismatchBadge}
+                ${mismatchActionBtn}
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:12px; font-size:13px;">
+              <div><span style="color:var(--text-muted);">Fuel Reported:</span> <strong style="font-family:var(--font-mono); font-size:15px; color:var(--navy-800);">${fl.liters} L</strong></div>
+              <div><span style="color:var(--text-muted);">Trip Nominal Estimate:</span> <strong style="font-family:var(--font-mono); font-size:14px;">${estLit.toFixed(1)} L</strong></div>
+              <div><span style="color:var(--text-muted);">Station / Pump:</span> <strong>${escapeHtml(fl.station_name)}</strong></div>
+            </div>
+
+            <div>
+              <div style="font-size:12px; font-weight:700; color:var(--navy-800); margin-bottom:6px;">5 Mandatory Live Verification Photos (Click to Enlarge):</div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                ${renderPhotoThumb(photos.gauge_before, '1. Gauge Before')}
+                ${renderPhotoThumb(photos.pump_display, '2. Pump Display')}
+                ${renderPhotoThumb(photos.gauge_after, '3. Gauge After')}
+                ${renderPhotoThumb(photos.receipt, '4. Receipt')}
+                ${renderPhotoThumb(photos.odometer, '5. Odometer')}
+              </div>
+            </div>
+
+            ${fl.mismatch_flagged ? `
+              <div style="margin-top:10px; padding:8px 12px; background:#FEF2F2; border:1px solid #F87171; border-radius:6px; color:#991B1B; font-size:12.5px;">
+                <strong>Auditor Discrepancy Note:</strong> ${escapeHtml(fl.mismatch_notes || 'Typed liters differ from pump display photo')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
     function handleReconcileTrip(id) {
-      const reconciled = FleetStore.reconcileTrip(id, 'Verified fuel receipt & odometer. Cleared within ±10% threshold.');
-      alert(`Financial reconciliation approved for trip (${id}) successfully!\n\nFuel Variance: ${reconciled ? reconciled.fuelVariancePct : 0}%\nStatus: Reconciled\nFinal chargeback successfully debited against departmental budget.`);
+      const reconciled = FleetStore.reconcileTrip(id, 'Audit clearance verified. Variance accepted by Internal Audit.');
+      alert(`Financial reconciliation approved for trip ${id}.\n\nCompliance Status: Cleared\nChargeback debited against departmental budget.`);
       renderAuditLedger();
+      renderPassengerTimelineAudit();
+      renderFuelLogsAudit();
+      renderAuditActionLog();
+    }
+
+    function renderAuditActionLog() {
+      const tbody = document.getElementById('audit-events-tbody');
+      if (!tbody) return;
+
+      const data = FleetStore.load();
+      const allEvents = [];
+
+      // Add auditTrail entries
+      if (Array.isArray(data.auditTrail)) {
+        data.auditTrail.forEach(a => {
+          allEvents.push({
+            time: a.time || 'Just now',
+            date: a.time && a.time.includes('-') ? a.time.split('T')[0] : '2026-10-13',
+            entity: a.ref || 'System',
+            user: a.user || 'System',
+            action: a.action || 'ACTION',
+            details: a.details || ''
+          });
+        });
+      }
+
+      // Add booking history entries
+      if (Array.isArray(data.bookings)) {
+        data.bookings.forEach(b => {
+          if (Array.isArray(b.history)) {
+            b.history.forEach(h => {
+              const dt = h.at || '2026-10-13T10:00:00+03:00';
+              allEvents.push({
+                time: dt.replace('T', ' ').substring(0, 19),
+                date: dt.split('T')[0],
+                entity: b.id,
+                user: h.by || 'System',
+                action: h.status || 'STATUS_UPDATE',
+                details: h.note || ''
+              });
+            });
+          }
+        });
+      }
+
+      // Filter events
+      const dateVal = document.getElementById('audit-filter-date')?.value;
+      const userVal = (document.getElementById('audit-filter-user')?.value || '').trim().toLowerCase();
+      const actionVal = document.getElementById('audit-filter-action')?.value || 'All';
+
+      let filtered = allEvents.filter(ev => {
+        if (dateVal && ev.date && !ev.date.startsWith(dateVal)) return false;
+        if (userVal && !ev.user.toLowerCase().includes(userVal)) return false;
+        if (actionVal !== 'All') {
+          const act = (ev.action + ' ' + ev.details).toUpperCase();
+          if (!act.includes(actionVal)) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align:center; padding:28px; color:var(--text-muted);">
+              No audit events found matching the selected filters.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(ev => {
+        return `
+          <tr>
+            <td style="font-family:var(--font-mono); font-size:12.5px; white-space:nowrap;">${escapeHtml(ev.time)}</td>
+            <td style="font-family:var(--font-mono); font-weight:700;">${escapeHtml(ev.entity)}</td>
+            <td><strong>${escapeHtml(ev.user)}</strong></td>
+            <td><span class="badge badge-info" style="font-size:11px;">${escapeHtml(ev.action)}</span></td>
+            <td style="font-size:13px; color:var(--text-muted);">${escapeHtml(ev.details)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function resetAuditFilters() {
+      const d = document.getElementById('audit-filter-date');
+      const u = document.getElementById('audit-filter-user');
+      const a = document.getElementById('audit-filter-action');
+      if (d) d.value = '';
+      if (u) u.value = '';
+      if (a) a.value = 'All';
+      renderAuditActionLog();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-      if (!Auth.requireAuth(["Auditor"])) return;
+      if (!Auth.requireAuth(["Auditor", "Fleet admin"])) return;
       Auth.renderAppShell('audit');
       renderAuditLedger();
+      renderAuditActionLog();
     });
   </script>
 </body>

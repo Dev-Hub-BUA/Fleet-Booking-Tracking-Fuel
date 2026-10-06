@@ -219,6 +219,24 @@
             <div id="assigned-resources-content"></div>
           </div>
 
+          <!-- Passenger Movement & Stop Timeline Card -->
+          <div class="card" id="detail-passenger-timeline-card">
+            <h2 class="card-title">Passenger Movement &amp; Stop Timeline</h2>
+            <div id="detail-passenger-timeline-content"></div>
+          </div>
+
+          <!-- Mandatory Telemetry & Odometer Verification Card -->
+          <div class="card" id="detail-odometer-card">
+            <h2 class="card-title">Mandatory Telemetry &amp; Odometer Verification</h2>
+            <div id="detail-odometer-content"></div>
+          </div>
+
+          <!-- In-Trip Refuel Receipts & Verifications Card -->
+          <div class="card" id="detail-refuel-card">
+            <h2 class="card-title">In-Trip Refuel Logs &amp; Verifications</h2>
+            <div id="detail-refuel-content"></div>
+          </div>
+
         </div>
 
         <!-- Right Column: Request Details & Messages -->
@@ -331,9 +349,27 @@
     </div>
   </footer>
 
+  <!-- High-Res Photo Viewer Modal -->
+  <div class="modal-overlay" id="image-viewer-modal">
+    <div class="modal-box" style="max-width:700px; background:#0B132B; color:#FFFFFF;">
+      <div class="modal-header" style="background:#1C2541; border-bottom:1px solid #3A506B;">
+        <h3 class="modal-title" id="image-viewer-title" style="color:#CE9F51; font-size:17px;">Live Camera Photo Proof</h3>
+        <button type="button" class="modal-close-btn" onclick="closeImageViewerModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:16px; text-align:center; background:#0B132B;">
+        <img id="image-viewer-img" src="" alt="Enlarged Verification Photo" style="max-width:100%; max-height:480px; object-fit:contain; border-radius:6px; border:1px solid #3A506B;">
+        <div id="image-viewer-meta" style="margin-top:10px; font-size:12px; font-family:var(--font-mono); color:#94A3B8;"></div>
+      </div>
+      <div class="modal-footer" style="background:#1C2541; border-top:1px solid #3A506B;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeImageViewerModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/media.js"></script>
   <script src="js/geo.js"></script>
   <script src="js/telemetry.js"></script>
   <script src="js/dev.js"></script>
@@ -455,6 +491,9 @@
       renderTripDetails(booking);
       renderCargoBlock(booking);
       renderAssignedResources(booking);
+      renderPassengerTimeline(booking);
+      renderOdometerVerification(booking);
+      renderFuelLogs(booking);
       renderItinerarySection(booking);
       renderMessages(booking);
     }
@@ -1048,6 +1087,228 @@
       input.value = '';
       currentBooking = FleetStore.getBooking(currentBooking.id);
       renderMessages(currentBooking);
+    }
+
+    function renderPhotoThumb(photoId, label) {
+      if (!photoId) {
+        return `<div style="width:76px; height:56px; background:#E2E8F0; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#64748B;">No Photo</div>`;
+      }
+      return `
+        <div style="cursor:pointer; text-align:center;" onclick="openImageViewer('${photoId}', '${escapeHtml(label)}')">
+          <div style="width:76px; height:56px; border-radius:4px; border:1px solid var(--border); overflow:hidden; background:#000; position:relative;">
+            <img id="thumb-${photoId}" src="" alt="${escapeHtml(label)}" style="width:100%; height:100%; object-fit:cover;">
+            <span style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); color:#CE9F51; font-size:8px; padding:1px 3px; border-radius:2px;">LIVE</span>
+          </div>
+          <div style="font-size:9.5px; color:var(--text-muted); margin-top:2px; max-width:76px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(label)}</div>
+        </div>
+      `;
+    }
+
+    function loadThumbnailImage(photoId) {
+      if (!photoId) return;
+      Media.getUrl(photoId).then(url => {
+        const el = document.getElementById(`thumb-${photoId}`);
+        if (el && url) el.src = url;
+      });
+    }
+
+    async function openImageViewer(photoId, title) {
+      if (!photoId) return;
+      const modal = document.getElementById('image-viewer-modal');
+      const imgEl = document.getElementById('image-viewer-img');
+      const titleEl = document.getElementById('image-viewer-title');
+      const metaEl = document.getElementById('image-viewer-meta');
+
+      titleEl.textContent = title || 'Live Photo Verification';
+      imgEl.src = '';
+      metaEl.textContent = 'Loading verified photo blob from IndexedDB…';
+      modal.classList.add('open');
+
+      const url = await Media.getUrl(photoId);
+      const rec = await Media.get(photoId);
+      if (url) {
+        imgEl.src = url;
+      }
+      if (rec) {
+        metaEl.textContent = `ID: ${rec.id} · Kind: ${rec.kind} · Taken: ${rec.taken_at} · GPS: ${rec.lat}, ${rec.lng} · Taken By: ${rec.by_user_id}`;
+      } else {
+        metaEl.textContent = `Photo ID: ${photoId}`;
+      }
+    }
+
+    function closeImageViewerModal() {
+      const modal = document.getElementById('image-viewer-modal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    function renderPassengerTimeline(booking) {
+      const container = document.getElementById('detail-passenger-timeline-content');
+      if (!container) return;
+
+      const events = Array.isArray(booking.passenger_events) ? booking.passenger_events : [];
+      if (events.length === 0) {
+        container.innerHTML = `
+          <div style="background: var(--bg-page); padding: 16px; border-radius: 6px; text-align: center; color: var(--text-muted); font-size: 13px;">
+            No passenger check-in events recorded for this mission.
+          </div>
+        `;
+        return;
+      }
+
+      const tl = FleetStore.calculatePassengerTimeline(events, booking);
+
+      const segmentsHtml = tl.segments.map(s => {
+        const isStop = s.type === 'stopped';
+        const bg = isStop ? '#FEF3C7' : '#F0FDF4';
+        const border = isStop ? '#F59E0B' : '#10B981';
+        const color = isStop ? '#92400E' : '#065F46';
+        return `<span style="background:${bg}; border:1px solid ${border}; color:${color}; padding:4px 8px; border-radius:4px; font-size:12px; font-weight:600;">${escapeHtml(s.display)}</span>`;
+      }).join(' ');
+
+      const disputeBadges = tl.disputedEvents.map(e => `
+        <div style="background:#FEE2E2; border:1px solid #EF4444; border-radius:6px; padding:8px 12px; margin-top:8px; color:#991B1B; font-size:12.5px;">
+          <strong>FLAGGED DISPUTE (${escapeHtml(e.type)}):</strong> Driver disputed passenger report — "${escapeHtml(e.dispute_note || 'Status/time mismatch')}" (${new Date(e.disputed_at || e.at).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })})
+        </div>
+      `).join('');
+
+      container.innerHTML = `
+        <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:12px;">
+          ${segmentsHtml || '<span style="color:var(--text-muted); font-size:12.5px;">Awaiting movement segments…</span>'}
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; background:var(--bg-page); padding:10px; border-radius:6px; font-size:12.5px;">
+          <div><span style="color:var(--text-muted); display:block;">Total Moving:</span> <strong>${tl.totalMovingStr}</strong></div>
+          <div><span style="color:var(--text-muted); display:block;">Total Stopped:</span> <strong>${tl.totalStoppedStr}</strong></div>
+          <div><span style="color:var(--text-muted); display:block;">Stop Count:</span> <strong>${tl.stopCount} stops</strong></div>
+          <div><span style="color:var(--text-muted); display:block;">Disputes:</span> <strong style="color:${tl.disputedCount > 0 ? 'var(--danger)' : 'var(--success)'};">${tl.disputedCount}</strong></div>
+        </div>
+        ${disputeBadges}
+      `;
+    }
+
+    function renderOdometerVerification(booking) {
+      const container = document.getElementById('detail-odometer-content');
+      if (!container) return;
+
+      const hasStart = Boolean(booking.start_odometer_km);
+      const hasEnd = Boolean(booking.end_odometer_km);
+
+      if (!hasStart && !hasEnd) {
+        container.innerHTML = `
+          <div style="background: var(--bg-page); padding: 16px; border-radius: 6px; text-align: center; color: var(--text-muted); font-size: 13px;">
+            Mandatory odometer telemetry and camera verification photos are recorded upon driver trip departure and closure.
+          </div>
+        `;
+        return;
+      }
+
+      const startKm = booking.start_odometer_km ? `${booking.start_odometer_km.toLocaleString()} km` : 'Pending departure';
+      const endKm = booking.end_odometer_km ? `${booking.end_odometer_km.toLocaleString()} km` : 'Pending return';
+      const plannedKm = (booking.route_legs && booking.route_legs.reduce((acc, l) => acc + (l.distance_km || 0), 0)) || booking.total_distance_km || 0;
+
+      let actualKm = null;
+      let varianceHtml = '';
+      if (booking.start_odometer_km && booking.end_odometer_km) {
+        actualKm = booking.end_odometer_km - booking.start_odometer_km;
+        const diff = actualKm - plannedKm;
+        const pct = plannedKm > 0 ? ((diff / plannedKm) * 100).toFixed(1) : 0;
+        const sign = diff > 0 ? `+${diff.toFixed(1)}` : diff.toFixed(1);
+        const signPct = pct > 0 ? `+${pct}` : pct;
+        varianceHtml = `
+          <div style="grid-column:1 / -1; background:#F8FAFC; border:1px solid var(--border); border-radius:6px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-top:4px;">
+            <span>Actual vs Planned Trip Distance:</span>
+            <strong>${actualKm.toLocaleString()} km vs ${plannedKm.toFixed(1)} km <span style="color:${Math.abs(pct) > 10 ? '#B91C1C' : 'var(--navy-700)'}; font-family:var(--font-mono);">(${sign} km / ${signPct}%)</span></strong>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+          <div style="border:1px solid var(--border); border-radius:6px; padding:12px; background:var(--bg-page); display:flex; gap:12px; align-items:center;">
+            ${renderPhotoThumb(booking.start_odometer_photo_id, 'Departure Odometer')}
+            <div style="flex:1;">
+              <span style="font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:700;">Departure Reading</span>
+              <div style="font-size:16px; font-weight:800; font-family:var(--font-mono); color:var(--navy-800);">${escapeHtml(startKm)}</div>
+              ${booking.start_odometer_note ? `<div style="font-size:11.5px; color:#B91C1C; margin-top:2px;">Note: ${escapeHtml(booking.start_odometer_note)}</div>` : ''}
+            </div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:6px; padding:12px; background:var(--bg-page); display:flex; gap:12px; align-items:center;">
+            ${renderPhotoThumb(booking.end_odometer_photo_id, 'Return Odometer')}
+            <div style="flex:1;">
+              <span style="font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:700;">Return Reading</span>
+              <div style="font-size:16px; font-weight:800; font-family:var(--font-mono); color:var(--navy-800);">${escapeHtml(endKm)}</div>
+              ${booking.end_odometer_note ? `<div style="font-size:11.5px; color:#B91C1C; margin-top:2px;">Note: ${escapeHtml(booking.end_odometer_note)}</div>` : ''}
+            </div>
+          </div>
+          ${varianceHtml}
+        </div>
+      `;
+
+      if (booking.start_odometer_photo_id) loadThumbnailImage(booking.start_odometer_photo_id);
+      if (booking.end_odometer_photo_id) loadThumbnailImage(booking.end_odometer_photo_id);
+    }
+
+    function renderFuelLogs(booking) {
+      const container = document.getElementById('detail-refuel-content');
+      if (!container) return;
+
+      const logs = Array.isArray(booking.fuel_logs) ? booking.fuel_logs : [];
+      if (logs.length === 0) {
+        container.innerHTML = `
+          <div style="background: var(--bg-page); padding: 16px; border-radius: 6px; text-align: center; color: var(--text-muted); font-size: 13px;">
+            No in-trip fuel purchases recorded for this mission.
+          </div>
+        `;
+        return;
+      }
+
+      const canSeeCosts = typeof Money !== 'undefined' && Money.canView();
+
+      container.innerHTML = logs.map(fl => {
+        const photos = fl.photos || {};
+        const costHtml = canSeeCosts && fl.amount_paid
+          ? `<div><span style="color:var(--text-muted);">Amount:</span> <strong style="font-family:var(--font-mono); color:var(--cira-burgundy);">${Money.render(fl.amount_paid)}</strong></div>`
+          : '';
+
+        setTimeout(() => {
+          ['gauge_before', 'pump_display', 'gauge_after', 'receipt', 'odometer'].forEach(k => {
+            if (photos[k]) loadThumbnailImage(photos[k]);
+          });
+        }, 10);
+
+        return `
+          <div style="border:1px solid ${fl.mismatch_flagged ? '#EF4444' : 'var(--border)'}; border-radius:8px; padding:14px; margin-bottom:12px; background:#FFFFFF;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+              <div>
+                <strong style="color:var(--navy-800); font-size:14px;">${escapeHtml(fl.station_name || 'Refuel Station')}</strong>
+                <span style="font-size:12px; color:var(--text-muted); margin-left:8px;">${fl.odometer_km ? `${fl.odometer_km.toLocaleString()} km` : ''} · Logged by ${escapeHtml(fl.driver || 'Driver')}</span>
+              </div>
+              <div>
+                ${fl.mismatch_flagged ? '<span class="badge badge-danger">Fuel Mismatch Flagged</span>' : '<span class="badge badge-success">Quantities Aligned</span>'}
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; background:var(--bg-page); padding:10px; border-radius:6px; font-size:13px; margin-bottom:12px;">
+              <div><span style="color:var(--text-muted);">Volume:</span> <strong style="font-family:var(--font-mono);">${fl.liters} L</strong></div>
+              ${costHtml}
+              <div><span style="color:var(--text-muted);">Timestamp:</span> <span style="font-family:var(--font-mono); font-size:12px;">${fl.logged_at ? new Date(fl.logged_at).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) : '—'}</span></div>
+            </div>
+            <div>
+              <div style="font-size:12px; font-weight:700; color:var(--navy-800); margin-bottom:6px;">5 Mandatory Live Verification Photos:</div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                ${renderPhotoThumb(photos.gauge_before, '1. Gauge Before')}
+                ${renderPhotoThumb(photos.pump_display, '2. Pump Display')}
+                ${renderPhotoThumb(photos.gauge_after, '3. Gauge After')}
+                ${renderPhotoThumb(photos.receipt, '4. Receipt')}
+                ${renderPhotoThumb(photos.odometer, '5. Odometer')}
+              </div>
+            </div>
+            ${fl.mismatch_flagged ? `
+              <div style="margin-top:10px; padding:8px 12px; background:#FEF2F2; border:1px solid #F87171; border-radius:6px; color:#991B1B; font-size:12.5px;">
+                <strong>Auditor Discrepancy Note:</strong> ${escapeHtml(fl.mismatch_notes || 'Typed liters differ from pump display photo')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
     }
 
     function escapeHtml(str) {

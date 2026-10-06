@@ -121,18 +121,62 @@
       const user = Auth.getUser();
       const container = document.getElementById('role-main-container');
 
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"']/g, function(m) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+        });
+      }
+
+      function getStatusBadge(status) {
+        switch (status) {
+          case 'Pending':
+            return '<span class="badge badge-warning" style="background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;">Pending Review</span>';
+          case 'Approved':
+            return '<span class="badge badge-success" style="background:#DCFCE7;color:#166534;border:1px solid #BBF7D0;">Approved</span>';
+          case 'Changes requested':
+            return '<span class="badge badge-warning" style="background:#FFF7ED;color:#C2410C;border:1px solid #FFEDD5;">Changes Requested</span>';
+          case 'Rejected':
+            return '<span class="badge badge-danger" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;">Rejected</span>';
+          case 'Dispatched':
+            return '<span class="badge badge-info" style="background:#E0F2FE;color:#0369A1;border:1px solid #BAE6FD;">Dispatched</span>';
+          case 'Active':
+            return '<span class="badge" style="background:var(--navy-700);color:#FFFFFF;">Active</span>';
+          case 'Completed':
+            return '<span class="badge badge-success" style="background:#F0FDF4;color:#15803D;border:1px solid #DCFCE7;">Completed</span>';
+          case 'Closed':
+            return '<span class="badge badge-warning" style="background:#FFF3E0;color:#E65100;">Audit Pending</span>';
+          default:
+            return `<span class="badge badge-neutral">${escapeHtml(status || 'Draft')}</span>`;
+        }
+      }
+
+      function getRouteText(b) {
+        if (!b.itinerary || b.itinerary.length === 0) return 'Route unassigned';
+        const start = b.itinerary[0].place_name || 'Origin';
+        const end = b.itinerary[b.itinerary.length - 1].place_name || 'Destination';
+        return start === end ? start : `${start} → ${end}`;
+      }
+
       if (user.role === 'Dispatcher') {
+        const bookings = FleetStore.getBookings() || [];
+        const vehicles = FleetStore.getVehicles() || [];
+        const pendingList = bookings.filter(b => b.status === 'Pending');
+        const activeList = bookings.filter(b => b.status === 'Active' || b.status === 'Dispatched');
+        const busyVehiclesCount = vehicles.filter(v => v.status === 'On trip' || v.status === 'Busy').length;
+        const freeVehiclesCount = vehicles.length - busyVehiclesCount;
+
         container.innerHTML = `
           <div class="page-header">
             <div class="page-title-group">
               <span class="page-pretitle">Logistics Command &amp; Operations Desk</span>
-              <h1 class="page-title">Welcome, ${user.name}</h1>
+              <h1 class="page-title">Welcome, ${escapeHtml(user.name)}</h1>
               <span class="page-subtitle">Central Dispatcher Controller · Active Operations</span>
             </div>
             <div>
               <a href="dispatch-queue.html" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                <span>Review Approval Queue (4)</span>
+                <span>Review Approval Queue (${pendingList.length})</span>
               </a>
             </div>
           </div>
@@ -140,24 +184,24 @@
           <div class="stat-grid" style="margin-top: 24px;">
             <div class="stat-tile">
               <span class="stat-label">Pending Approval</span>
-              <span class="stat-value" style="color: var(--danger);">4 Requests</span>
-              <span class="stat-sub">2 require buffer conflict resolution</span>
+              <span class="stat-value" style="color: var(--danger);">${pendingList.length} Requests</span>
+              <span class="stat-sub"><a href="dispatch-queue.html" style="color:var(--navy-700); font-weight:600; text-decoration:none;">Open Dispatch Desk →</a></span>
             </div>
             <div class="stat-tile">
-              <span class="stat-label">Active on Map</span>
-              <span class="stat-value" style="color: var(--cira-burgundy);">14 Vehicles</span>
-              <span class="stat-sub">1 vehicle approaching stale signal threshold</span>
+              <span class="stat-label">Trips Active Today</span>
+              <span class="stat-value" style="color: var(--cira-burgundy);">${activeList.length} Trips</span>
+              <span class="stat-sub"><a href="dispatch-map.html" style="color:var(--navy-700); font-weight:600; text-decoration:none;">View Live GPS Map →</a></span>
             </div>
             <div class="stat-tile">
-              <span class="stat-label">Standby Pool</span>
-              <span class="stat-value">6 Vehicles</span>
-              <span class="stat-sub">Ready for emergency redeployment</span>
+              <span class="stat-label">Fleet Availability</span>
+              <span class="stat-value">${freeVehiclesCount} Available</span>
+              <span class="stat-sub">${busyVehiclesCount} currently dispatched / on trip</span>
             </div>
           </div>
 
           <div class="card" style="margin-top: 24px;">
             <div class="card-title">
-              <span>Urgent Approvals in Queue</span>
+              <span>Pending Requests Awaiting Operations Review</span>
               <a href="dispatch-queue.html" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:4px;">
                 <span>Full Dispatch Desk</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -171,104 +215,137 @@
                     <th>Route</th>
                     <th>Departure</th>
                     <th>Department</th>
-                    <th>Flag / Alert</th>
+                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td><strong>BK-2047</strong></td>
-                    <td>Main Campus → 10th of Ramadan Plant 3</td>
-                    <td>Today · 08:30</td>
-                    <td>Faculty of Pharmacy</td>
-                    <td><span class="badge badge-danger">Tight Buffer (25m)</span></td>
-                    <td><a href="dispatch-queue.html" class="btn btn-primary btn-sm">Review &amp; Assign</a></td>
-                  </tr>
-                  <tr>
-                    <td><strong>BK-2051</strong></td>
-                    <td>BUC Badr → Ain Sokhna Marine Station</td>
-                    <td>Tomorrow · 07:00</td>
-                    <td>Faculty of Engineering</td>
-                    <td><span class="badge badge-warning">Long Haul (>200km)</span></td>
-                    <td><a href="dispatch-queue.html" class="btn btn-secondary btn-sm">Review</a></td>
-                  </tr>
+                  ${pendingList.length === 0 ? `
+                    <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No pending requests awaiting approval. All cleared.</td></tr>
+                  ` : pendingList.slice(0, 5).map(b => `
+                    <tr>
+                      <td style="font-family:var(--font-mono); font-weight:700;">${b.id}</td>
+                      <td>${escapeHtml(getRouteText(b))}</td>
+                      <td>${b.start_date}</td>
+                      <td>${escapeHtml((b.requester && b.requester.department) || '')}</td>
+                      <td>${getStatusBadge(b.status)}</td>
+                      <td><a href="dispatch-queue.html?id=${b.id}" class="btn btn-primary btn-sm">Review &amp; Assign</a></td>
+                    </tr>
+                  `).join('')}
                 </tbody>
               </table>
             </div>
           </div>
         `;
       } else if (user.role === 'Driver') {
+        const bookings = FleetStore.getBookings() || [];
+        const driverAssignments = bookings.filter(b =>
+          b.assignment && Array.isArray(b.assignment.driver_ids) &&
+          (b.assignment.driver_ids.includes(user.id) || b.assignment.driver_ids.includes(user.name))
+        );
+        const activeTrip = driverAssignments.find(b => b.status === 'Active' || b.status === 'Dispatched') || driverAssignments[0];
+        const shift = FleetStore.getDriverShift(user.id);
+
         container.innerHTML = `
           <div class="page-header">
             <div class="page-title-group">
               <span class="page-pretitle">Central Transport Pool</span>
-              <h1 class="page-title">Welcome, ${user.name}</h1>
-              <span class="page-subtitle">Shift Active · Pre-Trip Inspection Verified</span>
+              <h1 class="page-title">Welcome, ${escapeHtml(user.name)}</h1>
+              <span class="page-subtitle">Driver Shift Active · Assigned to ${user.home_site_id || 'Base Station'}</span>
             </div>
             <div>
-              <a href="driver-run.html" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px;">
-                <span>Launch Live Run &amp; SOS</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-              </a>
+              ${activeTrip ? `
+                <a href="driver-trip.html?id=${activeTrip.id}" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px;">
+                  <span>Open Active Manifest (${activeTrip.id})</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                </a>
+              ` : `
+                <a href="driver-shift.html" class="btn btn-secondary">View Shift Log</a>
+              `}
             </div>
           </div>
 
           <div class="stat-grid" style="margin-top: 24px;">
             <div class="stat-tile">
               <span class="stat-label">Assigned Vehicle</span>
-              <span class="stat-value" style="color: var(--cira-burgundy);">Hyundai H-1 (V-122)</span>
-              <span class="stat-sub">Plate BDR 3307 · Fuel Tank 85%</span>
+              <span class="stat-value" style="color: var(--cira-burgundy);">${activeTrip && activeTrip.assignment ? activeTrip.assignment.vehicle_id : 'Standby Pool'}</span>
+              <span class="stat-sub">${activeTrip ? escapeHtml(getRouteText(activeTrip)) : 'No vehicle currently allocated'}</span>
             </div>
             <div class="stat-tile">
-              <span class="stat-label">Current Trip</span>
-              <span class="stat-value">BK-2047</span>
-              <span class="stat-sub">Campus → Obour → Plant 3 (3 Pax)</span>
+              <span class="stat-label">Current / Next Assignment</span>
+              <span class="stat-value">${activeTrip ? activeTrip.id : 'None'}</span>
+              <span class="stat-sub">${activeTrip ? getStatusBadge(activeTrip.status) : 'Awaiting dispatch'}</span>
             </div>
             <div class="stat-tile">
               <span class="stat-label">Duty Hours Today</span>
-              <span class="stat-value">3.5 / 8.0h</span>
+              <span class="stat-value">${shift.dutyHours || 3.5} / 8.0 h</span>
               <span class="stat-sub" style="color: var(--success); display:inline-flex; align-items:center; gap:4px;">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Compliant with safety rules</span>
+                <span>Within maximum safety limit</span>
               </span>
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 24px;">
-            <div class="card">
-              <h3 class="card-title">Driver Workflow Actions</h3>
-              <div style="display: flex; flex-direction: column; gap: 10px;">
-                <a href="driver-shift.html" class="btn btn-secondary" style="justify-content: flex-start; gap: 10px;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  <span>Shift Log &amp; Safety Inspection Checklist</span>
-                </a>
-                <a href="driver-trip.html" class="btn btn-secondary" style="justify-content: flex-start; gap: 10px;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                  <span>Active Trip Manifest &amp; Passenger Roll Call</span>
-                </a>
-                <a href="driver-close.html" class="btn btn-secondary" style="justify-content: flex-start; gap: 10px;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-                  <span>Closeout Trip &amp; Submit Fuel Receipts</span>
-                </a>
-              </div>
+          <div class="card" style="margin-top: 24px;">
+            <div class="card-title">
+              <span>My Assigned Missions Schedule</span>
+              <a href="driver-shift.html" class="btn btn-secondary btn-sm">Full Shift Protocol</a>
             </div>
-
-            <div class="card">
-              <h3 class="card-title">Safety &amp; Operational Reminders</h3>
-              <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: var(--text-muted);">
-                <li>Maximum driving without 15m rest: 4.0 continuous hours.</li>
-                <li>Close-out requires odometer photo and valid tax invoice.</li>
-                <li>In case of breakdown or medical emergency, tap SOS on Live Run.</li>
-              </ul>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Trip ID</th>
+                    <th>Route</th>
+                    <th>Trip Date</th>
+                    <th>Passengers &amp; Cargo</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${driverAssignments.length === 0 ? `
+                    <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No trips currently assigned to your driver ID.</td></tr>
+                  ` : driverAssignments.slice(0, 5).map(b => `
+                    <tr>
+                      <td style="font-family:var(--font-mono); font-weight:700;">${b.id}</td>
+                      <td>${escapeHtml(getRouteText(b))}</td>
+                      <td>${b.start_date}</td>
+                      <td>${b.passengers || 1} pax ${b.has_extra_cargo ? `· ${b.cargo_kg}kg cargo` : ''}</td>
+                      <td>${getStatusBadge(b.status)}</td>
+                      <td>
+                        <a href="driver-trip.html?id=${b.id}" class="btn btn-primary btn-sm">Open Manifest</a>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
             </div>
           </div>
         `;
       } else if (user.role === 'Fleet admin') {
+        const vehicles = FleetStore.getVehicles() || [];
+        const drivers = FleetStore.getDrivers() || [];
+        const bookings = FleetStore.getBookings() || [];
+
+        const availableCount = vehicles.filter(v => v.status === 'Available').length;
+        const onTripCount = vehicles.filter(v => v.status === 'On trip' || v.status === 'Busy').length;
+        const maintCount = vehicles.filter(v => v.status !== 'Available' && v.status !== 'On trip' && v.status !== 'Busy').length;
+
+        const expiringDrivers = drivers.filter(d => {
+          const days = Math.ceil((new Date(d.expires) - new Date()) / (1000 * 3600 * 24));
+          return days >= 0 && days <= 30;
+        });
+
+        const fuelCostTotal = bookings.reduce((sum, b) => {
+          return sum + ((b.actuals && b.actuals.receipt_amount_egp) || (b.estimate && b.estimate.cost_egp) || 0);
+        }, 0);
+
         container.innerHTML = `
           <div class="page-header">
             <div class="page-title-group">
               <span class="page-pretitle">Fleet Operations Directorate</span>
-              <h1 class="page-title">Welcome, ${user.name}</h1>
+              <h1 class="page-title">Welcome, ${escapeHtml(user.name)}</h1>
               <span class="page-subtitle">Executive Fleet Administration &amp; Asset Management</span>
             </div>
             <div>
@@ -281,22 +358,19 @@
 
           <div class="stat-grid" style="margin-top: 24px;">
             <div class="stat-tile">
-              <span class="stat-label">Total Fleet Assets</span>
-              <span class="stat-value">42 Vehicles</span>
-              <span class="stat-sub">32 Active · 6 Standby · 4 Service</span>
+              <span class="stat-label">Total Fleet Vehicles</span>
+              <span class="stat-value">${vehicles.length} Vehicles</span>
+              <span class="stat-sub">${availableCount} Available · ${onTripCount} On Trip · ${maintCount} Service</span>
             </div>
             <div class="stat-tile">
-              <span class="stat-label">Fleet Utilization</span>
-              <span class="stat-value" style="color: var(--cira-burgundy);">76.2%</span>
-              <span class="stat-sub" style="color: var(--success); display:inline-flex; align-items:center; gap:4px;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
-                <span>+4.1% vs last month</span>
-              </span>
+              <span class="stat-label">Licenses Expiring (&lt;30d)</span>
+              <span class="stat-value" style="color:${expiringDrivers.length > 0 ? 'var(--warning)' : 'var(--success)'};">${expiringDrivers.length} Drivers</span>
+              <span class="stat-sub"><a href="admin-drivers.html" style="color:var(--navy-700); font-weight:600; text-decoration:none;">View Driver Compliance →</a></span>
             </div>
             <div class="stat-tile">
-              <span class="stat-label">Fuel Price Tariff</span>
-              <span class="stat-value">Book v3</span>
-              <span class="stat-sub">Effective 01 Aug 2026</span>
+              <span class="stat-label">Monthly Fuel Cost</span>
+              <span class="stat-value" style="color: var(--cira-burgundy);">${typeof Money !== 'undefined' ? Money.render(fuelCostTotal) : Math.round(fuelCostTotal).toLocaleString() + ' EGP'}</span>
+              <span class="stat-sub">Across all university branch missions</span>
             </div>
           </div>
 
@@ -310,26 +384,42 @@
               </div>
             </div>
             <div class="card">
-              <h3 class="card-title">Pending Maintenance Work Orders</h3>
-              <div style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--cira-gold); flex-shrink:0;"><circle cx="12" cy="12" r="10"/></svg>
-                  <span><strong>Bus B-301:</strong> 40,000 km Major Service due in 3 days.</span>
+              <h3 class="card-title">Fleet Asset Distribution by Status</h3>
+              <div style="display:flex; flex-direction:column; gap:12px; font-size:14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>Available / Free:</span>
+                  <span class="badge badge-success">${availableCount} vehicles</span>
                 </div>
-                <div style="margin-top: 8px; display:flex; align-items:center; gap:6px;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--cira-gold); flex-shrink:0;"><circle cx="12" cy="12" r="10"/></svg>
-                  <span><strong>Van V-108:</strong> Brake pads replacement scheduled at Obour Depot.</span>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>On Active Mission:</span>
+                  <span class="badge badge-info">${onTripCount} vehicles</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>Service / Standby:</span>
+                  <span class="badge badge-neutral">${maintCount} vehicles</span>
                 </div>
               </div>
             </div>
           </div>
         `;
       } else if (user.role === 'Auditor') {
+        const storeData = FleetStore.load();
+        const auditTrail = storeData.auditTrail || [];
+        const bookings = storeData.bookings || [];
+
+        const flaggedVariances = bookings.filter(b => {
+          if (!b.actuals || !b.estimate) return false;
+          const est = Number(b.estimate.fuel_liters);
+          const act = Number(b.actuals.fuel_liters);
+          if (!est || !act) return false;
+          return Math.abs(act - est) / est > 0.10;
+        });
+
         container.innerHTML = `
           <div class="page-header">
             <div class="page-title-group">
               <span class="page-pretitle">Financial Compliance &amp; Internal Audit Bureau</span>
-              <h1 class="page-title">Welcome, ${user.name}</h1>
+              <h1 class="page-title">Welcome, ${escapeHtml(user.name)}</h1>
               <span class="page-subtitle">Enterprise Fuel Reconciliation &amp; Chargeback Bureau</span>
             </div>
             <div>
@@ -342,59 +432,52 @@
 
           <div class="stat-grid" style="margin-top: 24px;">
             <div class="stat-tile">
-              <span class="stat-label">Variance Exceptions</span>
-              <span class="stat-value" style="color: var(--danger);">2 Flags</span>
-              <span class="stat-sub">Exceeded ±10% algorithmic fuel threshold</span>
-            </div>
-            <div class="stat-tile">
-              <span class="stat-label">Cycle Fuel Volume</span>
-              <span class="stat-value" style="color: var(--cira-burgundy);">9,226 Liters</span>
-              <span class="stat-sub">100% matched against consumption benchmarks</span>
+              <span class="stat-label">Variance Exceptions (&gt;±10%)</span>
+              <span class="stat-value" style="color: ${flaggedVariances.length > 0 ? 'var(--danger)' : 'var(--success)'};">${flaggedVariances.length} Flags</span>
+              <span class="stat-sub">Exceeded algorithmic fuel threshold</span>
             </div>
             <div class="stat-tile">
               <span class="stat-label">Audit Trail Records</span>
-              <span class="stat-value">1,420 Logs</span>
+              <span class="stat-value">${auditTrail.length} Logs</span>
               <span class="stat-sub">Append-only immutable event trail</span>
+            </div>
+            <div class="stat-tile">
+              <span class="stat-label">Total Bookings Recorded</span>
+              <span class="stat-value" style="color: var(--cira-burgundy);">${bookings.length} Bookings</span>
+              <span class="stat-sub"><a href="audit.html" style="color:var(--navy-700); font-weight:600; text-decoration:none;">Open Audit Ledger →</a></span>
             </div>
           </div>
 
           <div class="card" style="margin-top: 24px;">
             <div class="card-title">
-              <span>Exceptions Requiring Auditor Sign-off</span>
-              <a href="audit.html" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:4px;">
-                <span>Open Audit Bureau</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </a>
+              <span>Latest Audit Events</span>
+              <a href="audit.html" class="btn btn-secondary btn-sm">Full Audit Trail</a>
             </div>
             <div class="table-wrapper">
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>Trip ID</th>
-                    <th>Vehicle</th>
-                    <th>Standard Consumption</th>
-                    <th>Actual Invoiced</th>
-                    <th>Variance %</th>
-                    <th>Status</th>
+                    <th>Event ID</th>
+                    <th>Time</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Reference</th>
+                    <th>Details</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td><strong>BK-2038</strong></td>
-                    <td>Toyota Coaster (B-402)</td>
-                    <td>54.0 L</td>
-                    <td>68.5 L</td>
-                    <td><span class="badge badge-danger">+26.8%</span></td>
-                    <td>Awaiting Justification</td>
-                  </tr>
-                  <tr>
-                    <td><strong>BK-2041</strong></td>
-                    <td>Chevrolet Move (V-110)</td>
-                    <td>22.0 L</td>
-                    <td>26.0 L</td>
-                    <td><span class="badge badge-warning">+18.2%</span></td>
-                    <td>Review Pending</td>
-                  </tr>
+                  ${auditTrail.length === 0 ? `
+                    <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No audit events recorded yet.</td></tr>
+                  ` : auditTrail.slice(0, 5).map(a => `
+                    <tr>
+                      <td style="font-family:var(--font-mono); font-weight:700;">${a.id}</td>
+                      <td style="font-family:var(--font-mono); font-size:12.5px;">${a.time}</td>
+                      <td><strong>${escapeHtml(a.user)}</strong></td>
+                      <td><span class="badge badge-neutral">${escapeHtml(a.action)}</span></td>
+                      <td style="font-family:var(--font-mono);">${a.ref || '—'}</td>
+                      <td style="font-size:13px; color:var(--text-muted);">${escapeHtml(a.details || '')}</td>
+                    </tr>
+                  `).join('')}
                 </tbody>
               </table>
             </div>
@@ -402,12 +485,20 @@
         `;
       } else {
         // Default: Requester Dashboard
+        const myBookings = (FleetStore.getBookings() || []).filter(b => b.requester && b.requester.id === user.id);
+        const pendingCount = myBookings.filter(b => b.status === 'Pending').length;
+        const approvedCount = myBookings.filter(b => b.status === 'Approved').length;
+        const activeCount = myBookings.filter(b => b.status === 'Active' || b.status === 'Dispatched').length;
+        const completedCount = myBookings.filter(b => b.status === 'Completed' || b.status === 'Closed').length;
+
+        const nextTrip = myBookings.find(b => ['Active', 'Dispatched', 'Approved', 'Pending'].includes(b.status)) || myBookings[0];
+
         container.innerHTML = `
           <div class="page-header">
             <div class="page-title-group">
-              <span class="page-pretitle" id="home-dept-label">${user.dept}</span>
-              <h1 class="page-title" id="home-greeting">Welcome, ${user.name}</h1>
-              <span class="page-subtitle" id="home-sub">Associate Professor &amp; Lab Director</span>
+              <span class="page-pretitle">${escapeHtml(user.dept || 'Faculty of Pharmacy')}</span>
+              <h1 class="page-title">Welcome, ${escapeHtml(user.name)}</h1>
+              <span class="page-subtitle">${escapeHtml(user.role)} Dashboard · CIRA Fleet Logistics</span>
             </div>
             <div>
               <a href="booking-new.html" class="btn btn-gold" id="home-primary-action" style="display:inline-flex; align-items:center; gap:6px;">
@@ -419,30 +510,27 @@
 
           <div class="stat-grid" style="margin-top: 24px;">
             <div class="stat-tile">
-              <span class="stat-label">Department Trips</span>
-              <span class="stat-value" id="home-stat-1">14 Allocated</span>
-              <span class="stat-sub" style="color:var(--success); display:inline-flex; align-items:center; gap:4px;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>64.5% quota active · Normal balance</span>
-              </span>
+              <span class="stat-label">Pending Approval</span>
+              <span class="stat-value" style="color:var(--warning);">${pendingCount} Requests</span>
+              <span class="stat-sub">Under review by Logistics Operations</span>
             </div>
             <div class="stat-tile">
-              <span class="stat-label">Active Trip</span>
-              <span class="stat-value" style="color:var(--cira-burgundy);" id="home-stat-2">BK-2047</span>
-              <span class="stat-sub">En route to Plant 3 · ETA 09:52</span>
+              <span class="stat-label">My Next Trip</span>
+              <span class="stat-value" style="color:var(--cira-burgundy);">${nextTrip ? nextTrip.id : 'No Trips'}</span>
+              <span class="stat-sub">${nextTrip ? escapeHtml(getRouteText(nextTrip)) : 'No upcoming bookings'}</span>
             </div>
             <div class="stat-tile">
-              <span class="stat-label">Completed This Month</span>
-              <span class="stat-value" id="home-stat-3">18 Trips</span>
-              <span class="stat-sub">100% fuel closed &amp; reconciled</span>
+              <span class="stat-label">Approved &amp; Active</span>
+              <span class="stat-value">${approvedCount + activeCount} Trips</span>
+              <span class="stat-sub">${completedCount} completed previously</span>
             </div>
           </div>
 
           <div class="card" style="margin-top: 24px;">
             <div class="card-title">
-              <span>Recent Department Activity</span>
+              <span>My Recent Bookings</span>
               <a href="bookings.html" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:4px;">
-                <span>View All Bookings</span>
+                <span>View All (${myBookings.length})</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </a>
             </div>
@@ -452,29 +540,31 @@
                   <tr>
                     <th>Booking ID</th>
                     <th>Route</th>
-                    <th>Date &amp; Time</th>
-                    <th>Vehicle</th>
+                    <th>Trip Date</th>
+                    <th>Allocated Vehicle</th>
                     <th>Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td><strong>BK-2047</strong></td>
-                    <td>Campus → Obour → 10th of Ramadan</td>
-                    <td>Tue 13 Oct · 08:30</td>
-                    <td>Hyundai H-1 (V-122)</td>
-                    <td><span class="badge badge-info">Active</span></td>
-                    <td><a href="booking-track.html" class="btn btn-primary btn-sm">Live Track</a></td>
-                  </tr>
-                  <tr>
-                    <td><strong>BK-2045</strong></td>
-                    <td>Campus → Cairo Airport T3</td>
-                    <td>Mon 12 Oct · 14:00</td>
-                    <td>Toyota Corolla (V-205)</td>
-                    <td><span class="badge badge-success">Completed</span></td>
-                    <td><a href="booking-detail.html" class="btn btn-secondary btn-sm">Details</a></td>
-                  </tr>
+                  ${myBookings.length === 0 ? `
+                    <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">You have no bookings yet. Tap "New Vehicle Booking" above to submit one.</td></tr>
+                  ` : myBookings.slice(0, 5).map(b => `
+                    <tr>
+                      <td style="font-family:var(--font-mono); font-weight:700;">${b.id}</td>
+                      <td>${escapeHtml(getRouteText(b))}</td>
+                      <td>${b.start_date}</td>
+                      <td>${b.assignment ? b.assignment.vehicle_id : 'Pending Assignment'}</td>
+                      <td>${getStatusBadge(b.status)}</td>
+                      <td>
+                        ${(b.status === 'Active' || b.status === 'Dispatched') ? `
+                          <a href="booking-track.html?id=${b.id}" class="btn btn-primary btn-sm">Live Track</a>
+                        ` : `
+                          <a href="booking-detail.html?id=${b.id}" class="btn btn-secondary btn-sm">Details</a>
+                        `}
+                      </td>
+                    </tr>
+                  `).join('')}
                 </tbody>
               </table>
             </div>

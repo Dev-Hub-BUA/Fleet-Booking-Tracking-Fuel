@@ -67,50 +67,14 @@
         <h1 class="page-title">Notifications</h1>
         <span class="page-subtitle">Trip approvals, vehicle dispatches, compliance alerts and schedule notices</span>
       </div>
-      <button class="btn btn-secondary btn-sm" onclick="document.querySelectorAll('.card').forEach(c => c.style.borderLeftColor='var(--border)'); alert('All notifications marked as read.');" style="display:inline-flex; align-items:center; gap:6px;">
+      <button class="btn btn-secondary btn-sm" onclick="handleMarkAllRead();" style="display:inline-flex; align-items:center; gap:6px;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         <span>Mark All Read</span>
       </button>
     </div>
     
-    <div style="display:flex; flex-direction:column; gap:12px;">
-      <div class="card" style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; border-left: 4px solid var(--gold-500);">
-          <div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="badge badge-neutral">Bookings</span>
-              <span style="font-size:12px; color:var(--text-muted);">12 mins ago</span>
-            </div>
-            <h3 style="margin:6px 0 2px; font-size:16px; color:var(--navy-800);">Trip BK-2047 is now Active on the road</h3>
-            <p style="margin:0; font-size:14px; color:var(--text-muted);">Driver Demo Driver 01 departed Obour Depot en route to Plant 3. Live tracking is active.</p>
-          </div>
-          <div>
-            <button class="btn btn-secondary btn-sm" onclick="this.closest('.card').style.borderLeftColor='var(--border)'; this.textContent='Read';">Mark Read</button>
-          </div>
-        </div><div class="card" style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; border-left: 4px solid var(--border);">
-          <div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="badge badge-neutral">Bookings</span>
-              <span style="font-size:12px; color:var(--text-muted);">Yesterday</span>
-            </div>
-            <h3 style="margin:6px 0 2px; font-size:16px; color:var(--navy-800);">Booking BK-2047 Approved with vehicle update</h3>
-            <p style="margin:0; font-size:14px; color:var(--text-muted);">Vehicle V-122 assigned in place of V-114 to prevent buffer overlap. Turnaround window locked.</p>
-          </div>
-          <div>
-            <button class="btn btn-secondary btn-sm" onclick="this.closest('.card').style.borderLeftColor='var(--border)'; this.textContent='Read';">Mark Read</button>
-          </div>
-        </div><div class="card" style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; border-left: 4px solid var(--border);">
-          <div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="badge badge-neutral">System</span>
-              <span style="font-size:12px; color:var(--text-muted);">3 days ago</span>
-            </div>
-            <h3 style="margin:6px 0 2px; font-size:16px; color:var(--navy-800);">October Trip Quota 64% utilized</h3>
-            <p style="margin:0; font-size:14px; color:var(--text-muted);">Your department has ample travel allowance remaining in the current operating period.</p>
-          </div>
-          <div>
-            <button class="btn btn-secondary btn-sm" onclick="this.closest('.card').style.borderLeftColor='var(--border)'; this.textContent='Read';">Mark Read</button>
-          </div>
-        </div>
+    <div id="notifications-container" style="display:flex; flex-direction:column; gap:12px;">
+      <!-- Rendered dynamically via FleetStore -->
     </div>
     </main>
   </div>
@@ -161,12 +125,93 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
+    }
+
+    function renderNotifications() {
+      const user = Auth.getUser();
+      const listEl = document.getElementById('notifications-container');
+      if (!listEl) return;
+
+      const notifs = FleetStore.getNotifications(user.role);
+      const unreadCount = notifs.filter(n => !n.read).length;
+
+      // Update header bell counter
+      document.querySelectorAll('.badge-counter').forEach(b => {
+        b.textContent = unreadCount;
+        b.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+      });
+
+      if (notifs.length === 0) {
+        listEl.innerHTML = `
+          <div class="card" style="text-align:center; padding:36px; color:var(--text-muted);">
+            You have no notifications at this time.
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = notifs.map(n => {
+        const isUnread = !n.read;
+        const borderStyle = isUnread ? 'border-left: 4px solid var(--cira-gold);' : 'border-left: 4px solid var(--border);';
+        const link = n.link || 'home.html';
+
+        return `
+          <div class="card" style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; ${borderStyle} transition: background 0.15s ease;">
+            <div style="flex:1; cursor:pointer;" onclick="handleNotificationClick('${n.id}', '${link}')">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="badge ${isUnread ? 'badge-warning' : 'badge-neutral'}">${escapeHtml(n.targetRole || 'System')}</span>
+                <span style="font-size:12px; color:var(--text-muted);">${escapeHtml(n.time || 'Recently')}</span>
+                ${isUnread ? '<span style="width:8px; height:8px; border-radius:50%; background:var(--cira-gold); display:inline-block;"></span>' : ''}
+              </div>
+              <h3 style="margin:6px 0 3px; font-size:15.5px; color:var(--navy-800);">${escapeHtml(n.title)}</h3>
+              <p style="margin:0; font-size:13.5px; color:var(--text-main); line-height:1.4;">${escapeHtml(n.message)}</p>
+              ${n.link ? `<div style="font-size:12px; color:var(--navy-700); font-weight:600; margin-top:6px;">View Related Record →</div>` : ''}
+            </div>
+            <div>
+              ${isUnread ? `
+                <button type="button" class="btn btn-secondary btn-sm" onclick="handleMarkRead('${n.id}')">Mark Read</button>
+              ` : `
+                <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Read</span>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleNotificationClick(notifId, targetLink) {
+      FleetStore.markNotificationRead(notifId);
+      window.location.href = targetLink;
+    }
+
+    function handleMarkRead(notifId) {
+      FleetStore.markNotificationRead(notifId);
+      renderNotifications();
+    }
+
+    function handleMarkAllRead() {
+      const user = Auth.getUser();
+      FleetStore.markAllNotificationsRead(user.role);
+      renderNotifications();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["all"])) return;
       Auth.renderAppShell('notifications');
-      
+
+      const user = Auth.getUser();
+      const pretitle = document.querySelector('.page-pretitle');
+      if (pretitle) pretitle.textContent = `${user.role} Inbox`;
+
+      renderNotifications();
     });
   </script>
 </body>

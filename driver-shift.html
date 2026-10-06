@@ -70,27 +70,8 @@
 </div>
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; align-items: start;">
-  <div class="card">
-    <h2 class="card-title">Shift Status</h2>
-    <div style="display: flex; flex-direction: column; gap: 14px;">
-      <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <span>Assigned Vehicle:</span>
-        <strong>V-122 · Hyundai H-1</strong>
-      </div>
-      <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <span>Checked in today at:</span>
-        <strong style="font-family:var(--font-mono);">07:40</strong>
-      </div>
-      <div>
-        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
-          <span>Daily Driving Safety Limit</span>
-          <span style="font-family:var(--font-mono); font-weight:700;">6.5 / 8.0 h (1.5h Remaining)</span>
-        </div>
-        <div style="height: 12px; background: var(--bg-muted); border-radius: 6px; overflow: hidden;">
-          <div style="width: 81%; height: 100%; background: var(--warning);"></div>
-        </div>
-      </div>
-    </div>
+  <div class="card" id="shift-status-card">
+    <!-- Populated dynamically via FleetStore -->
   </div>
 
   <div class="card">
@@ -102,6 +83,27 @@
       <span>Proceed to Active Trip Manifest</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </a>
+  </div>
+</div>
+
+<div class="card" style="margin-top: 24px;">
+  <h2 class="card-title">My Assigned Trips (Today &amp; Next 7 Days)</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Trip ID</th>
+          <th>Route</th>
+          <th>Trip Dates</th>
+          <th>Vehicle</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="driver-schedule-tbody">
+        <!-- Rendered dynamically via FleetStore -->
+      </tbody>
+    </table>
   </div>
 </div>
     </main>
@@ -153,12 +155,116 @@
   </footer>
 
   <script src="data/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
   <script>
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
+    }
+
+    function renderDriverShift() {
+      const user = Auth.getUser();
+      const shift = FleetStore.getDriverShift(user.id);
+      const bookings = FleetStore.getBookings() || [];
+
+      const driverAssignments = bookings.filter(b =>
+        b.assignment && Array.isArray(b.assignment.driver_ids) &&
+        (b.assignment.driver_ids.includes(user.id) || b.assignment.driver_ids.includes(user.name))
+      );
+
+      // Active / upcoming trip
+      const activeTrip = driverAssignments.find(b => b.status === 'Active' || b.status === 'Dispatched') || driverAssignments[0];
+
+      // Update Shift Status card
+      const shiftCard = document.getElementById('shift-status-card');
+      const dutyHours = shift.dutyHours || (activeTrip ? 3.5 : 0.0);
+      const dutyPct = Math.min(100, Math.round((dutyHours / 8.0) * 100));
+      const hoursRemaining = Math.max(0, (8.0 - dutyHours)).toFixed(1);
+
+      if (shiftCard) {
+        shiftCard.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h2 class="card-title" style="margin:0;">Shift &amp; Duty Status</h2>
+            <span class="badge ${shift.active ? 'badge-success' : 'badge-neutral'}">${shift.active ? 'Shift Active' : 'Off Duty'}</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px; font-size:14px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span style="color:var(--text-muted);">Assigned Vehicle:</span>
+              <strong>${activeTrip && activeTrip.assignment ? activeTrip.assignment.vehicle_id : 'Standby Pool'}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span style="color:var(--text-muted);">Clocked in at:</span>
+              <strong style="font-family:var(--font-mono);">${shift.startedAt || '07:45'}</strong>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+                <span>Daily Driving Safety Limit</span>
+                <span style="font-family:var(--font-mono); font-weight:700;">${dutyHours.toFixed(1)} / 8.0 h (${hoursRemaining}h Remaining)</span>
+              </div>
+              <div style="height: 12px; background: var(--bg-muted); border-radius: 6px; overflow: hidden;">
+                <div style="width: ${dutyPct}%; height: 100%; background: ${dutyPct > 80 ? 'var(--warning)' : 'var(--success)'};"></div>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:8px;">
+              ${shift.active ? `
+                <button type="button" class="btn btn-secondary btn-sm" onclick="handleEndShift()" style="flex:1;">End Shift (Clock Out)</button>
+              ` : `
+                <button type="button" class="btn btn-primary btn-sm" onclick="handleStartShift()" style="flex:1;">Start Shift (Clock In)</button>
+              `}
+            </div>
+          </div>
+        `;
+      }
+
+      // Render today + next 7 days assignments
+      const schedBody = document.getElementById('driver-schedule-tbody');
+      if (schedBody) {
+        if (driverAssignments.length === 0) {
+          schedBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No assignments found for your driver ID.</td></tr>`;
+        } else {
+          schedBody.innerHTML = driverAssignments.map(b => {
+            const startPlace = (b.itinerary && b.itinerary[0] && b.itinerary[0].place_name) || 'Origin';
+            const endPlace = (b.itinerary && b.itinerary.length > 0 && b.itinerary[b.itinerary.length - 1].place_name) || 'Destination';
+            const routeStr = startPlace === endPlace ? startPlace : `${startPlace} → ${endPlace}`;
+
+            return `
+              <tr>
+                <td style="font-family:var(--font-mono); font-weight:700;">${b.id}</td>
+                <td><strong>${escapeHtml(routeStr)}</strong></td>
+                <td>${b.start_date} ${b.end_date !== b.start_date ? `→ ${b.end_date}` : ''}</td>
+                <td>${b.assignment ? b.assignment.vehicle_id : 'TBD'}</td>
+                <td><span class="badge ${b.status === 'Active' ? 'badge-info' : 'badge-neutral'}">${b.status}</span></td>
+                <td>
+                  <a href="driver-trip.html?id=${b.id}" class="btn btn-primary btn-sm">Manifest</a>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+    }
+
+    function handleStartShift() {
+      const user = Auth.getUser();
+      FleetStore.startDriverShift(user.id, user.name);
+      renderDriverShift();
+      alert('Shift started. Duty log activated.');
+    }
+
+    function handleEndShift() {
+      const user = Auth.getUser();
+      FleetStore.endDriverShift(user.id, user.name);
+      renderDriverShift();
+      alert('Shift ended. Clock out recorded.');
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Driver"])) return;
       Auth.renderAppShell('shift');
-      
+      renderDriverShift();
     });
   </script>
 </body>

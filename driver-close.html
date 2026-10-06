@@ -69,57 +69,93 @@
   </div>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 24px; align-items: start;">
-  <div class="card">
-    <h2 class="card-title">1. Odometer &amp; Mileage Reconciliation</h2>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-      <div class="form-group">
-        <label class="form-label">Departure Odometer (km)</label>
-        <input type="text" class="form-input" disabled value="48,215">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Return Odometer (km)</label>
-        <input type="text" class="form-input" value="48,276">
-      </div>
-    </div>
-    <div style="background: var(--bg-page); padding: 12px; border-radius: 8px; font-size: 13px; margin-top: 10px;">
-      <div><strong>Actual Travelled:</strong> 61 km (Est: 61.4 km)</div>
-      <div><strong>Mileage Variance:</strong> <span style="color:var(--success); font-weight:700;">-0.6% (Within normal ±5% range)</span></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2 class="card-title">2. Fuel Purchases &amp; Receipts</h2>
-    <div style="display: flex; flex-direction: column; gap: 10px;">
-      <div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 14px;">
-          <div style="display: flex; justify-content: space-between;">
-            <strong>TotalEnergies · Obour Industrial Corridor</strong>
-            <span style="font-family:var(--font-mono); font-weight:700;">20.0 Liters</span>
-          </div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-            Diesel · Paid via University Fleet Card #4018 · Receipt Attached
-          </div>
+<form id="driver-close-form" onsubmit="handleCompleteAndClose(event)">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 24px; align-items: start;">
+    <!-- Card 1: Odometer & Mileage -->
+    <div class="card">
+      <h2 class="card-title">1. Odometer &amp; Mileage Reconciliation</h2>
+      <div style="border: 2px dashed var(--border); border-radius: 8px; padding: 14px; text-align: center; background: var(--bg-page); margin-bottom: 14px;">
+        <div id="close-odo-photo-preview" style="display:none; margin-bottom:10px;">
+          <img id="close-odo-img" src="" alt="Return Odometer Verification" style="max-width:100%; max-height:160px; border-radius:6px; border:1px solid var(--border);">
+          <div style="font-size:12px; color:var(--success); font-weight:700; margin-top:4px;">Live Return Odometer Verified</div>
         </div>
-    </div>
-    <button class="btn btn-secondary btn-sm" onclick="alert('Receipt attachment dialog simulated.');" style="display:inline-flex; align-items:center; gap:6px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>Attach Additional Fuel Receipt</span>
-    </button>
-  </div>
+        <button type="button" class="btn btn-gold" id="btn-snap-close-odo" onclick="captureCloseOdometerPhoto()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span id="close-odo-btn-label">Capture Live Return Odometer Photo *</span>
+        </button>
+      </div>
 
-  <div class="card" style="grid-column: span 2;">
-    <h2 class="card-title">3. Post-Trip Return Checklist</h2>
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-      <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>No new vehicle body scratches, dents, glass chips or tyre damage</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Vehicle cabin swept clean, no personal items or waste left behind</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>All exterior and cabin lights switched off</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Keys, fuel card, and logbook deposited at Dispatch Gate 2 locker</span></label>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div class="form-group">
+          <label class="form-label" for="close-odo-start">Departure Odometer (km) *</label>
+          <input type="number" id="close-odo-start" class="form-input" required value="48215" oninput="calculateTripMetrics()">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="close-odo-end">Return Odometer (km) *</label>
+          <input type="number" id="close-odo-end" class="form-input" required value="48276" oninput="calculateTripMetrics()">
+        </div>
+      </div>
+      <div style="background: var(--bg-page); padding: 12px; border-radius: 8px; font-size: 13px; margin-top: 10px;">
+        <div><strong>Actual Travelled:</strong> <span id="close-calc-km">61 km</span> (<span id="close-est-km">Planned route: 61.4 km</span>)</div>
+        <div><strong>Mileage Variance:</strong> <span id="close-calc-odo-var" style="color:var(--success); font-weight:700;">-0.6%</span></div>
+      </div>
     </div>
-    <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-      <button class="btn btn-gold btn-lg" style="display:inline-flex; align-items:center; gap:8px;" onclick="alert('Trip BK-2047 successfully closed and submitted to Internal Audit Bureau.'); window.location.href='home.html';">
-        <span>Complete &amp; Close Trip</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-      </button>
+
+    <!-- Card 2: Fuel Added & Receipt Amount -->
+    <div class="card">
+      <h2 class="card-title">2. Fuel Purchases &amp; Receipts</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div class="form-group">
+          <label class="form-label" for="close-fuel-liters">Fuel Added (Liters) *</label>
+          <input type="number" id="close-fuel-liters" class="form-input" step="0.1" required value="14.5" oninput="calculateTripMetrics()">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="close-fuel-receipt">Receipt Amount (EGP) *</label>
+          <input type="number" id="close-fuel-receipt" class="form-input" step="0.25" required value="297.25">
+        </div>
+      </div>
+      <div style="background: var(--bg-page); padding: 12px; border-radius: 8px; font-size: 13px; margin-top: 10px;">
+        <div><strong>Nominal Est Fuel:</strong> <span id="close-est-fuel">14.1 L</span></div>
+        <div><strong>Fuel Variance:</strong> <span id="close-calc-fuel-var" style="color:var(--success); font-weight:700;">+2.8%</span></div>
+      </div>
+    </div>
+
+    <!-- Card 3: Notes & Inspection Checklist -->
+    <div class="card" style="grid-column: 1 / -1;">
+      <h2 class="card-title">3. Post-Trip Notes &amp; Return Checklist</h2>
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label class="form-label" for="close-notes">Driver Mission Notes &amp; Route Anomalies</label>
+        <textarea id="close-notes" class="form-input" rows="3" placeholder="Enter any route delays, detours, road hazards, or vehicle performance observations…"></textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px;">
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;">
+          <input type="checkbox" required checked style="accent-color: var(--success); width: 18px; height: 18px;">
+          <span>No new vehicle body scratches, dents, glass chips or tyre damage</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;">
+          <input type="checkbox" required checked style="accent-color: var(--success); width: 18px; height: 18px;">
+          <span>Vehicle cabin swept clean, no personal items or waste left behind</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;">
+          <input type="checkbox" required checked style="accent-color: var(--success); width: 18px; height: 18px;">
+          <span>All exterior and cabin lights switched off</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;">
+          <input type="checkbox" required checked style="accent-color: var(--success); width: 18px; height: 18px;">
+          <span>Keys, fuel card, and logbook deposited at Dispatch Gate locker</span>
+        </label>
+      </div>
+
+      <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+        <button type="submit" class="btn btn-gold btn-lg" id="close-submit-btn" style="display:inline-flex; align-items:center; gap:8px;">
+          <span>Submit &amp; Complete Booking</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+      </div>
     </div>
   </div>
-</div>
+</form>
     </main>
   </div>
 
@@ -170,39 +206,146 @@
 
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/media.js"></script>
+  <script src="js/camera.js"></script>
   <script src="js/main.js"></script>
   <script>
     let activeCloseTripId = 'BK-2047';
+    let tripEstimatedKm = 61.4;
+    let tripEstimatedFuel = 14.1;
+    let closeOdoPhotoId = null;
 
-    function handleCompleteAndClose() {
-      const returnOdoInput = document.querySelector('input[value="48,276"]') || document.querySelectorAll('.form-input')[1];
-      const endOdoVal = returnOdoInput ? parseInt(returnOdoInput.value.replace(/\D/g, ''), 10) : 48276;
-
-      const closed = FleetStore.closeTrip(activeCloseTripId, {
-        endOdo: endOdoVal || 48276,
-        fuelLitres: 14.5,
-        fuelCost: 297.25
+    async function captureCloseOdometerPhoto() {
+      const photoId = await Camera.capture({
+        title: 'Return Odometer Verification',
+        hint: 'Capture live return odometer reading on the dashboard',
+        booking_id: activeCloseTripId,
+        kind: 'return_odometer',
+        reading: document.getElementById('close-odo-end').value
       });
 
-      alert(`Trip (${closed ? closed.id : activeCloseTripId}) closed successfully!\n\nFinal Odometer: ${closed ? closed.actualOdoEnd : '48,276'} km\nActual Fuel: ${closed ? closed.actualFuelLitres : 14.5} L\nFuel Variance: ${closed ? closed.fuelVariancePct : 2.8}% (within allowable ±10% threshold)\n\nTrip automatically forwarded to Internal Audit & Reconciliation (Stage 4).`);
-      window.location.href = 'audit.html';
+      if (photoId) {
+        closeOdoPhotoId = photoId;
+        const imgUrl = await Media.getUrl(photoId);
+        const imgEl = document.getElementById('close-odo-img');
+        if (imgEl && imgUrl) {
+          imgEl.src = imgUrl;
+        }
+        document.getElementById('close-odo-photo-preview').style.display = 'block';
+        document.getElementById('close-odo-btn-label').textContent = 'Retake Live Photo';
+      }
+    }
+
+    function calculateTripMetrics() {
+      const startOdo = parseFloat(document.getElementById('close-odo-start').value) || 0;
+      const endOdo = parseFloat(document.getElementById('close-odo-end').value) || startOdo;
+      const actualKm = Math.max(0, endOdo - startOdo);
+      const fuelLiters = parseFloat(document.getElementById('close-fuel-liters').value) || 0;
+
+      const calcKmEl = document.getElementById('close-calc-km');
+      if (calcKmEl) calcKmEl.textContent = `${actualKm.toLocaleString()} km`;
+
+      const odoVarEl = document.getElementById('close-calc-odo-var');
+      if (odoVarEl) {
+        if (tripEstimatedKm > 0) {
+          const odoVar = (((actualKm - tripEstimatedKm) / tripEstimatedKm) * 100).toFixed(1);
+          const sign = odoVar > 0 ? '+' : '';
+          odoVarEl.textContent = `${sign}${odoVar}%`;
+          odoVarEl.style.color = Math.abs(odoVar) <= 10 ? 'var(--success)' : 'var(--danger)';
+        }
+      }
+
+      const fuelVarEl = document.getElementById('close-calc-fuel-var');
+      if (fuelVarEl) {
+        if (tripEstimatedFuel > 0) {
+          const fVar = (((fuelLiters - tripEstimatedFuel) / tripEstimatedFuel) * 100).toFixed(1);
+          const sign = fVar > 0 ? '+' : '';
+          fuelVarEl.textContent = `${sign}${fVar}%`;
+          fuelVarEl.style.color = Math.abs(fVar) <= 10 ? 'var(--success)' : 'var(--danger)';
+        }
+      }
+    }
+
+    function handleCompleteAndClose(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const startOdo = parseFloat(document.getElementById('close-odo-start').value) || 0;
+      const endOdo = parseFloat(document.getElementById('close-odo-end').value) || startOdo;
+      const fuelLiters = parseFloat(document.getElementById('close-fuel-liters').value) || 0;
+      const receiptAmount = parseFloat(document.getElementById('close-fuel-receipt').value) || 0;
+      const notes = document.getElementById('close-notes').value;
+
+      if (!closeOdoPhotoId) {
+        alert('Mandatory live return odometer photo is required before closing trip.');
+        return;
+      }
+      if (endOdo < startOdo) {
+        alert('Return odometer cannot be less than departure odometer.');
+        return;
+      }
+
+      const closed = FleetStore.closeTrip(activeCloseTripId, {
+        startOdo: startOdo,
+        endOdo: endOdo,
+        fuelLiters: fuelLiters,
+        receiptAmount: receiptAmount,
+        notes: notes,
+        end_odometer_photo_id: closeOdoPhotoId
+      });
+
+      const kmTravelled = Math.max(0, endOdo - startOdo);
+      alert(`Trip ${activeCloseTripId} closed successfully!\n\nFinal Odometer: ${endOdo.toLocaleString()} km (+${kmTravelled} km travelled)\nFuel Reported: ${fuelLiters} L\nFuel Variance: ${closed ? closed.fuelVariancePct : 0}%\n\nBooking status transitioned to Completed and forwarded to Internal Audit.`);
+      window.location.href = 'home.html';
     }
 
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Driver", "Auditor", "Dispatcher"])) return;
       Auth.renderAppShell('close');
 
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqTripId = urlParams.get('id');
       const bookings = FleetStore.getBookings();
-      const trip = bookings.find(b => b.status === 'Active' || b.status === 'Dispatched') || bookings[0];
+      const trip = (reqTripId ? FleetStore.getBooking(reqTripId) : null) ||
+                   bookings.find(b => b.status === 'Active' || b.status === 'Dispatched') ||
+                   bookings[0];
+
       if (trip) {
         activeCloseTripId = trip.id;
         const pretitle = document.querySelector('.page-pretitle');
         if (pretitle) pretitle.textContent = `${trip.id} · Trip Completion`;
-      }
 
-      const closeBtn = document.querySelector('button.btn-gold.btn-lg');
-      if (closeBtn) {
-        closeBtn.onclick = handleCompleteAndClose;
+        let estKm = 60;
+        if (trip.route_legs && trip.route_legs.length > 0) {
+          estKm = trip.route_legs.reduce((acc, l) => acc + (l.distance_km || 0), 0);
+        } else if (trip.distance_km) {
+          estKm = trip.distance_km;
+        }
+        tripEstimatedKm = estKm;
+
+        let estFuel = 14.1;
+        if (trip.estimate && trip.estimate.fuel_liters) {
+          estFuel = trip.estimate.fuel_liters;
+        } else if (trip.estFuelLiters) {
+          estFuel = trip.estFuelLiters;
+        }
+        tripEstimatedFuel = estFuel;
+
+        const estKmEl = document.getElementById('close-est-km');
+        if (estKmEl) estKmEl.textContent = `Est: ${tripEstimatedKm.toFixed(1)} km`;
+
+        const estFuelEl = document.getElementById('close-est-fuel');
+        if (estFuelEl) estFuelEl.textContent = `${tripEstimatedFuel.toFixed(1)} L`;
+
+        const vCode = (trip.assignment && trip.assignment.vehicle_id) || trip.vehicleCode;
+        const vehicle = vCode ? FleetStore.getVehicles().find(v => v.code === vCode || v.id === vCode) : null;
+        const baseOdo = trip.start_odometer_km || (vehicle && (vehicle.last_odometer_km || vehicle.odo || vehicle.odometer)) || 48215;
+        document.getElementById('close-odo-start').value = baseOdo;
+        document.getElementById('close-odo-end').value = baseOdo + Math.round(tripEstimatedKm);
+
+        document.getElementById('close-fuel-liters').value = tripEstimatedFuel.toFixed(1);
+        const estCost = (trip.estimate && trip.estimate.cost_egp) || Math.round(tripEstimatedFuel * 20.5);
+        document.getElementById('close-fuel-receipt').value = estCost.toFixed(2);
+
+        calculateTripMetrics();
       }
     });
   </script>

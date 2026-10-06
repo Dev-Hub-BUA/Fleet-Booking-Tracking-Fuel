@@ -1,0 +1,891 @@
+/* ==========================================================================
+   CIRA Education — Enterprise Fleet Logistics & Dispatch Platform
+   Official Master Responsive Stylesheet
+   Applies across ALL 24 portal pages:
+   360 (small phone) · 390 (iPhone) · 768 (tablet) · 1024 (small laptop) · 1440 (desktop)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. GLOBAL OVERFLOW CONTROL & TAP TARGET STANDARDS
+   -------------------------------------------------------------------------- */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Ensure no media asset forces viewport expansion */
+img, video, canvas, svg, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Text wrap & truncation controls */
+p, span, h1, h2, h3, h4, h5, h6, strong, div, td, th {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.mono-id, .truncate-text, [data-cell-id], td.id-cell {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Touch targets: all interactive elements >= 44px min-height */
+button,
+.btn,
+.btn-icon,
+.btn-nav-toggle,
+.user-btn,
+.nav-link,
+.role-pill-btn,
+.form-input,
+.form-select,
+.search-input,
+.filter-tab-btn,
+.timeline-toggle-btn {
+  min-height: 44px;
+}
+
+.btn-icon {
+  min-width: 44px;
+}
+
+/* --------------------------------------------------------------------------
+   2. MOBILE HAMBURGER BUTTON & SIDEBAR SLIDE-IN PANEL (< 1024px)
+   -------------------------------------------------------------------------- */
+/* Desktop default: Hide mobile nav toggle and backdrop */
+.btn-nav-toggle {
+  display: none !important;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
+.sidebar-close-btn {
+  display: none;
+}
+
+@media (max-width: 1023.98px) {
+  /* Show hamburger button in header */
+  .btn-nav-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    background: var(--bg-card, #FFFFFF);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--navy-800);
+    cursor: pointer;
+    padding: 0;
+    transition: var(--trans);
+    flex-shrink: 0;
+  }
+
+  .btn-nav-toggle:hover,
+  .btn-nav-toggle:focus {
+    background: var(--navy-50, #FBF1F3);
+    border-color: var(--cira-burgundy);
+  }
+
+  /* Slide-in sidebar panel */
+  .sidebar-nav {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 290px !important;
+    max-width: 85vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    background: var(--navy-800) !important;
+    z-index: 2100 !important;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: var(--shadow-xl) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 20px 16px !important;
+  }
+
+  /* When open */
+  body.sidebar-open .sidebar-nav,
+  .sidebar-nav.open {
+    transform: translateX(0) !important;
+  }
+
+  /* Sidebar backdrop overlay */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 37, 69, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 2099;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  body.sidebar-open .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Close button inside sidebar */
+  .sidebar-mobile-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 14px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .sidebar-close-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    color: #FFFFFF;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .sidebar-close-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  /* App container below 1024 */
+  .app-container {
+    flex-direction: column !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .main-content {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. HEADER & FOOTER CLEAN WRAPPING (FITS AT 360PX)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1023.98px) {
+  .header-inner {
+    padding: 8px 14px;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .public-nav {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+  }
+
+  .header-inner {
+    padding: 8px 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* Logo */
+  .logo-btn {
+    padding: 2px 4px;
+    gap: 8px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .logo-badge {
+    width: 36px;
+    height: 36px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .logo-text .univ-name {
+    font-size: 15px;
+    line-height: 1.1;
+  }
+
+  .logo-text .portal-title {
+    display: none;
+  }
+
+  /* Header actions on mobile: Logo + Role + Bell + Menu fit at 360 */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  /* Search bar wraps cleanly below on mobile */
+  .search-wrapper {
+    order: 10;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+    margin-top: 4px;
+  }
+
+  .search-input {
+    height: 42px;
+    font-size: 13.5px;
+  }
+
+  /* User profile button compact */
+  .user-btn {
+    padding: 3px 8px 3px 4px;
+    gap: 6px;
+    min-height: 44px;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .user-info {
+    max-width: 85px;
+    overflow: hidden;
+  }
+
+  .user-name {
+    display: none !important;
+  }
+
+  .user-role-badge {
+    font-size: 11px !important;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--navy-800) !important;
+    font-weight: 700 !important;
+  }
+
+  /* Dropdown menu */
+  .dropdown-menu {
+    width: calc(100vw - 24px);
+    right: -6px;
+    top: 50px;
+    max-width: 320px;
+  }
+
+  /* Master Footer */
+  .footer-inner {
+    padding: 32px 16px 20px !important;
+    gap: 24px !important;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .footer-bottom {
+    flex-direction: column !important;
+    gap: 12px !important;
+    text-align: left !important;
+  }
+}
+
+/* Super compact header adjustments for 360px & 390px screens */
+@media (max-width: 400px) {
+  .header-inner {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  .logo-btn {
+    gap: 6px;
+    padding: 0;
+  }
+
+  .logo-badge {
+    width: 34px;
+    height: 34px;
+    font-size: 10px;
+  }
+
+  .logo-text .univ-name {
+    font-size: 13.5px;
+  }
+
+  .header-actions {
+    gap: 4px;
+  }
+
+  .user-btn {
+    padding: 2px 4px;
+  }
+
+  .user-info {
+    max-width: 65px;
+  }
+
+  .user-role-badge {
+    font-size: 10px !important;
+  }
+
+  .btn-icon,
+  .btn-nav-toggle {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. MAIN CONTENT & PAGE HEADERS RESPONSIVENESS
+   -------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  .main-content {
+    padding: 16px 12px 48px !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .page-title {
+    font-size: 28px !important;
+    line-height: 1.15 !important;
+  }
+
+  .page-subtitle {
+    font-size: 13px !important;
+  }
+
+  .page-header > div:last-child,
+  .page-header > .btn,
+  .page-header > a.btn {
+    width: 100% !important;
+  }
+
+  .page-header > div:last-child {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .page-header > div:last-child .btn,
+  .page-header > div:last-child a.btn {
+    flex: 1 1 calc(50% - 6px) !important;
+    min-height: 44px !important;
+    justify-content: center !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .main-content {
+    padding: 24px 20px 48px !important;
+  }
+
+  .page-title {
+    font-size: 34px !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. CARDS & AUTO-FIT GRIDS (minmax scaling 1 -> 2 -> 3+ columns)
+   -------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  .card {
+    padding: 16px 14px !important;
+    gap: 12px !important;
+    border-radius: var(--radius-sm) !important;
+    max-width: 100% !important;
+  }
+
+  /* Force multi-column grids to 1 column below 768px */
+  .stat-grid,
+  .catalog-grid,
+  .kpi-grid,
+  #catalog-grid,
+  #admin-kpi-grid,
+  .queue-layout,
+  [style*="grid-template-columns: repeat(auto-fit, minmax(4"],
+  [style*="grid-template-columns: repeat(auto-fit, minmax(3"],
+  [style*="grid-template-columns: repeat(auto-fit, minmax(5"],
+  [style*="grid-template-columns: repeat(auto-fill, minmax(290px"],
+  [style*="grid-template-columns: repeat(auto-fit, minmax(290px"],
+  [style*="grid-template-columns: repeat(auto-fit, minmax(220px"] {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Flex containers that might overflow */
+  [style*="flex: 999"],
+  [style*="flex: 1 1 540px"],
+  [style*="flex: 1 1 620px"],
+  [style*="flex: 1 1 340px"],
+  [style*="flex: 1 1 480px"],
+  [style*="flex: 1 1 500px"],
+  [style*="flex: 0 0 380px"],
+  .queue-left-col,
+  .queue-right-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 100% !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  /* 2 columns on tablet */
+  [style*="grid-template-columns: repeat(auto-fit, minmax(4"],
+  [style*="grid-template-columns: repeat(auto-fit, minmax(5"] {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. TABLES: ROW-TO-CARD TRANSFORMATION (< 768px)
+      Wide tables (timeline, audit) scroll inside their own container only.
+   -------------------------------------------------------------------------- */
+/* Scroll-inside container for wide tables */
+.table-wrapper,
+.audit-table-wrapper,
+.timeline-card,
+.table-scroll-only {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100% !important;
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 767.98px) {
+  /* Tables that transform into cards (exclude tables marked stay-table or audit) */
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) {
+    display: block !important;
+    width: 100% !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) thead {
+    display: none !important;
+  }
+
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) tbody {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) tr {
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--bg-card, #FFFFFF) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 12px 14px !important;
+    box-shadow: var(--shadow-sm) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 6px 0 !important;
+    border-bottom: 1px solid var(--border-light, #F1EFEA) !important;
+    font-size: 13.5px !important;
+    text-align: right !important;
+  }
+
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) td:last-child {
+    border-bottom: none !important;
+    padding-top: 8px !important;
+  }
+
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) td::before {
+    content: attr(data-label) !important;
+    font-weight: 700 !important;
+    font-size: 11.5px !important;
+    color: var(--text-muted) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    text-align: left !important;
+    margin-right: 12px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Actions as full-width buttons inside card */
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) td:last-child {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    width: 100% !important;
+    align-items: stretch !important;
+  }
+
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) td:last-child::before {
+    display: none !important;
+  }
+
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) td:last-child .btn,
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) td:last-child button,
+  .table-wrapper:not(.table-scroll-only):not(.audit-table-wrapper) table.data-table:not(.table-stay-table):not(.table-preserve) td:last-child a.btn {
+    width: 100% !important;
+    min-height: 44px !important;
+    justify-content: center !important;
+  }
+
+  /* Wide tables that must stay tables (audit, timeline): scroll inside container */
+  .audit-table-wrapper,
+  .table-scroll-only,
+  table.table-stay-table,
+  table.table-preserve {
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7. FORMS RESPONSIVENESS (< 768px)
+      One column below 768, inputs 100% width, labels above inputs.
+   -------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  form,
+  .form-group,
+  .form-row,
+  .form-grid {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Form grids become 1 column */
+  [style*="grid-template-columns: 1fr 1fr"],
+  [style*="grid-template-columns: repeat(2, 1fr)"],
+  [style*="grid-template-columns: repeat(3, 1fr)"],
+  .form-row {
+    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .form-label {
+    display: block !important;
+    margin-bottom: 6px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    width: 100% !important;
+    min-height: 44px !important;
+    font-size: 14.5px !important;
+  }
+
+  /* Checkbox / radio groups */
+  .checkbox-group,
+  label:has(input[type="checkbox"]),
+  label:has(input[type="radio"]) {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   8. MODALS (Camera, Cancel, Fuel Log, Image Viewer) (< 768px)
+      Full-screen below 768, scroll inside, close button always visible,
+      action buttons fixed at the bottom.
+   -------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  .modal-overlay,
+  .modal-backdrop,
+  #cancel-modal,
+  #add-fuel-modal,
+  #image-viewer-modal,
+  #driver-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: 9999 !important;
+    background: rgba(11, 37, 69, 0.75) !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+  }
+
+  .modal-overlay.open,
+  .modal-backdrop[style*="display: flex"],
+  .modal-backdrop[style*="display: block"],
+  #cancel-modal[style*="display: flex"],
+  #cancel-modal[style*="display: block"],
+  #add-fuel-modal.open,
+  #image-viewer-modal.open {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .modal-box,
+  .modal-dialog,
+  .modal-card,
+  #cancel-modal > div,
+  #add-fuel-modal .modal-box,
+  #image-viewer-modal .modal-box,
+  .modal-backdrop .modal-dialog {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    border: none !important;
+  }
+
+  /* Close button always visible */
+  .modal-header,
+  .modal-dialog > .modal-header,
+  .modal-box > .modal-header,
+  .modal-card > div:first-child,
+  #cancel-modal .modal-header {
+    flex-shrink: 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 60 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 14px 16px !important;
+  }
+
+  .modal-close-btn,
+  .modal-header button,
+  #cam-btn-close {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 26px !important;
+    line-height: 1 !important;
+  }
+
+  /* Scroll inside body */
+  .modal-body,
+  .modal-dialog > form,
+  .modal-dialog > .modal-body,
+  .modal-box > .modal-body,
+  .modal-card > div:nth-child(2) {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 16px !important;
+    padding-bottom: 96px !important; /* reserve room for fixed action bar */
+    max-height: none !important;
+  }
+
+  /* Action buttons fixed at the bottom */
+  .modal-footer,
+  .modal-dialog > .modal-footer,
+  .modal-box > .modal-footer,
+  .modal-card > div:last-child,
+  #cancel-modal .modal-footer,
+  .modal-dialog form > div:last-child {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    box-sizing: border-box !important;
+    z-index: 60 !important;
+    padding: 12px 16px !important;
+    background: var(--bg-card, #FFFFFF) !important;
+    border-top: 1px solid var(--border) !important;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15) !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .modal-footer button,
+  .modal-footer .btn,
+  .modal-card > div:last-child button,
+  .modal-card > div:last-child .btn,
+  .modal-dialog form > div:last-child button,
+  .modal-dialog form > div:last-child .btn {
+    flex: 1 1 calc(50% - 10px) !important;
+    min-height: 44px !important;
+    justify-content: center !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   9. MAPS RESPONSIVENESS (< 768px)
+      Height 50-60vh on mobile, never 0 height.
+   -------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  .map-canvas-container,
+  #dispatch-fleet-map,
+  #summary-leaflet-map,
+  #detail-leaflet-map,
+  #track-leaflet-map,
+  #incident-scene-map,
+  #geomap-picker-leaflet-map,
+  .leaflet-container {
+    height: 52vh !important;
+    min-height: 300px !important;
+    max-height: 60vh !important;
+    width: 100% !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   10. DISPATCH TIMELINE GANTT
+       Horizontal scroll inside timeline only, vehicle names column sticky.
+   -------------------------------------------------------------------------- */
+.timeline-card {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+.timeline-header-hours,
+.timeline-row,
+.week-header-days,
+.week-timeline-row {
+  min-width: 820px;
+}
+
+/* Sticky Vehicle Names column */
+.timeline-veh-label,
+.week-header-days > div:first-child,
+.week-timeline-row > div:first-child,
+.timeline-header-hours > div:first-child,
+.timeline-row > div:first-child {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 5 !important;
+  background: var(--bg-card, #FFFFFF) !important;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.06);
+}
+
+.week-header-days > div:first-child {
+  background: var(--navy-50, #FBF1F3) !important;
+}
+
+/* --------------------------------------------------------------------------
+   11. CHARTS (admin-kpi)
+       Scale to container width, no fixed px widths.
+   -------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  #chart-trips-month > div,
+  #chart-km-vehicle > div {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  #chart-trips-month span:first-child,
+  #chart-km-vehicle > div > div:first-child {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #chart-trips-month > div > div,
+  #chart-km-vehicle > div > div:last-child {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   12. LOGIN & PUBLIC PAGE SPECIALIZED RESPONSIVE TWEAKS
+   -------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  .persona-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .persona-card > div:last-child {
+    width: 100% !important;
+    display: flex !important;
+    gap: 8px !important;
+  }
+
+  .persona-card > div:last-child button {
+    flex: 1 1 50% !important;
+    min-height: 44px !important;
+    justify-content: center !important;
+  }
+
+  /* Presenter card */
+  .presenter-container {
+    right: 12px !important;
+    bottom: 12px !important;
+  }
+
+  .presenter-card {
+    width: calc(100vw - 24px) !important;
+    max-width: 360px !important;
+    right: 12px !important;
+    bottom: 70px !important;
+  }
+}
