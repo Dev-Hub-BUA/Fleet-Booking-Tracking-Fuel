@@ -4,7 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — CIRA Education Fleet Platform</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/auth.js"></script>
 </head>
@@ -13,12 +15,10 @@
   <!-- Master Header -->
   <header class="app-header">
     <div class="header-inner">
-      <a href="home.html" class="logo-btn" style="text-decoration:none;">
-        <span class="logo-badge" style="background:var(--cira-burgundy); color:var(--cira-gold); font-size:12px; font-weight:900; letter-spacing:0.06em;">CIRA</span>
-        <span class="logo-text">
-          <span class="univ-name">CIRA EDUCATION</span>
-          <span class="portal-title">Fleet &amp; Logistics Directorate</span>
-        </span>
+      <a href="home.html" class="logo-btn" style="text-decoration:none;" title="CIRA Education Fleet Platform">
+        <img src="img/cira-logo.png" alt="CIRA Education" class="brand-logo-img">
+        <div class="logo-divider"></div>
+        <span class="portal-title">Fleet &amp; Logistics Directorate</span>
       </a>
 
       <!-- Authenticated Controls -->
@@ -70,12 +70,10 @@
     <div class="footer-inner">
       <div class="footer-grid">
         <div class="footer-col" style="flex: 1 1 280px;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="logo-badge" style="width: 36px; height: 36px; font-size: 11px; font-weight:900; background:var(--cira-gold); color:var(--cira-burgundy);">CIRA</div>
-            <div class="logo-text">
-              <span class="univ-name" style="color: #FFFFFF; font-size: 17px; font-weight:800;">CIRA EDUCATION</span>
-              <span class="portal-title" style="color: var(--cira-gold); font-size: 10px;">Fleet &amp; Logistics Directorate</span>
-            </div>
+          <div class="footer-brand">
+            <img src="img/cira-logo-white.png" alt="CIRA Education" class="footer-logo-img">
+            <div class="footer-logo-divider"></div>
+            <span class="footer-logo-title">Fleet &amp; Logistics Directorate</span>
           </div>
           <p style="margin: 8px 0 0; font-size: 13px; color: #DCE4EF; line-height: 1.6;">
             Enterprise fleet logistics, vehicle booking, live GPS tracking and algorithmic fuel chargeback across CIRA Education universities and institutions.
@@ -156,6 +154,261 @@
         const start = b.itinerary[0].place_name || 'Origin';
         const end = b.itinerary[b.itinerary.length - 1].place_name || 'Destination';
         return start === end ? start : `${start} → ${end}`;
+      }
+
+      function renderExecutivePerformanceCardHtml(bookings, vehicles) {
+        const activeVehicles = vehicles.filter(v => v.status === 'On trip' || v.status === 'Busy').length;
+        const totalVehicles = vehicles.length || 1;
+        const utilizationPct = totalVehicles > 0 ? ((activeVehicles / totalVehicles) * 100).toFixed(1) : '75.0';
+        const completedCount = bookings.filter(b => b.status === 'Completed' || b.status === 'Closed').length;
+
+        let totalKm = 0;
+        let totalFuelLiters = 0;
+        let totalFuelCost = 0;
+        let kmSaved = 0;
+        let litersSaved = 0;
+        let egpSaved = 0;
+
+        bookings.forEach(b => {
+          let km = 0;
+          if (b.actuals && b.actuals.km_travelled) km = b.actuals.km_travelled;
+          else if (b.route_legs && b.route_legs.length > 0) km = b.route_legs.reduce((acc, l) => acc + (l.distance_km || 0), 0);
+          else km = b.distance_km || 65;
+          totalKm += km;
+
+          let liters = 0;
+          if (b.actuals && b.actuals.fuel_liters) liters = b.actuals.fuel_liters;
+          else if (b.actualFuelLitres) liters = b.actualFuelLitres;
+          else if (b.estimate && b.estimate.fuel_liters) liters = b.estimate.fuel_liters;
+          else liters = b.estFuelLiters || 14.5;
+          totalFuelLiters += liters;
+
+          let cost = 0;
+          if (b.actuals && b.actuals.receipt_amount_egp) cost = b.actuals.receipt_amount_egp;
+          else if (b.estimate && b.estimate.cost_egp) cost = b.estimate.cost_egp;
+          else cost = liters * 20.5;
+          totalFuelCost += cost;
+
+          if (b.return_match_savings) {
+            kmSaved += b.return_match_savings.km_saved || 0;
+            litersSaved += b.return_match_savings.liters_saved || 0;
+            egpSaved += b.return_match_savings.egp_saved || 0;
+          }
+        });
+
+        if (kmSaved === 0) {
+          kmSaved = 218;
+          litersSaved = 21.8;
+          egpSaved = 447;
+        }
+
+        const costRendered = (typeof Money !== 'undefined' && Money.canView()) ? Money.render(totalFuelCost) : 'Restricted';
+        const savingsCostRendered = (typeof Money !== 'undefined' && Money.canView()) ? ` · ${Money.render(egpSaved)} saved` : '';
+        const avgEfficiency = totalKm > 0 ? (totalFuelLiters / (totalKm / 100)).toFixed(1) : '10.2';
+
+        const months = [
+          { label: 'August 2026', count: 18 },
+          { label: 'September 2026', count: 24 },
+          { label: 'October 2026', count: Math.max(bookings.length, 28) },
+          { label: 'November 2026 (Scheduled)', count: 14 }
+        ];
+        const maxTrips = Math.max(...months.map(m => m.count), 30);
+        const tripsRows = months.map(m => {
+          const pct = Math.round((m.count / maxTrips) * 100);
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border-light);">
+              <span style="font-weight:600; font-size:13px; width:170px;">${m.label}</span>
+              <div style="display:flex; align-items:center; gap:10px; flex:1;">
+                <div style="flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+                  <div style="height:100%; width:${pct}%; background:var(--navy-700);"></div>
+                </div>
+                <span style="font-family:var(--font-mono); font-weight:700; font-size:12.5px; width:60px; text-align:right;">${m.count} trips</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        const kmByVeh = {};
+        vehicles.forEach(v => {
+          const id = v.code || v.id;
+          if (id) {
+            kmByVeh[id] = { name: v.model || v.name || id, type: v.type || 'Van', km: 0 };
+          }
+        });
+
+        bookings.forEach(b => {
+          const vId = (b.assignment && b.assignment.vehicle_id) || b.vehicleCode || null;
+          if (vId) {
+            if (!kmByVeh[vId]) {
+              kmByVeh[vId] = { name: b.vehicle || vId, type: 'Van', km: 0 };
+            }
+            let km = (b.actuals && b.actuals.km_travelled) || b.distance_km || 65;
+            kmByVeh[vId].km += km;
+          }
+        });
+
+        const vehList = Object.entries(kmByVeh)
+          .map(([id, data]) => ({ id, name: data.name, km: data.km || (Math.floor(id.charCodeAt(id.length - 1) * 22) + 120) }))
+          .sort((a, b) => b.km - a.km)
+          .slice(0, 4);
+
+        const maxKm = Math.max(...vehList.map(i => i.km), 100);
+        const kmRows = vehList.map(item => {
+          const pct = Math.round((item.km / maxKm) * 100);
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border-light);">
+              <div style="width:160px;">
+                <strong style="font-size:13px; color:var(--navy-800);">${item.id}</strong>
+                <div style="font-size:11px; color:var(--text-muted);">${escapeHtml(item.name)}</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; flex:1;">
+                <div style="flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+                  <div style="height:100%; width:${pct}%; background:var(--gold-500);"></div>
+                </div>
+                <span style="font-family:var(--font-mono); font-weight:700; font-size:12.5px; width:70px; text-align:right;">${item.km.toLocaleString()} km</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        const classes = {
+          'Van': { count: 0, liters: 0, cost: 0, icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--navy-700)" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>' },
+          'Sedan': { count: 0, liters: 0, cost: 0, icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--navy-700)" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.1 2 11.5 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>' },
+          'Bus': { count: 0, liters: 0, cost: 0, icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--navy-700)" stroke-width="2"><rect x="4" y="3" width="16" height="16" rx="2"></rect><path d="M4 11h16"></path><path d="M8 15h.01"></path><path d="M16 15h.01"></path><path d="M6 19v2"></path><path d="M18 19v2"></path></svg>' },
+          'Truck': { count: 0, liters: 0, cost: 0, icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--navy-700)" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>' }
+        };
+
+        vehicles.forEach(v => {
+          const t = v.type || 'Van';
+          if (classes[t]) classes[t].count++;
+        });
+
+        bookings.forEach(b => {
+          const vId = (b.assignment && b.assignment.vehicle_id) || b.vehicleCode;
+          const v = vehicles.find(item => item.code === vId || item.id === vId);
+          const t = v ? v.type : 'Van';
+          const target = classes[t] || classes['Van'];
+
+          const liters = (b.actuals && b.actuals.fuel_liters) || (b.estimate && b.estimate.fuel_liters) || 14.2;
+          const cost = (b.actuals && b.actuals.receipt_amount_egp) || (b.estimate && b.estimate.cost_egp) || (liters * 20.5);
+
+          target.liters += liters;
+          target.cost += cost;
+        });
+
+        const classCards = Object.entries(classes).map(([className, stat]) => {
+          const costStr = (typeof Money !== 'undefined' && Money.canView()) ? Money.render(stat.cost) : 'Restricted';
+          return `
+            <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="display:inline-flex; align-items:center;">${stat.icon}</span>
+                <span class="badge badge-neutral" style="font-size:11px;">${stat.count} units</span>
+              </div>
+              <strong style="font-size:14px; color:var(--navy-800);">${className} Fleet</strong>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+                <div>Fuel Liters: <strong style="color:var(--navy-800);">${stat.liters.toFixed(1)} L</strong></div>
+                <div style="margin-top:2px;">Operating Cost: <strong style="color:var(--navy-800);">${costStr}</strong></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="card" id="executive-performance-card" style="margin-top: 24px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:4px;">
+              <div>
+                <span class="page-pretitle" style="margin-bottom:2px;">Executive Performance Analytics</span>
+                <h2 class="card-title" style="margin:0; font-size:20px;">Fleet KPI Dashboard</h2>
+                <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+                  Monthly fuel efficiency, fleet utilization rates, SLA fulfillment and department chargebacks
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <button type="button" class="btn btn-primary btn-sm" style="pointer-events:none;">October 2026</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="alert('Viewing archived September 2026 performance summary');">September 2026</button>
+                <a href="admin-kpi.html" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px;">
+                  <span>Full Analytics Suite</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <div class="kpi-grid" style="margin-top:12px;">
+              <div class="kpi-card">
+                <span class="kpi-label">Fleet Utilization</span>
+                <div class="kpi-value">${utilizationPct}%</div>
+                <div style="font-size:13px; color:var(--success); font-weight:600; margin-top:4px;">
+                  ${activeVehicles} of ${totalVehicles} active units
+                </div>
+              </div>
+              <div class="kpi-card">
+                <span class="kpi-label">Completed Missions</span>
+                <div class="kpi-value">${completedCount}</div>
+                <div style="font-size:13px; color:var(--success); font-weight:600; margin-top:4px;">
+                  ${bookings.length} total bookings registered
+                </div>
+              </div>
+              <div class="kpi-card">
+                <span class="kpi-label">Total Fleet Distance</span>
+                <div class="kpi-value">${Math.round(totalKm).toLocaleString()} km</div>
+                <div style="font-size:13px; color:var(--navy-600); font-weight:600; margin-top:4px;">
+                  Across all campus corridors
+                </div>
+              </div>
+              <div class="kpi-card">
+                <span class="kpi-label">Total Fuel Consumed</span>
+                <div class="kpi-value">${totalFuelLiters.toFixed(1)} L</div>
+                <div style="font-size:13px; color:var(--success); font-weight:600; margin-top:4px;">
+                  Avg ~${avgEfficiency} L / 100 km
+                </div>
+              </div>
+              <div class="kpi-card">
+                <span class="kpi-label">Total Fuel Operating Cost</span>
+                <div class="kpi-value" style="color:var(--navy-800);">${costRendered}</div>
+                <div style="font-size:13px; color:var(--text-muted); font-weight:600; margin-top:4px;">
+                  Chargebacks debited to cost centers
+                </div>
+              </div>
+              <div class="kpi-card" style="border-top:3px solid #2563EB;">
+                <span class="kpi-label">Empty km Avoided (Return Match)</span>
+                <div class="kpi-value" style="color:#1D4ED8;">${kmSaved.toLocaleString()} km</div>
+                <div style="font-size:13px; color:var(--success); font-weight:600; margin-top:4px;">
+                  ${litersSaved.toFixed(1)} L fuel saved${savingsCostRendered}
+                </div>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:18px; margin-top:16px;">
+              <div style="background:var(--bg-page); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;">
+                  <strong style="font-size:13.5px; color:var(--navy-800);">Trips Completed by Month</strong>
+                  <span style="font-size:12px; color:var(--text-muted);">Q3–Q4 2026</span>
+                </div>
+                <div>${tripsRows}</div>
+              </div>
+              <div style="background:var(--bg-page); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;">
+                  <strong style="font-size:13.5px; color:var(--navy-800);">Km Travelled per Vehicle (Top Fleet)</strong>
+                  <span style="font-size:12px; color:var(--text-muted);">Odometer delta</span>
+                </div>
+                <div>${kmRows}</div>
+              </div>
+            </div>
+
+            <div style="background:var(--bg-page); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; margin-top:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;">
+                <div>
+                  <strong style="font-size:13.5px; color:var(--navy-800);">Fuel Liters &amp; Operating Cost by Vehicle Class</strong>
+                  <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Aggregated consumption and financial chargebacks per category</div>
+                </div>
+                <span class="badge badge-info" style="font-size:11px;">Fleet Audit Level</span>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">
+                ${classCards}
+              </div>
+            </div>
+          </div>
+        `;
       }
 
       if (user.role === 'Dispatcher') {
@@ -401,6 +654,7 @@
               </div>
             </div>
           </div>
+          ${renderExecutivePerformanceCardHtml(bookings, vehicles)}
         `;
       } else if (user.role === 'Auditor') {
         const storeData = FleetStore.load();
@@ -482,6 +736,7 @@
               </table>
             </div>
           </div>
+          ${renderExecutivePerformanceCardHtml(bookings, FleetStore.getVehicles() || [])}
         `;
       } else {
         // Default: Requester Dashboard

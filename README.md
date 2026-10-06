@@ -47,3 +47,11 @@ An enterprise vehicle booking, operations dispatch, telemetry tracking, and algo
 - Warm Gold Accent: `#CE9F51`
 - Typography: Google Font `Cairo` & `JetBrains Mono`
 - Strict inline SVG icons (no emoji characters)
+- Official CIRA Logo & Emblem (sourced directly from https://cira.com.eg/):
+  - `img/cira-logo.png`: Full official burgundy corporate logo
+  - `img/cira-logo-white.png`: High-contrast pure white corporate logo for dark headers/footers
+  - `img/cira-emblem.svg`: Vector SVG emblem (Burgundy `#703845`)
+  - `img/cira-emblem-gold.svg`: Vector SVG emblem (Gold `#CE9F51`)
+  - `img/cira-emblem-white.svg`: Vector SVG emblem (White `#FFFFFF`)
+  - `img/favicon.svg` / `img/favicon-32x32.png` / `img/apple-touch-icon.png`: Official site favicons and app icons
+

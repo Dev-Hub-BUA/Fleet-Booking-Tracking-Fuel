@@ -226,6 +226,25 @@ button,
     align-items: center;
   }
 
+  .brand-logo-img {
+    height: 30px;
+    max-width: 135px;
+  }
+
+  .logo-divider,
+  .logo-btn .portal-title {
+    display: none;
+  }
+
+  .footer-logo-img {
+    height: 26px;
+  }
+
+  .footer-logo-divider,
+  .footer-logo-title {
+    display: none;
+  }
+
   .logo-badge {
     width: 36px;
     height: 36px;
@@ -332,6 +351,11 @@ button,
   .logo-btn {
     gap: 6px;
     padding: 0;
+  }
+
+  .brand-logo-img {
+    height: 26px;
+    max-width: 115px;
   }
 
   .logo-badge {

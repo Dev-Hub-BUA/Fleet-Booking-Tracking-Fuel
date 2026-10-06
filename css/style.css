@@ -148,6 +148,32 @@ button {
   border-radius: var(--radius-sm);
 }
 
+.brand-logo-img {
+  height: 38px;
+  width: auto;
+  max-width: 175px;
+  object-fit: contain;
+  display: block;
+}
+
+.logo-divider {
+  width: 1.5px;
+  height: 28px;
+  background: var(--border-strong, #CEC8BF);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.logo-btn .portal-title {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--cira-burgundy, #703845);
+  text-transform: uppercase;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: left;
+}
+
 .logo-badge {
   width: 42px;
   height: 42px;
@@ -161,6 +187,12 @@ button {
   font-size: 20px;
   color: var(--gold-500);
   box-shadow: 0 2px 6px rgba(11,37,69,0.2);
+}
+
+.logo-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .logo-text {
@@ -843,6 +875,44 @@ button {
   gap: 4px;
 }
 
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.kpi-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.kpi-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.kpi-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpi-value {
+  font-family: var(--font-condensed);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--navy-800);
+  line-height: 1.1;
+}
+
 /* Alert Boxes */
 .alert-banner {
   border-radius: var(--radius-sm);
@@ -1382,6 +1452,35 @@ button {
   gap: 16px;
   font-size: 13px;
   color: #9FB0C8;
+}
+
+/* Footer Brand */
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-logo-img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.footer-logo-divider {
+  width: 1.5px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+
+.footer-logo-title {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--cira-gold, #CE9F51);
+  text-transform: uppercase;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 

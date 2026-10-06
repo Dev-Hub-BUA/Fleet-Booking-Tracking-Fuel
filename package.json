@@ -1,4 +1,8 @@
 {
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
   "devDependencies": {
     "playwright": "^1.63.0"
   }
