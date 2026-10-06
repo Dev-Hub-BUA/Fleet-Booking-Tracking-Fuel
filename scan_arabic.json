@@ -1,0 +1,757 @@
+[
+  {
+    "path": ".\\403.html",
+    "line": 6,
+    "text": "<title>403 — غير مصرح بالوصول | منظومة أسطول سيرا</title>"
+  },
+  {
+    "path": ".\\403.html",
+    "line": 22,
+    "text": "غير مصرح لك بالوصول إلى هذه الشاشة"
+  },
+  {
+    "path": ".\\403.html",
+    "line": 25,
+    "text": "حسابك المؤسسي الحالي لا يملك الصلاحيات الإدارية المطلوبة لفتح هذا المسار. تم تطبيق قيود الأمان (Role-Based Access Control) لحماية سجلات وبيانات المنظومة."
+  },
+  {
+    "path": ".\\403.html",
+    "line": 30,
+    "text": "<span style=\"color: var(--text-muted);\">المسار المطلوب:</span>"
+  },
+  {
+    "path": ".\\403.html",
+    "line": 34,
+    "text": "<span style=\"color: var(--text-muted);\">صلاحية الحساب الحالية:</span>"
+  },
+  {
+    "path": ".\\403.html",
+    "line": 41,
+    "text": "العودة للوحة التحكم الرئيسية"
+  },
+  {
+    "path": ".\\403.html",
+    "line": 44,
+    "text": "طلب صلاحية من مكتب الدعم"
+  },
+  {
+    "path": ".\\audit.html",
+    "line": 225,
+    "text": "لا توجد رحلات مغلقة بانتظار الاعتماد المالي حالياً."
+  },
+  {
+    "path": ".\\audit.html",
+    "line": 265,
+    "text": "alert(`✓ تم اعتماد المطابقة المالية للرحلة (${id}) بنجاح!\\n\\n• نسبة الفارق: ${reconciled ? reconciled.fuelVariancePct : 0}%\\n• الحالة: مكتملة ومطابقة بالكامل (Reconciled)\\n• تم قيد الخصم النهائي على موازنة الكلية بنجاح.`);"
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 143,
+    "text": "<h2 class=\"card-title\">المركبة والسائق (Assigned Resources)</h2>"
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 147,
+    "text": "<strong style=\"color: var(--navy-800); display: block; font-size: 15px;\">قيد التخصيص بواسطة إدارة التشغيل</strong>"
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 149,
+    "text": "يقوم مدير التشغيل بتخصيص كود المركبة والسائق بعد مراجعة الجداول."
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 158,
+    "text": "<h2 class=\"card-title\">بيانات المهمة والطلب</h2>"
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 160,
+    "text": "<div style=\"display: flex; justify-content: space-between;\"><span style=\"color:var(--text-muted);\">طالب الحجز:</span><strong id=\"detail-req-name\">Dr. Sarah Mansour</strong></div>"
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 161,
+    "text": "<div style=\"display: flex; justify-content: space-between;\"><span style=\"color:var(--text-muted);\">الجهة / الكلية:</span><strong id=\"detail-dept\">Faculty of Pharmacy</strong></div>"
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 162,
+    "text": "<div style=\"display: flex; justify-content: space-between;\"><span style=\"color:var(--text-muted);\">الفئة المطلوبة:</span><strong id=\"detail-cat\">فان ركاب / ميكروباص</strong></div>"
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 163,
+    "text": "<div style=\"display: flex; justify-content: space-between;\"><span style=\"color:var(--text-muted);\">حالة الاعتماد:</span><strong id=\"detail-status-text\" style=\"color:var(--cira-burgundy);\">Pending Review</strong></div>"
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 166,
+    "text": "يتم تحديد السائق والمركبة رسمياً من قبل إدارة التشغيل والحركة المركزية."
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 262,
+    "text": "if (catEl) catEl.textContent = booking.vehicleCategory || 'فان ركاب / ميكروباص';"
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 272,
+    "text": "<strong style=\"color: var(--navy-800); display: block; font-size: 15px;\">قيد التخصيص بواسطة إدارة التشغيل</strong>"
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 274,
+    "text": "يقوم مدير التشغيل بمراجعة الجداول وتخصيص كود المركبة المحددة وبيانات السائق المعتمد. ستظهر لك البيانات هنا فور الاعتماد."
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 286,
+    "text": "<div style=\"font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);\">BDR 3307 · مخصصة ومعقمة</div>"
+  },
+  {
+    "path": ".\\booking-detail.html",
+    "line": 290,
+    "text": "<strong>السائق المعتمد:</strong> ${booking.driver || 'Ahmed Hassan (Driver A)'} · +20 10 9988 7766"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 138,
+    "text": "<h2 class=\"card-title\">4. فئة المركبة المطلوبة</h2>"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 140,
+    "text": "<label class=\"form-label\">اختر نوع المركبة المناسب للمهمة</label>"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 142,
+    "text": "<option value=\"Passenger Van (فان ركاب / ميكروباص)\" selected>فان ركاب / ميكروباص (7 - 12 راكب) — مثل HiAce / H-1</option>"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 143,
+    "text": "<option value=\"Sedan (سيارة صالون)\">سيارة صالون / سيدان (1 - 4 ركاب) — مثل Corolla / Elantra</option>"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 144,
+    "text": "<option value=\"Bus (حافلة وفود)\">حافلة / ميني باص وفود (15 - 28 راكب) — مثل Coaster / MCV</option>"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 145,
+    "text": "<option value=\"Heavy Cargo Truck (شاحنة نقل)\">شاحنة نقل ومعدات ثقيلة — مثل Isuzu NPR</option>"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 148,
+    "text": "ℹ️ <strong>ملاحظة:</strong> يتم اختيار وتخصيص كود المركبة المحددة وبيانات السائق بواسطة <strong>مدير التشغيل</strong> عند مراجعة واعتماد الطلب."
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 157,
+    "text": "إجراءات الحجز والاعتماد"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 163,
+    "text": "<span>يُحال الطلب مباشرة لغرفة العمليات المركزية لمراجعة الجداول وتوافر الأسطول.</span>"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 167,
+    "text": "<span>يتولى مدير التشغيل تخصيص المركبة المناسبة وتعيين السائق المعتمد وتطبيق فترات التجهيز.</span>"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 171,
+    "text": "<span>تظهر بيانات المركبة المعينة والسائق في قائمة حجوزاتك فور اعتماد الطلب رسمياً.</span>"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 177,
+    "text": "تقديم طلب الحجز للتشغيل →"
+  },
+  {
+    "path": ".\\booking-new.html",
+    "line": 274,
+    "text": "alert(`✓ تم تقديم طلب الحجز بنجاح!\\n\\n• رقم الحجز: ${newBooking.id}\\n• خط السير: ${newBooking.route}\\n• فئة المركبة المطلوبة: ${vehicleCat}\\n\\nتم إحالة الطلب مباشرة إلى مدير التشغيل لاختيار وتخصيص المركبة وتعيين السائق.`);"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 152,
+    "text": "return '<span class=\"badge badge-warning\">Pending Review (قيد المراجعة)</span>';"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 154,
+    "text": "return '<span class=\"badge badge-info\">Dispatched (تم التعيين)</span>';"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 156,
+    "text": "return '<span class=\"badge badge-primary\" style=\"background:var(--navy-600);color:#fff;\">Active Run (جارية الآن)</span>';"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 158,
+    "text": "return '<span class=\"badge badge-warning\" style=\"background:#FFF3E0;color:#E65100;\">Audit Pending (بانتظار التسوية)</span>';"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 160,
+    "text": "return '<span class=\"badge badge-success\">Completed ✓ (مكتملة ومطابقة)</span>';"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 176,
+    "text": "<strong style=\"display:block; font-size:16px; color:var(--navy-800); margin-bottom:4px;\">لا توجد أي حجوزات مسجلة حالياً (البيانات فارغة)</strong>"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 177,
+    "text": "<span style=\"font-size:13px;\">اضغط على <strong>+ New Booking</strong> لبدء تقديم طلب حجز مركبة لمهمة عمل رسمية.</span>"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 179,
+    "text": "<a href=\"booking-new.html\" class=\"btn btn-gold\">+ تقديم طلب حجز جديد</a>"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 190,
+    "text": "allocatedVehicleHtml = '<span class=\"badge badge-neutral\" style=\"background:#F0F4F8; color:var(--text-muted); font-size:12px;\">قيد التخصيص بواسطة التشغيل</span>';"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 194,
+    "text": "<div style=\"font-size:12px;color:var(--text-muted); margin-top:2px;\">السائق: ${b.driver || 'Ahmed Hassan'}</div>"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 213,
+    "text": "<td><span style=\"font-size:13px; font-weight:600; color:var(--navy-700);\">${b.vehicleCategory || 'فان ركاب / ميكروباص'}</span></td>"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 228,
+    "text": "if (confirm('تأكيد: هل تريد مسح كافة الحجوزات والبيانات لبدء سيناريو تجريبي فارغ من الصفر؟')) {"
+  },
+  {
+    "path": ".\\bookings.html",
+    "line": 235,
+    "text": "if (confirm('هل تريد استعادة بيانات الديمو التلقائية؟')) {"
+  },
+  {
+    "path": ".\\dispatch-queue.html",
+    "line": 116,
+    "text": "<span style=\"color: var(--text-muted);\">الفئة المطلوبة من طالب الحجز:</span>"
+  },
+  {
+    "path": ".\\dispatch-queue.html",
+    "line": 117,
+    "text": "<span class=\"badge badge-info\" id=\"detail-requested-cat\">فان ركاب / ميكروباص</span>"
+  },
+  {
+    "path": ".\\dispatch-queue.html",
+    "line": 130,
+    "text": "<span><strong>تخصيص مسؤول التشغيل:</strong> راجع المركبات المتاحة في فئة الطلب أدناه وحدد المركبة والسائق المناسب لاعتماد الرحلة وترحيلها.</span>"
+  },
+  {
+    "path": ".\\dispatch-queue.html",
+    "line": 216,
+    "text": "<button class=\"btn btn-danger\" onclick=\"alert('تم رفض الطلب وإخطار مقدم الحجز بالسبب.');\">Reject Request</button>"
+  },
+  {
+    "path": ".\\dispatch-queue.html",
+    "line": 296,
+    "text": "if (catBadge) catBadge.textContent = booking.vehicleCategory || 'فان ركاب / ميكروباص';"
+  },
+  {
+    "path": ".\\dispatch-queue.html",
+    "line": 325,
+    "text": "✓ <strong>تم اعتماد وترحيل الحجز (${approved ? approved.id : activeBookingId}) بنجاح!</strong>"
+  },
+  {
+    "path": ".\\dispatch-queue.html",
+    "line": 326,
+    "text": "تم تخصيص المركبة (${vehicleModel}) وتكليف السائق (${driverName}). أصبحت المركبة ظاهرة الآن في حساب طالب الحجز."
+  },
+  {
+    "path": ".\\dispatch-queue.html",
+    "line": 329,
+    "text": "<a href=\"bookings.html\" class=\"btn btn-secondary\">عرض الحجوزات</a>"
+  },
+  {
+    "path": ".\\dispatch-queue.html",
+    "line": 330,
+    "text": "<a href=\"driver-trip.html\" class=\"btn btn-gold\">الانتقال لشاشة السائق (Stage 3) →</a>"
+  },
+  {
+    "path": ".\\driver-close.html",
+    "line": 183,
+    "text": "alert(`✓ تم إغلاق الرحلة (${closed ? closed.id : activeCloseTripId}) بنجاح!\\n\\n• قراءة العداد النهائية: ${closed ? closed.actualOdoEnd : '48,276'} كم\\n• الوقود الفعلي: ${closed ? closed.actualFuelLitres : 14.5} لتر\\n• نسبة الفارق: ${closed ? closed.fuelVariancePct : 2.8}% (ضمن النطاق المسموح ±10%)\\n\\nتم إحالة الرحلة تلقائياً إلى إدارة المراجعة المالية والرقابية (Stage 4).`);"
+  },
+  {
+    "path": ".\\home.html",
+    "line": 211,
+    "text": "<span class=\"stat-sub\">Plate 7194-ب س د · Fuel Tank 85%</span>"
+  },
+  {
+    "path": ".\\index.html",
+    "line": 5,
+    "text": "<title>CIRA Fleet Logistics — جاري التحويل</title>"
+  },
+  {
+    "path": ".\\index.html",
+    "line": 27,
+    "text": "<h2 style=\"margin:0 0 8px; font-size:20px;\">منظومة أسطول سيرا للتعليم</h2>"
+  },
+  {
+    "path": ".\\index.html",
+    "line": 28,
+    "text": "<p style=\"margin:0; font-size:14px; color:#5E5A5A;\">جاري توجيه جلسة العمل...</p>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 6,
+    "text": "<title>تسجيل الدخول — منظومة أسطول سيرا للتعليم</title>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 82,
+    "text": "<span style=\"font-size: 11px; letter-spacing: 0.16em; color: var(--cira-gold); text-transform: uppercase;\">إدارة أسطول الحركة والنقل واللوجستيات</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 88,
+    "text": "بوابة العمليات المركزية لإدارة وحجز أسطول المؤسسة"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 91,
+    "text": "المنصة المركزية الذكية لخدمة جامعات ومدارس سيرا، تشمل التحقق من الصلاحيات الإدارية، جدولة أسطول النقل، التتبع اللحظي، ومطابقة استهلاك الوقود إلكترونياً."
+  },
+  {
+    "path": ".\\login.html",
+    "line": 97,
+    "text": "<strong style=\"color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;\">التحقق المؤسسي</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 98,
+    "text": "<span style=\"font-size: 12.5px; opacity: 0.9;\">صلاحيات مفصلة لكل دور وظيفي عبر نظام RBAC المحكم.</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 101,
+    "text": "<strong style=\"color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;\">فترات التجهيز الإلزامية</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 102,
+    "text": "<span style=\"font-size: 12.5px; opacity: 0.9;\">تطبيق فترات التجهيز (30 دقيقة) والتعقيم والتبديل (45 دقيقة).</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 105,
+    "text": "<strong style=\"color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;\">الرقابة والتتبع المباشر</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 106,
+    "text": "<span style=\"font-size: 12.5px; opacity: 0.9;\">متابعة التيليماتري، إشارات السير، وإنذارات الطوارئ SOS.</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 109,
+    "text": "<strong style=\"color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;\">المطابقة المالية المقفلة</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 110,
+    "text": "<span style=\"font-size: 12.5px; opacity: 0.9;\">تطبيق حد فارق الوقود (±10%) وقفل الرحلات بفواتير معتمدة.</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 116,
+    "text": "<span>شركة القاهرة للاستثمار والتنمية العقارية (سيرا للتعليم)</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 118,
+    "text": "دليل التشغيل وإرشادات المنظومة"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 127,
+    "text": "<h2 style=\"margin: 0; font-family: var(--font-condensed); font-size: 32px; color: var(--cira-burgundy); font-weight: 800;\">تسجيل الدخول للمنظومة</h2>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 128,
+    "text": "<span style=\"font-size: 13.5px; color: var(--text-muted);\">أدخل بيانات حسابك المؤسسي أو استخدم أحد حسابات الاختبار أدناه</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 137,
+    "text": "<label class=\"form-label\" for=\"login-email\">البريد الإلكتروني المؤسسي</label>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 142,
+    "text": "<label class=\"form-label\" for=\"login-pwd\">كلمة المرور</label>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 145,
+    "text": "<button type=\"button\" class=\"pwd-toggle-btn\" onclick=\"togglePasswordVisibility();\" title=\"إظهار / إخفاء كلمة المرور\" aria-label=\"Toggle password\">"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 154,
+    "text": "<span>تذكر بياناتي في هذا المتصفح</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 156,
+    "text": "<a href=\"#\" onclick=\"showQuickAlert('تم إرسال رابط تأكيد الحساب لبريدك المؤسسي المسجل.', 'info'); return false;\" style=\"color: var(--cira-burgundy); font-weight: 700; text-decoration: none;\">نسيت كلمة المرور؟</a>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 160,
+    "text": "<span id=\"btn-text\">تسجيل الدخول ←</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 166,
+    "text": "أو الدخول المباشر بحساب المنظومة الموحد"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 173,
+    "text": "الدخول السريع عبر بوابة CIRA SSO (OIDC)"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 180,
+    "text": "حسابات الاختبار المعتمدة (Demo Accounts):"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 182,
+    "text": "<span class=\"copy-pill\" title=\"كلمة المرور المشتركة\">Pass: Cira@2026</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 190,
+    "text": "<span class=\"persona-role-badge\">طالب مركبة · Requester</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 191,
+    "text": "<strong style=\"font-size: 13.5px; color: var(--text-main);\">د. سارة منصور (كلية الصيدلة)</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 195,
+    "text": "<button type=\"button\" class=\"btn btn-secondary btn-sm\" onclick=\"fillForm('sarah.mansour@buc.edu.eg', 'Cira@2026');\" title=\"تعبئة الحقول في النموذج أعلاه\">تعبئة</button>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 196,
+    "text": "<button type=\"button\" class=\"btn btn-primary btn-sm\" onclick=\"directLogin('sarah.mansour@buc.edu.eg', 'Cira@2026');\" style=\"background:var(--cira-burgundy);\">دخول</button>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 203,
+    "text": "<span class=\"persona-role-badge\">مسؤول الترحيل · Dispatcher</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 204,
+    "text": "<strong style=\"font-size: 13.5px; color: var(--text-main);\">أ. خالد إبراهيم (غرفة العمليات المركزية)</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 208,
+    "text": "<button type=\"button\" class=\"btn btn-secondary btn-sm\" onclick=\"fillForm('khaled.ibrahim@cira.com.eg', 'Cira@2026');\">تعبئة</button>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 209,
+    "text": "<button type=\"button\" class=\"btn btn-primary btn-sm\" onclick=\"directLogin('khaled.ibrahim@cira.com.eg', 'Cira@2026');\" style=\"background:var(--cira-burgundy);\">دخول</button>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 216,
+    "text": "<span class=\"persona-role-badge\">سائق أسطول · Driver</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 217,
+    "text": "<strong style=\"font-size: 13.5px; color: var(--text-main);\">كابتن أحمد حسن (قسم الحركة والنقل)</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 221,
+    "text": "<button type=\"button\" class=\"btn btn-secondary btn-sm\" onclick=\"fillForm('ahmed.hassan@cira.com.eg', 'Cira@2026');\">تعبئة</button>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 222,
+    "text": "<button type=\"button\" class=\"btn btn-primary btn-sm\" onclick=\"directLogin('ahmed.hassan@cira.com.eg', 'Cira@2026');\" style=\"background:var(--cira-burgundy);\">دخول</button>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 229,
+    "text": "<span class=\"persona-role-badge\">مدير الأسطول · Fleet Admin</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 230,
+    "text": "<strong style=\"font-size: 13.5px; color: var(--text-main);\">م. طارق فتحي (الإدارة العامة للأسطول)</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 234,
+    "text": "<button type=\"button\" class=\"btn btn-secondary btn-sm\" onclick=\"fillForm('tarek.fathy@cira.com.eg', 'Cira@2026');\">تعبئة</button>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 235,
+    "text": "<button type=\"button\" class=\"btn btn-primary btn-sm\" onclick=\"directLogin('tarek.fathy@cira.com.eg', 'Cira@2026');\" style=\"background:var(--cira-burgundy);\">دخول</button>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 242,
+    "text": "<span class=\"persona-role-badge\">المراجع المالي · Auditor</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 243,
+    "text": "<strong style=\"font-size: 13.5px; color: var(--text-main);\">أ. منى عادل (إدارة الرقابة المالية)</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 247,
+    "text": "<button type=\"button\" class=\"btn btn-secondary btn-sm\" onclick=\"fillForm('mona.adel@cira.com.eg', 'Cira@2026');\">تعبئة</button>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 248,
+    "text": "<button type=\"button\" class=\"btn btn-primary btn-sm\" onclick=\"directLogin('mona.adel@cira.com.eg', 'Cira@2026');\" style=\"background:var(--cira-burgundy);\">دخول</button>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 262,
+    "text": "<h3 style=\"margin:0; color:var(--cira-burgundy); font-size:22px;\">دليل استخدام منظومة الأسطول والترحيل</h3>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 267,
+    "text": "<strong style=\"color:var(--cira-burgundy); display:block; font-size:15px;\">1. طلب حجز مركبة (Requester)</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 268,
+    "text": "<span>يقوم طالب المركبة بتقديم الطلب قبل موعد الرحلة بمدة لا تقل عن 4 ساعات مع بيان خط السير، ويتم حجز ميزانية تقديرية من كوتة الكلية.</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 271,
+    "text": "<strong style=\"color:var(--cira-burgundy); display:block; font-size:15px;\">2. المراجعة والترحيل (Dispatcher)</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 272,
+    "text": "<span>يقوم مسؤول الترحيل بالتحقق من عدم تعارض المركبة والسائق مع تطبيق فترات التجهيز (30 دقيقة) والتعقيم والتبديل (45 دقيقة).</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 275,
+    "text": "<strong style=\"color:var(--cira-burgundy); display:block; font-size:15px;\">3. تنفيذ الرحلة (Driver)</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 276,
+    "text": "<span>يستلم السائق أمر التشغيل عبر متصفح الويب، ويجري فحص السلامة قبل الانطلاق، ويسجل قراءات العداد وإيصالات التزود بالوقود لحظياً.</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 279,
+    "text": "<strong style=\"color:var(--cira-burgundy); display:block; font-size:15px;\">4. المطابقة والرقابة المالية (Auditor)</strong>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 280,
+    "text": "<span>تتم مطابقة المسافة الفعلية مقابل استهلاك الوقود المعتمد؛ وفي حال تجاوز الفارق نسبة ±10% يتم تفعيل علم المراجعة ولا تُقفل العهدة إلا بمبرر رسمي.</span>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 284,
+    "text": "<button type=\"button\" class=\"btn btn-primary\" onclick=\"document.getElementById('onboarding-modal').style.display='none';\">إغلاق الدليل</button>"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 342,
+    "text": "showQuickAlert('يرجى إدخال البريد الإلكتروني وكلمة المرور للمتابعة.', 'error');"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 347,
+    "text": "btnText.textContent = 'جاري التحقق من بيانات الاعتماد...';"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 353,
+    "text": "btnText.textContent = 'تسجيل الدخول ←';"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 354,
+    "text": "showQuickAlert(res ? res.error : 'فشل تسجيل الدخول. تأكد من البريد وكلمة المرور.', 'error');"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 356,
+    "text": "showQuickAlert(`تم التحقق بنجاح! مرحباً ${res.user.titleAr || res.user.name}. جاري توجيهك للوحة التحكم...`, 'success');"
+  },
+  {
+    "path": ".\\login.html",
+    "line": 367,
+    "text": "btnText.textContent = 'جاري الاتصال بـ CIRA SSO...';"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 8,
+    "text": "titleAr: 'د. سارة منصور',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 10,
+    "text": "roleAr: 'طالب مركبة (أعضاء هيئة التدريس)',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 12,
+    "text": "deptAr: 'كلية الصيدلة — جامعة بدر',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 20,
+    "text": "titleAr: 'أ. خالد إبراهيم',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 22,
+    "text": "roleAr: 'مسؤول الترحيل والعمليات',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 24,
+    "text": "deptAr: 'غرفة العمليات المركزية والترحيل',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 32,
+    "text": "titleAr: 'كابتن أحمد حسن',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 34,
+    "text": "roleAr: 'سائق الأسطول الميداني',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 36,
+    "text": "deptAr: 'قسم الحركة والنقل الميداني',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 44,
+    "text": "titleAr: 'م. طارق فتحي',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 46,
+    "text": "roleAr: 'مدير عام الأسطول واللوجستيات',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 48,
+    "text": "deptAr: 'الإدارة العامة للأسطول والمعدات',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 56,
+    "text": "titleAr: 'أ. منى عادل',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 58,
+    "text": "roleAr: 'المراجع المالي والرقابي',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 60,
+    "text": "deptAr: 'إدارة المراجعة والرقابة المالية',"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 149,
+    "text": "return { success: false, error: 'يرجى إدخال البريد الإلكتروني وكلمة المرور للمتابعة.' };"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 159,
+    "text": "error: 'البريد الإلكتروني غير مسجل بالمنظومة. استخدم أحد حسابات الاختبار المعتمدة أدناه.'"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 166,
+    "text": "error: 'كلمة المرور غير صحيحة. كلمة المرور المعتمدة لجميع حسابات الاختبار هي Cira@2026'"
+  },
+  {
+    "path": ".\\js\\auth.js",
+    "line": 254,
+    "text": "alert('انتهت جلسة العمل لدواعي الأمان المؤسسي بسبب عدم النشاط. يرجى إعادة تسجيل الدخول.\\nYour session has expired due to inactivity.');"
+  },
+  {
+    "path": ".\\js\\store.js",
+    "line": 33,
+    "text": "statusAr: 'جارية الآن',"
+  },
+  {
+    "path": ".\\js\\store.js",
+    "line": 62,
+    "text": "statusAr: 'مكتملة ومطابقة',"
+  },
+  {
+    "path": ".\\js\\store.js",
+    "line": 181,
+    "text": "statusAr: 'قيد المراجعة والترحيل',"
+  },
+  {
+    "path": ".\\js\\store.js",
+    "line": 220,
+    "text": "b.statusAr = 'معتمدة ومرحّلة للسائق';"
+  },
+  {
+    "path": ".\\js\\store.js",
+    "line": 247,
+    "text": "b.statusAr = 'جارية الآن على المسار';"
+  },
+  {
+    "path": ".\\js\\store.js",
+    "line": 276,
+    "text": "b.statusAr = 'مغلقة — بانتظار الاعتماد المالي';"
+  },
+  {
+    "path": ".\\js\\store.js",
+    "line": 297,
+    "text": "b.statusAr = 'مكتملة ومطابقة بالكامل ✓';"
+  }
+]
