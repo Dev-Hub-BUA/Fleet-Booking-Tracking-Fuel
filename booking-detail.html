@@ -275,11 +275,23 @@
               <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Requester:</span><strong id="detail-req-name">Dr. Sarah Mansour</strong></div>
               <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Department / Faculty:</span><strong id="detail-dept">Faculty of Pharmacy</strong></div>
               <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Vehicle Category:</span><strong id="detail-cat">Passenger Van / Minibus</strong></div>
+              <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Passengers:</span><strong id="detail-passengers">4 (personal luggage)</strong></div>
               <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Approval Status:</span><strong id="detail-status-text" style="color:var(--cira-burgundy);">Active</strong></div>
               <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Mission Period:</span><strong id="detail-period-text">18 Oct → 22 Oct 2026</strong></div>
               <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Vehicle Hold Window:</span><strong id="detail-hold-window-text" style="font-family:var(--font-mono); font-size:12.5px;">18 Oct 08:00 → 22 Oct 18:45</strong></div>
               <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Driver Overnight Stay:</span><strong id="detail-overnight-stay">BUC Faculty Guesthouse</strong></div>
               <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Mission Purpose:</span><span id="detail-purpose-text" style="text-align:right; max-width:240px; font-weight:600;">Official Delegation</span></div>
+            </div>
+            <div id="detail-cargo-block" style="display: none; margin-top: 14px; padding: 12px; background: var(--bg-page); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13.5px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 700; color: var(--navy-800); display: flex; align-items: center; gap: 6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                  <span>Extra Cargo Declared</span>
+                </span>
+                <span class="badge badge-gold" id="detail-cargo-weight" style="font-family: var(--font-mono); font-size: 12px;">350 kg</span>
+              </div>
+              <div id="detail-cargo-desc" style="color: var(--text-main); margin-bottom: 8px;">6 boxes of lab equipment, 2 projectors, fragile</div>
+              <div id="detail-cargo-flags" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
             </div>
             <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px;">
               Turnaround buffers (30m pre-trip inspection, 45m post-trip cleaning) are automatically allocated.
@@ -432,6 +444,38 @@
 
       const purposeEl = document.getElementById('detail-purpose-text');
       if (purposeEl) purposeEl.textContent = booking.purpose || 'Official delegation';
+
+      const passEl = document.getElementById('detail-passengers');
+      const paxCount = booking.passengers || 4;
+      if (passEl) passEl.textContent = `${paxCount} (personal luggage)`;
+
+      const cargoBlock = document.getElementById('detail-cargo-block');
+      const hasCargo = Boolean(booking.has_extra_cargo || (booking.cargo_kg && booking.cargo_kg > 0));
+      if (cargoBlock) {
+        if (hasCargo) {
+          cargoBlock.style.display = 'block';
+          const weightEl = document.getElementById('detail-cargo-weight');
+          if (weightEl) weightEl.textContent = `${booking.cargo_kg || booking.cargoWeightKg || 0} kg`;
+          const descEl = document.getElementById('detail-cargo-desc');
+          if (descEl) descEl.textContent = booking.cargo_description || 'Cargo manifest declared';
+          const flagsEl = document.getElementById('detail-cargo-flags');
+          if (flagsEl) {
+            flagsEl.innerHTML = '';
+            const flags = booking.cargo_flags || {};
+            if (flags.fragile) {
+              flagsEl.innerHTML += '<span class="badge badge-danger" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Fragile</span></span>';
+            }
+            if (flags.strap) {
+              flagsEl.innerHTML += '<span class="badge badge-warning" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Needs strapped</span></span>';
+            }
+            if (flags.loading_help) {
+              flagsEl.innerHTML += '<span class="badge badge-info" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Needs loading help</span></span>';
+            }
+          }
+        } else {
+          cargoBlock.style.display = 'none';
+        }
+      }
 
       // Resources
       const resContent = document.getElementById('assigned-resources-content');

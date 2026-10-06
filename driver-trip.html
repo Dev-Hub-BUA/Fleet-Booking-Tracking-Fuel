@@ -71,6 +71,34 @@
         </a>
       </div>
 
+      <!-- Passengers & cargo -->
+      <div class="card" id="driver-passengers-cargo-card" style="margin-bottom: 20px;">
+        <h2 class="card-title" style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Passengers &amp; cargo</span>
+        </h2>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: var(--text-muted);">Passengers:</span>
+            <strong id="driver-passengers-text">4 passengers · personal luggage included</strong>
+          </div>
+          <div id="driver-cargo-section" style="padding: 12px; background: var(--bg-page); border: 1px solid var(--border); border-radius: var(--radius-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-weight: 700; color: var(--navy-800); display: flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                <span>Cargo Description:</span>
+              </span>
+              <span class="badge badge-gold" id="driver-cargo-weight" style="font-family: var(--font-mono); font-size: 12px;">350 kg</span>
+            </div>
+            <div id="driver-cargo-description" style="color: var(--text-main); margin-bottom: 8px;">6 boxes of lab equipment, 2 projectors, fragile</div>
+            <div id="driver-cargo-flags" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+          </div>
+          <div id="driver-no-cargo-note" style="display: none; font-size: 13px; color: var(--text-muted); padding: 8px 12px; background: var(--bg-page); border-radius: var(--radius-sm);">
+            No extra cargo declared. Personal luggage only.
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; flex-wrap: wrap; gap: 8px;">
           <div style="font-weight: 700; color: var(--navy-800); font-size: 15px; display:flex; align-items:center; gap:6px;">
@@ -261,6 +289,38 @@
         currentTripId = myTrip.id;
         document.getElementById('trip-header-pretitle').textContent = `${myTrip.id} · Active Manifest (${myTrip.status})`;
         document.getElementById('trip-header-subtitle').textContent = `${myTrip.vehicleCode || 'V-122'} (${myTrip.vehicle || 'Hyundai H-1'}) · Lead: ${myTrip.requesterName || 'Dr. Sarah Mansour'} (${myTrip.dept || 'Pharmacy'})`;
+
+        const paxCount = myTrip.passengers || 4;
+        const paxEl = document.getElementById('driver-passengers-text');
+        if (paxEl) paxEl.textContent = `${paxCount} passengers · personal luggage included`;
+
+        const hasCargo = Boolean(myTrip.has_extra_cargo || (myTrip.cargo_kg && myTrip.cargo_kg > 0));
+        const cargoSec = document.getElementById('driver-cargo-section');
+        const noCargoNote = document.getElementById('driver-no-cargo-note');
+
+        if (hasCargo) {
+          if (cargoSec) cargoSec.style.display = 'block';
+          if (noCargoNote) noCargoNote.style.display = 'none';
+
+          const weightEl = document.getElementById('driver-cargo-weight');
+          if (weightEl) weightEl.textContent = `${myTrip.cargo_kg || myTrip.cargoWeightKg || 0} kg`;
+
+          const descEl = document.getElementById('driver-cargo-description');
+          if (descEl) descEl.textContent = myTrip.cargo_description || 'Cargo manifest declared';
+
+          const flagsEl = document.getElementById('driver-cargo-flags');
+          if (flagsEl) {
+            flagsEl.innerHTML = '';
+            const flags = myTrip.cargo_flags || {};
+            if (flags.fragile) flagsEl.innerHTML += '<span class="badge badge-danger" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Fragile</span></span>';
+            if (flags.strap) flagsEl.innerHTML += '<span class="badge badge-warning" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Needs to be strapped</span></span>';
+            if (flags.loading_help) flagsEl.innerHTML += '<span class="badge badge-info" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Needs loading help</span></span>';
+          }
+        } else {
+          if (cargoSec) cargoSec.style.display = 'none';
+          if (noCargoNote) noCargoNote.style.display = 'block';
+        }
+
         renderDriverWaypoints(myTrip);
       }
 
