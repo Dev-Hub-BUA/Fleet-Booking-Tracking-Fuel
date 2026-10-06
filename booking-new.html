@@ -504,15 +504,14 @@
                 <span style="color: var(--text-muted);">Vehicle Hold Window:</span>
                 <strong id="summary-hold-window" style="font-family: var(--font-mono); font-size: 12px; text-align: right; color: var(--navy-800);">18 Oct 08:00 → 22 Oct 18:45</strong>
               </div>
-              <div id="summary-load-factor-badge" style="display: none; font-size: 11px; color: var(--cira-burgundy); font-weight: 600; text-align: right; margin-top: -4px;"></div>
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; border-top: 1px solid var(--border); padding-top: 8px; font-size: 15px;">
+              <div id="summary-estimate-cost-row" style="display: none; justify-content: space-between; align-items: flex-start; border-top: 1px solid var(--border); padding-top: 8px; font-size: 15px;">
                 <div>
                   <span style="font-weight: 700; color: var(--navy-800);">Estimate (fleet average):</span>
                   <div style="font-size: 11.5px; color: var(--text-muted); font-weight: normal; margin-top: 2px;">
-                    Final cost depends on the vehicle Operations assigns.
+                    Final allocation depends on the vehicle Operations assigns.
                   </div>
                 </div>
-                <strong id="summary-total-cost" style="color: var(--cira-burgundy); font-family: var(--font-mono); font-size: 17px; white-space: nowrap;">EGP 1,225.80</strong>
+                <strong id="summary-total-cost" style="color: var(--cira-burgundy); font-family: var(--font-mono); font-size: 17px; white-space: nowrap;"></strong>
               </div>
             </div>
 
@@ -1387,12 +1386,13 @@
 
             const legEl = document.createElement('div');
             legEl.className = `leg-summary-card ${isReturnLeg ? 'return-leg' : ''}`;
+            const costTag = (typeof Money !== 'undefined' && Money.canView()) ? ` (${Money.render(leg.cost_egp)} est.)` : '';
             legEl.innerHTML = `
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-weight:700; color:var(--navy-800);">${leg.distance_km} km <span style="font-size:11px; font-weight:600; color:var(--navy-700);">${sourceTag}</span></span>
                 <span style="color:var(--text-muted); font-family:var(--font-mono);">${h}h ${m.toString().padStart(2, '0')}m driving</span>
               </div>
-              <div style="font-size:12px; color:var(--text-muted);">${(leg.fuel_liters || 0).toFixed(1)} L (${(leg.cost_egp || 0).toFixed(2)} EGP est.)</div>
+              <div style="font-size:12px; color:var(--text-muted);">${(leg.fuel_liters || 0).toFixed(1)} L fuel est.${costTag}</div>
               ${leg.warning ? `
                 <div style="margin-top:4px; font-size:11.5px; color:#B91C1C; display:flex; align-items:center; gap:4px; font-weight:600;">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -1424,8 +1424,14 @@
         const fuelEl = document.getElementById('summary-total-fuel');
         if (fuelEl) fuelEl.textContent = `${totalFuel.toFixed(1)} L (fleet avg)`;
 
+        const costRow = document.getElementById('summary-estimate-cost-row');
         const costEl = document.getElementById('summary-total-cost');
-        if (costEl) costEl.textContent = `EGP ${totalCost.toFixed(2)}`;
+        if (typeof Money !== 'undefined' && Money.canView()) {
+          if (costRow) costRow.style.display = 'flex';
+          if (costEl) costEl.textContent = Money.render(totalCost);
+        } else {
+          if (costRow) costRow.style.display = 'none';
+        }
 
         const holdWindowEl = document.getElementById('summary-hold-window');
         if (holdWindowEl && itineraryPoints.length >= 2) {

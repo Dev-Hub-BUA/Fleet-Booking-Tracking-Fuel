@@ -230,6 +230,15 @@
       return true;
     },
 
+    can: function (permission) {
+      const user = this.getUser();
+      if (!user) return false;
+      if (permission === 'view_costs') {
+        return user.role === 'Fleet admin';
+      }
+      return false;
+    },
+
     getSettings: function (callback) {
       if (window.FLEET_SETTINGS) {
         if (callback) callback(window.FLEET_SETTINGS);
@@ -330,7 +339,45 @@
     }
   };
 
+  const Money = {
+    canView: function () {
+      return typeof Auth !== 'undefined' && Auth.can && Auth.can('view_costs');
+    },
+    render: function (value, options = {}) {
+      if (!this.canView()) return '';
+      if (value === null || value === undefined || value === '') return '';
+      const num = Number(value);
+      if (isNaN(num)) return '';
+      const formatted = num.toLocaleString('en-US', {
+        minimumFractionDigits: options.decimals !== undefined ? options.decimals : 2,
+        maximumFractionDigits: options.decimals !== undefined ? options.decimals : 2
+      });
+      const prefix = options.prefix !== undefined ? options.prefix : 'EGP ';
+      const suffix = options.suffix !== undefined ? options.suffix : '';
+      return `${prefix}${formatted}${suffix}`;
+    },
+    renderRate: function (rate, unit = 'L') {
+      if (!this.canView()) return '';
+      return `${Number(rate).toFixed(2)} EGP/${unit}`;
+    },
+    stripCostsFromBooking: function (booking) {
+      if (this.canView() || !booking) return booking;
+      const sanitized = JSON.parse(JSON.stringify(booking));
+      if (sanitized.estimate) {
+        delete sanitized.estimate.cost_egp;
+      }
+      if (Array.isArray(sanitized.route_legs)) {
+        sanitized.route_legs.forEach(l => { delete l.cost_egp; });
+      }
+      if (sanitized.return_match_savings) {
+        delete sanitized.return_match_savings.egp_saved;
+      }
+      return sanitized;
+    }
+  };
+
   window.Auth = Auth;
+  window.Money = Money;
   window.USERS = USERS;
 
   document.addEventListener('DOMContentLoaded', function () {

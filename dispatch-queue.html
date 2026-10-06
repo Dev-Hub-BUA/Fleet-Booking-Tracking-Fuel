@@ -563,19 +563,52 @@
       const container = document.getElementById('queue-cards-container');
       container.innerHTML = '';
 
+      if (currentTab === 'approved') {
+        const emptyReturns = FleetStore.getEmptyReturnsThisWeek();
+        if (emptyReturns.length > 0) {
+          const erCard = document.createElement('div');
+          erCard.style.cssText = 'background:#F0FDF4; border:1px solid #86EFAC; border-radius:var(--radius-sm); padding:10px 12px; margin-bottom:4px;';
+          erCard.innerHTML = `
+            <div style="font-weight:700; font-size:12px; color:#14532D; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Empty Returns This Week (${emptyReturns.length})</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              ${emptyReturns.map(er => `
+                <div style="background:#FFF; border:1px solid #BBF7D0; border-radius:4px; padding:6px 8px; font-size:11.5px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="color:var(--navy-800);">${escapeHtml(er.vehicle_code)} (${escapeHtml(er.vehicle_model)})</strong>
+                    <span style="color:#15803D; font-weight:700;">${er.deadhead_km} km empty</span>
+                  </div>
+                  <div style="color:var(--text-muted); margin-top:2px;">
+                    Last drop: ${escapeHtml(er.last_point)} · ${escapeHtml(er.time_free)}
+                  </div>
+                  <div style="color:#166534; font-size:11px;">
+                    Base: ${escapeHtml(er.base_site)}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+          container.appendChild(erCard);
+        }
+      }
+
       if (queueData.items.length === 0) {
         let emptyMsg = 'No pending requests in this queue.';
         if (currentTab === 'changes') emptyMsg = 'No requests currently marked as Changes requested.';
         if (currentTab === 'approved') emptyMsg = 'No approved requests pending dispatch.';
         if (currentTab === 'rejected') emptyMsg = 'No rejected requests recorded.';
 
-        container.innerHTML = `
+        const emptyPlaceholder = document.createElement('div');
+        emptyPlaceholder.innerHTML = `
           <div style="background:var(--bg-card); border:1px dashed var(--border); border-radius:var(--radius-md); padding:32px 18px; text-align:center; color:var(--text-muted);">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px;"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
             <div style="font-weight:700; color:var(--navy-800); font-size:14px; margin-bottom:4px;">${emptyMsg}</div>
             <div style="font-size:12.5px;">Switch tabs or adjust your search filter above.</div>
           </div>
         `;
+        container.appendChild(emptyPlaceholder.firstElementChild);
         renderEmptyPanel();
         return;
       }
@@ -708,10 +741,14 @@
       const sDate = booking.startDate || '2026-10-18';
       const eDate = booking.endDate || '2026-10-22';
 
+      const returnMatches = (booking.status === 'Pending') ? FleetStore.findReturnMatches(booking) : [];
+
       const vehicleEligList = FleetStore.getVehicleEligibility(booking);
       if (!selectedVehicleCode) {
         if (booking.vehicleCode && booking.vehicleCode !== 'TBD' && booking.vehicleCode !== 'None') {
           selectedVehicleCode = booking.vehicleCode;
+        } else if (returnMatches.length > 0) {
+          selectedVehicleCode = returnMatches[0].vehicle.code;
         } else {
           const firstElig = vehicleEligList.find(v => v.eligible);
           selectedVehicleCode = firstElig ? firstElig.vehicle.code : vehicleEligList[0].vehicle.code;
@@ -822,6 +859,34 @@
           ${booking.status === 'Rejected' ? `
             <div class="alert-banner alert-danger" style="margin-top:14px;">
               <strong>Requisition Rejected:</strong> ${escapeHtml(booking.rejectionReason || 'Outside policy')} — ${escapeHtml(booking.rejectionText || 'No details provided.')}
+            </div>
+          ` : ''}
+
+          ${(booking.assignment && booking.assignment.linked_to) ? `
+            <div class="alert-banner" style="background:#EFF6FF; border:1.5px solid #93C5FD; color:#1E40AF; margin-top:14px; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <div>
+                  <strong style="font-size:13.5px; color:#1E3A8A;">Return Match Linked:</strong>
+                  <span style="font-size:13px; color:#1D4ED8; margin-left:4px;">Assigned to ${booking.assignment.vehicle_id} on return trip from preceding booking <strong>${booking.assignment.linked_to}</strong>.</span>
+                  ${booking.return_match_savings ? `<div style="font-size:12px; color:#2563EB; margin-top:2px;">Avoided empty deadhead: <strong>${booking.return_match_savings.km_saved} km / ${booking.return_match_savings.liters_saved} L</strong> saved.</div>` : ''}
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline" style="border-color:#EF4444; color:#EF4444; font-size:12px; font-weight:700; padding:6px 12px; background:#FFF;" onclick="handleUnlinkReturn('${booking.id}')">
+                Unlink Trip
+              </button>
+            </div>
+          ` : ''}
+
+          ${(booking.assignment && booking.assignment.deadhead_used_by) ? `
+            <div class="alert-banner" style="background:#F0FDF4; border:1.5px solid #86EFAC; color:#15803D; margin-top:14px; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <div>
+                  <strong style="font-size:13.5px; color:#14532D;">Empty Return Utilized:</strong>
+                  <span style="font-size:13px; color:#166534; margin-left:4px;">Vehicle return deadhead has been linked to serve booking <strong>${booking.assignment.deadhead_used_by}</strong>. Empty deadhead eliminated.</span>
+                </div>
+              </div>
             </div>
           ` : ''}
         </div>
@@ -991,6 +1056,41 @@
           </div>
         </div>
 
+        ${(booking.status === 'Pending' && returnMatches && returnMatches.length > 0) ? `
+          <div class="card" style="padding:16px 20px; margin-bottom:16px; background:linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border:1.5px solid #60A5FA; border-radius:var(--radius-sm); box-shadow:0 2px 6px rgba(37,99,235,0.08);">
+            ${returnMatches.map(m => {
+              const bA = m.bookingA;
+              const lastPtA = bA.itinerary[bA.itinerary.length - 1];
+              const arrTimeStr = lastPtA.arrive_at ? lastPtA.arrive_at.split('T')[1].substring(0, 5) : '12:20';
+              const homeBaseName = m.homeSite ? m.homeSite.name : 'home site';
+              const moneyStr = (typeof Money !== 'undefined' && Money.canView()) ? ` / ${Money.render(m.egpSaved)}` : '';
+              return `
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+                  <div style="flex:1; min-width:300px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                      <span class="badge" style="background:#2563EB; color:#FFF; font-weight:700; font-size:11px;">Return Match Available</span>
+                      <strong style="color:var(--navy-900); font-size:14px;">Vehicle ${m.vehicle.code} (${escapeHtml(m.vehicle.model)})</strong>
+                    </div>
+                    <div style="font-size:13.5px; color:#1E3A8A; line-height:1.4;">
+                      <strong>Return match:</strong> <strong>${m.vehicle.code}</strong> finishes <strong>${bA.id}</strong> at ${escapeHtml(lastPtA.place_name)} ${arrTimeStr} and returns empty to ${escapeHtml(homeBaseName)}. Use it for this request?
+                    </div>
+                    <div style="font-size:12px; color:#1E40AF; margin-top:6px; display:flex; flex-wrap:wrap; gap:12px;">
+                      <span>· Wait <strong>${m.waitTimeMinutes} min</strong></span>
+                      <span>· Detour <strong>+${m.detourMinutes} min</strong></span>
+                      <span>· Saves <strong>${m.kmSaved} km / ${m.litersSaved} L${moneyStr}</strong></span>
+                      ${m.driverNote ? `<span style="color:#B45309; font-weight:600;">· ${escapeHtml(m.driverNote)}</span>` : ''}
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-primary" style="background:#1D4ED8; color:#FFF; font-weight:700; padding:10px 18px; border:none; border-radius:var(--radius-sm); cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 2px 4px rgba(29,78,216,0.25);" onclick="handleAssignReturnMatch('${bA.id}', '${booking.id}')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    <span>Assign on ${m.vehicle.code}'s return</span>
+                  </button>
+                </div>
+              `;
+            }).join('<div style="height:1px; background:#BFDBFE; margin:12px 0;"></div>')}
+          </div>
+        ` : ''}
+
         <!-- Section 3.4: Vehicle Assignment -->
         <div class="card" style="padding: 20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
@@ -1025,16 +1125,21 @@
                   const trClass = item.eligible ? (isChecked ? 'roster-row-eligible roster-row-selected' : 'roster-row-eligible') : 'roster-row-ineligible';
 
                   let badgeHtml = '<span class="badge badge-success">Eligible · Best Fit</span>';
-                  if (!item.eligible) {
+                  if (item.isReturnMatch) {
+                    badgeHtml = '<span class="badge" style="background:#e0f2fe; color:#0369a1; font-weight:700;">Available via return match</span>';
+                  } else if (!item.eligible) {
                     badgeHtml = `<span class="badge badge-danger">${escapeHtml(item.reasons.join(', '))}</span>`;
                   }
 
                   const homeSiteObj = v.home_site_id ? FleetStore.getSite(v.home_site_id) : null;
                   const homeSiteName = homeSiteObj ? homeSiteObj.name : (est.homeSiteName || v.location || 'Unknown Base');
 
-                  const repositionText = est.repositioningKm > 0
+                  let repositionText = est.repositioningKm > 0
                     ? `<span style="color:#B45309; font-weight:600;">${est.repositioningKm} km to departure</span>`
                     : '<span style="color:#047857; font-weight:600;">0 km to departure</span>';
+                  if (item.isReturnMatch) {
+                    repositionText = `<span style="color:#0284C7; font-weight:700;">Empty return match (${est.repositioningKm} km to pickup)</span>`;
+                  }
 
                   return `
                     <tr class="${trClass}" onclick="${item.eligible ? `handleSelectVehicle('${v.code}')` : ''}">
@@ -1054,7 +1159,7 @@
                       </td>
                       <td>
                         <strong style="font-family:var(--font-mono);">${est.fuelLiters} L</strong>
-                        <div style="font-size:11.5px; color:var(--cira-burgundy); font-weight:700;">EGP ${est.costEGP.toLocaleString()}</div>
+                        ${(typeof Money !== 'undefined' && Money.render(est.costEGP)) ? `<div style="font-size:11.5px; color:var(--cira-burgundy); font-weight:700;">${Money.render(est.costEGP)}</div>` : ''}
                       </td>
                       <td>${badgeHtml}</td>
                     </tr>
@@ -1157,7 +1262,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div style="font-size:13.5px; color:var(--navy-800);">
               <strong id="decision-summary-text" style="font-size:14px;">
-                ${chosenVehicleItem ? chosenVehicleItem.vehicle.code : 'Pending Vehicle'} + ${secondDriverItem ? `${primaryDriverItem.driver.name} & ${secondDriverItem.driver.name}` : (primaryDriverItem ? primaryDriverItem.driver.name : 'Pending Driver')} · ${hold.formatted} · ${chosenVehicleItem ? chosenVehicleItem.estimate.fuelLiters : 0} L · EGP ${chosenVehicleItem ? chosenVehicleItem.estimate.costEGP.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
+                ${chosenVehicleItem ? chosenVehicleItem.vehicle.code : 'Pending Vehicle'} + ${secondDriverItem ? `${primaryDriverItem.driver.name} & ${secondDriverItem.driver.name}` : (primaryDriverItem ? primaryDriverItem.driver.name : 'Pending Driver')} · ${hold.formatted} · ${chosenVehicleItem ? chosenVehicleItem.estimate.fuelLiters : 0} L${(typeof Money !== 'undefined' && Money.canView() && chosenVehicleItem) ? ` · ${Money.render(chosenVehicleItem.estimate.costEGP)}` : ''}
               </strong>
             </div>
             <div style="font-size:12px; color:var(--text-muted);">
@@ -1278,9 +1383,36 @@
       const dAssigned = result.booking.assignment ? result.booking.assignment.driver_ids.join(', ') : 'Assigned';
       const estLiters = result.booking.estimate ? result.booking.estimate.fuel_liters : 0;
       const estCost = result.booking.estimate ? result.booking.estimate.cost_egp : 0;
-      alert(`Booking ${bookingId} approved successfully!\n\nAssigned Vehicle: ${vAssigned}\nAssigned Driver(s): ${dAssigned}\nHold Window: ${result.booking.hold_window.start} → ${result.booking.hold_window.end}\nRecomputed Fuel: ${estLiters} L (EGP ${estCost.toLocaleString()})`);
+      const costAlertPart = (typeof Money !== 'undefined' && Money.canView()) ? ` (${Money.render(estCost)})` : '';
+      alert(`Booking ${bookingId} approved successfully!\n\nAssigned Vehicle: ${vAssigned}\nAssigned Driver(s): ${dAssigned}\nHold Window: ${result.booking.hold_window.start} → ${result.booking.hold_window.end}\nRecomputed Fuel: ${estLiters} L${costAlertPart}`);
       switchQueueTab('approved');
       selectBooking(bookingId);
+    }
+
+    function handleAssignReturnMatch(bookingAId, bookingBId) {
+      const note = prompt('Optional approval note for return match link:', 'Linked with return deadhead of ' + bookingAId);
+      if (note === null) return;
+      const res = FleetStore.linkReturnTrip(bookingAId, bookingBId, note);
+      if (res.success) {
+        alert(`Return match successfully linked!\n\nBooking ${bookingBId} is now assigned to ${res.bookingB.assignment.vehicle_id} upon return from ${bookingAId}.\nAvoided: ${res.bookingB.return_match_savings.km_saved} km / ${res.bookingB.return_match_savings.liters_saved} L empty deadhead.`);
+        switchQueueTab('approved');
+        selectBooking(bookingBId);
+      } else {
+        alert(res.error || 'Failed to link return match.');
+      }
+    }
+
+    function handleUnlinkReturn(bookingBId) {
+      const reason = prompt('Reason for unlinking return trip:', 'Operational schedule change');
+      if (reason === null) return;
+      const res = FleetStore.unlinkReturnTrip(bookingBId, reason);
+      if (res.success) {
+        alert(`Booking ${bookingBId} unlinked from preceding return trip. Status reset to Pending.`);
+        switchQueueTab('pending');
+        selectBooking(bookingBId);
+      } else {
+        alert(res.error || 'Failed to unlink return match.');
+      }
     }
 
     function handleDispatchTrip(bookingId) {

@@ -256,10 +256,22 @@
 
         if (f) {
           document.getElementById('pricebook-version-label').textContent = f.activeVersion;
-          document.getElementById('rate-p92').textContent = f.rates.petrol92.toFixed(2) + ' EGP / L';
-          document.getElementById('rate-p95').textContent = f.rates.petrol95.toFixed(2) + ' EGP / L';
-          document.getElementById('rate-diesel').textContent = f.rates.diesel.toFixed(2) + ' EGP / L';
-          document.getElementById('rate-cng').textContent = f.rates.cng.toFixed(2) + ' EGP / m³';
+          const canViewPrices = typeof Auth !== 'undefined' && Auth.can('view_costs');
+          if (canViewPrices) {
+            document.getElementById('rate-p92').textContent = Money.renderRate(f.rates.petrol92, 'L');
+            document.getElementById('rate-p95').textContent = Money.renderRate(f.rates.petrol95, 'L');
+            document.getElementById('rate-diesel').textContent = Money.renderRate(f.rates.diesel, 'L');
+            document.getElementById('rate-cng').textContent = Money.renderRate(f.rates.cng, 'm³');
+          } else {
+            const ratesDisplay = document.getElementById('fuel-rates-display');
+            if (ratesDisplay) {
+              ratesDisplay.innerHTML = `
+                <div style="grid-column:1/-1; padding:12px; background:var(--bg-muted); border-radius:6px; color:var(--text-muted); font-size:13px; font-family:var(--font-sans);">
+                  Fuel price index tariffs are managed under Price Book ${escapeHtml(f.activeVersion || 'v3')} and visible to the Fleet Administration Directorate.
+                </div>
+              `;
+            }
+          }
         }
       });
     });

@@ -258,6 +258,42 @@
 
         container.appendChild(row);
       });
+
+      if (trip.assignment && trip.assignment.deadhead_used_by) {
+        const bB = FleetStore.getBooking(trip.assignment.deadhead_used_by);
+        const bPt = (bB && Array.isArray(bB.itinerary) && bB.itinerary[0]) || {};
+        const nextCard = document.createElement('div');
+        nextCard.style.cssText = 'border:2px solid #3B82F6; background:#EFF6FF; border-radius:10px; padding:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:8px;';
+        nextCard.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:36px; height:36px; border-radius:50%; background:#2563EB; color:#FFF; display:flex; align-items:center; justify-content:center; font-weight:700;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:700; color:#1E3A8A; font-size:15px;">Next: Pick up ${trip.assignment.deadhead_used_by} at ${escapeHtml(bPt.place_name || 'Designated Stop')} (${escapeHtml(bPt.depart_at || '')})</div>
+              <div style="font-size:12.5px; color:#1D4ED8; margin-top:2px;">Assigned via Return Match. Proceed directly to pickup after passenger drop-off.</div>
+            </div>
+          </div>
+          <a href="driver-trip.html?id=${trip.assignment.deadhead_used_by}" class="btn btn-primary btn-sm" style="background:#2563EB; border:none; font-weight:700;">Open Next Manifest</a>
+        `;
+        container.appendChild(nextCard);
+      } else if (trip.deadhead) {
+        const retCard = document.createElement('div');
+        retCard.style.cssText = 'border:1px dashed var(--border); background:#F8FAFC; border-radius:10px; padding:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:8px;';
+        retCard.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:32px; height:32px; border-radius:50%; background:var(--navy-700); color:#FFF; display:flex; align-items:center; justify-content:center; font-weight:700;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:700; color:var(--navy-800); font-size:14px;">Return to base: ${escapeHtml(trip.deadhead.to_place)}</div>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${trip.deadhead.distance_km} km empty deadhead back to vehicle home station.</div>
+            </div>
+          </div>
+          <span class="badge badge-neutral">Base Return</span>
+        `;
+        container.appendChild(retCard);
+      }
     }
 
     function escapeHtml(str) {

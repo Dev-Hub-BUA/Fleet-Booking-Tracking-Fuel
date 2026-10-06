@@ -113,7 +113,12 @@
       agingThresholdHours: 4,
       staleSignalThresholdMin: 5,
       maxIdleMinutesAlert: 15,
-      fleetAverageRatePer100Km: 10.0
+      fleetAverageRatePer100Km: 10.0,
+      returnMatch: {
+        maxPickupDistanceKm: 15,
+        maxWaitHours: 3,
+        maxDetourMinutes: 30
+      }
     },
     contacts: {
       office: 'CIRA Central Logistics Directorate, Campus Admin Bldg, G-14',
@@ -306,7 +311,7 @@
     { id: 'D-104', name: 'Sherif Fathy', home_site_id: 'SITE-BUC', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-SHR-77291', expires: '2026-09-15', status: 'Off Duty (Expired)', totalTrips: 288, allowedVehicles: ['Sedan', 'Van'] },
     { id: 'D-105', name: 'Sameh Adel', home_site_id: 'SITE-BUA', licenseClass: 'Class 3 (Private)', licenseNo: 'EG-CAI-99201', expires: '2029-01-18', status: 'Available', totalTrips: 180, allowedVehicles: ['Sedan only'] },
     { id: 'D-106', name: 'Khaled Soliman', home_site_id: 'SITE-HQ', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-66419', expires: '2027-05-30', status: 'Available', totalTrips: 390, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
-    { id: 'D-107', name: 'Walid Saad', home_site_id: 'SITE-ALEX', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-33820', expires: '2028-09-12', status: 'On leave', totalTrips: 210, allowedVehicles: ['Sedan', 'Van', 'CNG'] },
+    { id: 'D-107', name: 'Walid Saad', home_site_id: 'SITE-ALEX', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-33820', expires: '2028-09-12', status: 'Available', totalTrips: 210, allowedVehicles: ['Sedan', 'Van', 'CNG'] },
     { id: 'D-108', name: 'Hassan Metwally', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-CAI-00192', expires: '2027-12-05', status: 'Available', totalTrips: 640, allowedVehicles: ['Bus', 'Heavy Coach', 'Van', 'Sedan'] },
     { id: 'D-109', name: 'Ibrahim Gamal', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-SHR-44109', expires: '2028-04-22', status: 'Available', totalTrips: 480, allowedVehicles: ['Truck', 'Van', 'Heavy Cargo'] },
     { id: 'D-110', name: 'Mahmoud Reda', home_site_id: 'SITE-BUC', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-CAI-55219', expires: '2028-07-14', status: 'Suspended: Incident Triage', totalTrips: 310, allowedVehicles: ['Bus', 'Van'] }
@@ -829,19 +834,27 @@
         vehicle_id: vCode,
         driver_ids: dIds,
         approved_by: (raw.assignment && raw.assignment.approved_by) || raw.approved_by || 'Khaled Ibrahim (Dispatcher)',
-        approved_at: formatEgyptISO((raw.assignment && raw.assignment.approved_at) || raw.approved_at || raw.createdAt || new Date())
+        approved_at: formatEgyptISO((raw.assignment && raw.assignment.approved_at) || raw.approved_at || raw.createdAt || new Date()),
+        linked_to: (raw.assignment && raw.assignment.linked_to) || null,
+        deadhead_used_by: (raw.assignment && raw.assignment.deadhead_used_by) || null,
+        original_deadhead: (raw.assignment && raw.assignment.original_deadhead) || null,
+        repositioning: (raw.assignment && raw.assignment.repositioning) || null
       };
     }
 
     let deadhead = null;
     if (!return_with_vehicle) {
-      if (raw.deadhead && raw.deadhead.to_place) {
+      if (raw.assignment && raw.assignment.deadhead_used_by) {
+        deadhead = null;
+      } else if (raw.deadhead && raw.deadhead.to_place) {
         deadhead = {
           from_seq: Number(raw.deadhead.from_seq || itinerary[itinerary.length - 1].sequence),
           to_place: String(raw.deadhead.to_place),
           distance_km: Number(raw.deadhead.distance_km || 0),
           drive_minutes: Number(raw.deadhead.drive_minutes || 0)
         };
+      } else if (raw.assignment && raw.assignment.linked_to) {
+        deadhead = null;
       } else {
         const basePlace = assignedVehicle ? assignedVehicle.location : itinerary[0].place_name;
         deadhead = calculateDeadheadLeg(itinerary[itinerary.length - 1], basePlace);
@@ -945,7 +958,8 @@
       hold_window: hold_window,
       estimate: estimate,
       history: history,
-      messages: messages
+      messages: messages,
+      return_match_savings: raw.return_match_savings || null
     };
   }
 
@@ -1423,6 +1437,164 @@
             }
           ],
           messages: []
+        },
+        {
+          id: 'BK-2061',
+          status: 'Approved',
+          requester: {
+            id: 'USR-REQ-102',
+            name: 'Dr. Mona Radwan',
+            department: 'Faculty of Physical Therapy'
+          },
+          cost_center: 'CC-420 (Faculty of Physical Therapy)',
+          start_date: '2026-10-18',
+          end_date: '2026-10-18',
+          return_with_vehicle: false,
+          itinerary: [
+            {
+              sequence: 1,
+              type: 'departure',
+              place_name: 'Alexandria Branch (CIRA)',
+              lat: 31.2001,
+              lng: 29.9187,
+              pinned: true,
+              approx: false,
+              arrive_at: null,
+              depart_at: '2026-10-18T09:00:00+03:00',
+              notes: 'Depart from Alexandria campus main gate'
+            },
+            {
+              sequence: 2,
+              type: 'stop',
+              place_name: 'Cairo University',
+              lat: 30.0276,
+              lng: 31.2089,
+              pinned: true,
+              approx: false,
+              arrive_at: '2026-10-18T12:20:00+03:00',
+              depart_at: null,
+              notes: 'Drop off delegation at Medical Campus'
+            }
+          ],
+          route_legs: [
+            { from_seq: 1, to_seq: 2, distance_km: 218, drive_minutes: 170, source: 'route' }
+          ],
+          deadhead: {
+            from_seq: 2,
+            to_place: 'Alexandria Branch (CIRA)',
+            distance_km: 218,
+            drive_minutes: 170
+          },
+          passengers: 4,
+          has_extra_cargo: false,
+          cargo_kg: 0,
+          cargo_description: '',
+          cargo_flags: { fragile: false, strap: false, loading_help: false },
+          driver_overnight_location: '',
+          notes_for_dispatch: 'Official medical delegation one-way transport to Cairo.',
+          assignment: {
+            vehicle_id: 'V-125',
+            driver_ids: ['D-107'],
+            approved_by: 'Khaled Ibrahim (Dispatcher)',
+            approved_at: '2026-10-17T14:00:00+03:00'
+          },
+          hold_window: {
+            start: '2026-10-18T09:00:00+03:00',
+            end: '2026-10-18T16:00:00+03:00',
+            buffer_minutes: 45
+          },
+          estimate: {
+            basis: 'vehicle',
+            fuel_liters: 43.6,
+            cost_egp: 893.80,
+            price_book_version: 'Effective 10 Mar 2026'
+          },
+          history: [
+            {
+              status: 'Submitted',
+              at: '2026-10-17T10:00:00+03:00',
+              by: 'Dr. Mona Radwan (Requester)',
+              note: 'Initial booking request submitted'
+            },
+            {
+              status: 'Approved',
+              at: '2026-10-17T14:00:00+03:00',
+              by: 'Khaled Ibrahim (Dispatcher)',
+              note: 'Assigned Toyota HiAce (V-125) with driver Walid Saad'
+            }
+          ],
+          messages: []
+        },
+        {
+          id: 'BK-2062',
+          status: 'Pending',
+          requester: {
+            id: 'USR-REQ-103',
+            name: 'Dr. Tamer Samir',
+            department: 'Faculty of Engineering'
+          },
+          cost_center: 'CC-430 (Faculty of Engineering)',
+          start_date: '2026-10-18',
+          end_date: '2026-10-18',
+          return_with_vehicle: false,
+          itinerary: [
+            {
+              sequence: 1,
+              type: 'departure',
+              place_name: 'Cairo University',
+              lat: 30.0276,
+              lng: 31.2089,
+              pinned: true,
+              approx: false,
+              arrive_at: null,
+              depart_at: '2026-10-18T13:30:00+03:00',
+              notes: 'Pickup delegation at Main Administration Building'
+            },
+            {
+              sequence: 2,
+              type: 'stop',
+              place_name: 'Alexandria Branch (CIRA)',
+              lat: 31.2001,
+              lng: 29.9187,
+              pinned: true,
+              approx: false,
+              arrive_at: '2026-10-18T16:20:00+03:00',
+              depart_at: null,
+              notes: 'Return transfer to Alexandria campus'
+            }
+          ],
+          route_legs: [
+            { from_seq: 1, to_seq: 2, distance_km: 218, drive_minutes: 170, source: 'route' }
+          ],
+          deadhead: null,
+          passengers: 3,
+          has_extra_cargo: false,
+          cargo_kg: 0,
+          cargo_description: '',
+          cargo_flags: { fragile: false, strap: false, loading_help: false },
+          driver_overnight_location: '',
+          notes_for_dispatch: 'Engineering faculty delegates returning to Alexandria.',
+          assignment: null,
+          hold_window: {
+            start: '2026-10-18T13:30:00+03:00',
+            end: '2026-10-18T17:05:00+03:00',
+            buffer_minutes: 45
+          },
+          estimate: {
+            basis: 'fleet_average',
+            fuel_liters: 21.8,
+            cost_egp: 446.90,
+            price_book_version: 'Effective 10 Mar 2026'
+          },
+          history: [
+            {
+              status: 'Submitted',
+              at: '2026-10-18T10:15:00+03:00',
+              by: 'Dr. Tamer Samir (Requester)',
+              note: 'Booking submitted for afternoon departure'
+            }
+          ],
+          messages: []
         }
       ],
       auditTrail: [
@@ -1483,6 +1655,25 @@
           cng: 13.00
         };
       }
+
+      if (parsed.settings && parsed.settings.rules && !parsed.settings.rules.returnMatch) {
+        parsed.settings.rules.returnMatch = {
+          maxPickupDistanceKm: 15,
+          maxWaitHours: 3,
+          maxDetourMinutes: 30
+        };
+      }
+
+      parsed.bookings = parsed.bookings || [];
+      const initData = getInitialData();
+      ['BK-2061', 'BK-2062'].forEach(seedId => {
+        if (!parsed.bookings.some(b => b.id === seedId)) {
+          const seedB = initData.bookings.find(b => b.id === seedId);
+          if (seedB) {
+            parsed.bookings.push(JSON.parse(JSON.stringify(seedB)));
+          }
+        }
+      });
 
       if (!parsed.vehicles.some(v => v.code === 'V-125')) {
         parsed.vehicles.push({
@@ -1988,6 +2179,28 @@
       return data.settings || DEFAULT_SETTINGS;
     },
 
+    saveSettings: function (newSettings, user = 'Khaled Ibrahim (Fleet Admin)') {
+      const data = this.load();
+      data.settings = data.settings || JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+      if (newSettings.rules) {
+        data.settings.rules = { ...data.settings.rules, ...newSettings.rules };
+      }
+      if (newSettings.system) {
+        data.settings.system = { ...data.settings.system, ...newSettings.system };
+      }
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: (typeof user === 'object' && user.name) ? user.name : user,
+        action: 'Update Operating Policies & Settings',
+        ref: 'SETTINGS',
+        details: 'Updated fleet operating rules and return match thresholds.'
+      });
+      this.save(data);
+      return { success: true, settings: data.settings };
+    },
+
     getVehicles: function () {
       const data = this.load();
       return (data.vehicles && data.vehicles.length > 0) ? data.vehicles : DEFAULT_VEHICLES;
@@ -2127,12 +2340,419 @@
       return summary;
     },
 
+    findReturnMatches: function (bookingB) {
+      if (!bookingB) return [];
+      const data = this.load();
+      const allBookings = data.bookings || [];
+      const allVehicles = this.getVehicles();
+      const allDrivers = this.getDrivers();
+      const settings = this.getSettings();
+      const returnRules = (settings.rules && settings.rules.returnMatch) || {
+        maxPickupDistanceKm: 15,
+        maxWaitHours: 3,
+        maxDetourMinutes: 30
+      };
+      const prepBufferMin = (settings.rules && settings.rules.prepBufferMin) || 30;
+      const priceBook = getPriceBookForDate(bookingB.start_date);
+
+      const bDep = Array.isArray(bookingB.itinerary) && bookingB.itinerary[0];
+      const bLast = Array.isArray(bookingB.itinerary) && bookingB.itinerary[bookingB.itinerary.length - 1];
+      if (!bDep || !bLast) return [];
+
+      const bDepDate = parseDateTimeSafe(bDep.depart_at || bDep.arrive_at, '08:00');
+      const bDepMs = bDepDate.getTime();
+      const bPax = bookingB.passengers || 1;
+      const bCargo = bookingB.has_extra_cargo ? (Number(bookingB.cargo_kg) || 0) : 0;
+
+      let bLegsKm = 0;
+      let bLegsMinutes = 0;
+      if (Array.isArray(bookingB.route_legs) && bookingB.route_legs.length > 0) {
+        bookingB.route_legs.forEach(l => {
+          bLegsKm += (l.distance_km || 0);
+          bLegsMinutes += (l.drive_minutes || 0);
+        });
+      } else {
+        const estLeg = RouteEstimator.estimateLeg(bDep, bLast, 'Van');
+        bLegsKm = estLeg.distanceKm;
+        bLegsMinutes = estLeg.driveMinutes;
+      }
+
+      const matches = [];
+
+      allBookings.forEach(bookingA => {
+        if (bookingA.id === bookingB.id) return;
+        if (!['Approved', 'Dispatched'].includes(bookingA.status)) return;
+        if (!bookingA.assignment || !bookingA.assignment.vehicle_id) return;
+        if (bookingA.assignment.deadhead_used_by) return;
+        if (!bookingA.deadhead || !bookingA.deadhead.distance_km) return;
+
+        const aLast = Array.isArray(bookingA.itinerary) && bookingA.itinerary[bookingA.itinerary.length - 1];
+        if (!aLast) return;
+
+        const vA = allVehicles.find(v => v.code === bookingA.assignment.vehicle_id);
+        if (!vA || ['Maintenance', 'Out of service', 'Decommissioned'].includes(vA.status)) return;
+
+        if (vA.seats < bPax) return;
+        if (bCargo > 0 && vA.payloadKg < bCargo) return;
+
+        const homeSiteA = (vA.home_site_id ? this.getSite(vA.home_site_id) : null) || findLocationByName(vA.location);
+        const homeSiteName = homeSiteA ? homeSiteA.name : (vA.location || 'Base');
+
+        let pickupDistKm = 0;
+        let pickupMinutes = 0;
+        if (typeof aLast.lat === 'number' && typeof bDep.lat === 'number') {
+          const directKm = calculateHaversineKm(aLast.lat, aLast.lng, bDep.lat, bDep.lng);
+          pickupDistKm = directKm < 0.25 ? 0 : Math.round(directKm * 1.25 * 10) / 10;
+        } else {
+          const aLastName = (aLast.place_name || '').toLowerCase();
+          const bDepName = (bDep.place_name || '').toLowerCase();
+          if (aLastName === bDepName || aLastName.includes(bDepName) || bDepName.includes(aLastName)) {
+            pickupDistKm = 0;
+          } else {
+            const legEst = RouteEstimator.estimateLeg(aLast, bDep, vA.category);
+            pickupDistKm = legEst.distanceKm;
+          }
+        }
+
+        if (pickupDistKm > returnRules.maxPickupDistanceKm) return;
+        pickupMinutes = Math.round(pickupDistKm * 1.5);
+
+        const aLastDate = parseDateTimeSafe(aLast.arrive_at || aLast.depart_at, '18:00');
+        const earliestPickupMs = aLastDate.getTime() + (prepBufferMin * 60000);
+        const latestPickupMs = earliestPickupMs + (returnRules.maxWaitHours * 3600000);
+
+        if (bDepMs < earliestPickupMs || bDepMs > latestPickupMs) return;
+
+        const waitTimeMinutes = Math.max(0, Math.round((bDepMs - earliestPickupMs) / 60000));
+
+        const plainDeadheadKm = bookingA.deadhead.distance_km;
+        const plainDeadheadMinutes = bookingA.deadhead.drive_minutes;
+
+        let newDeadheadB = null;
+        let bEndToHomeKm = 0;
+        let bEndToHomeMinutes = 0;
+
+        const bLastPlace = (bLast.place_name || '').toLowerCase();
+        const homePlace = homeSiteName.toLowerCase();
+        const endsNearHome = Boolean(homeSiteA && (
+          bLastPlace.includes(homePlace) || homePlace.includes(bLastPlace) ||
+          (homeSiteA.city && bLastPlace.includes(homeSiteA.city.toLowerCase()))
+        ));
+
+        if (!endsNearHome) {
+          newDeadheadB = calculateDeadheadLeg(bLast, homeSiteName);
+          if (newDeadheadB) {
+            bEndToHomeKm = newDeadheadB.distance_km;
+            bEndToHomeMinutes = newDeadheadB.drive_minutes;
+          }
+        }
+
+        const totalReturnMinutes = pickupMinutes + bLegsMinutes + bEndToHomeMinutes;
+        const detourMinutes = Math.max(0, totalReturnMinutes - plainDeadheadMinutes);
+
+        if (!endsNearHome && detourMinutes > returnRules.maxDetourMinutes) return;
+
+        const primaryDriverId = bookingA.assignment.driver_ids && bookingA.assignment.driver_ids[0];
+        const driverA = allDrivers.find(d => d.id === primaryDriverId);
+        let assignedDriver = driverA;
+        let sameDriver = true;
+        let driverNote = null;
+
+        if (driverA) {
+          const aSummary = this.computeDailyDrivingSummary(bookingA);
+          const aMinutes = aSummary.reduce((acc, row) => acc + row.minutes, 0);
+          const combinedMinutes = aMinutes + pickupMinutes + bLegsMinutes + bEndToHomeMinutes;
+          const maxDriveMins = ((settings.rules && settings.rules.maxDrivingHoursPerDay) || 8.0) * 60;
+
+          if (combinedMinutes > maxDriveMins) {
+            const altDriver = allDrivers.find(d =>
+              d.id !== driverA.id &&
+              d.status === 'Available' &&
+              d.licenseClass && !d.licenseClass.includes('Class 3')
+            );
+            if (altDriver) {
+              assignedDriver = altDriver;
+              sameDriver = false;
+              driverNote = `Requires local driver exchange at ${aLast.place_name} (daily limit reached)`;
+            } else {
+              sameDriver = false;
+              driverNote = `Driver daily limit reached; relay driver required at ${aLast.place_name}`;
+            }
+          }
+        }
+
+        let kmSaved = plainDeadheadKm;
+        if (pickupDistKm > 0 || bEndToHomeKm > 0) {
+          kmSaved = Math.max(10, Math.round(plainDeadheadKm - (pickupDistKm + bEndToHomeKm)));
+        }
+        const nominalRate = vA.ratePer100Km || 10.0;
+        const litersSaved = Math.round((kmSaved * (nominalRate / 100)) * 10) / 10;
+        let fuelPrice = priceBook.rates.diesel;
+        if (vA.fuelType === 'Petrol 92') fuelPrice = priceBook.rates.petrol92;
+        else if (vA.fuelType === 'Petrol 95') fuelPrice = priceBook.rates.petrol95;
+        else if (vA.fuelType === 'CNG') fuelPrice = priceBook.rates.cng;
+        const egpSaved = Math.round(litersSaved * fuelPrice);
+
+        matches.push({
+          bookingA: bookingA,
+          vehicle: vA,
+          driver: assignedDriver,
+          sameDriver: sameDriver,
+          driverNote: driverNote,
+          waitTimeMinutes: waitTimeMinutes,
+          detourMinutes: detourMinutes,
+          kmSaved: kmSaved,
+          litersSaved: litersSaved,
+          egpSaved: egpSaved,
+          repositioningLeg: {
+            from_seq: 0,
+            to_seq: 1,
+            from_place: aLast.place_name,
+            to_place: bDep.place_name,
+            distance_km: pickupDistKm,
+            drive_minutes: pickupMinutes,
+            source: 'route'
+          },
+          newDeadheadB: newDeadheadB,
+          homeSite: homeSiteA
+        });
+      });
+
+      matches.sort((m1, m2) => {
+        if (m1.kmSaved !== m2.kmSaved) return m2.kmSaved - m1.kmSaved;
+        return m1.waitTimeMinutes - m2.waitTimeMinutes;
+      });
+
+      return matches;
+    },
+
+    linkReturnTrip: function (bookingAId, bookingBId, note = '', user = 'Khaled Ibrahim (Dispatcher)') {
+      const data = this.load();
+      const bA = (data.bookings || []).find(b => b.id === bookingAId);
+      const bB = (data.bookings || []).find(b => b.id === bookingBId);
+      if (!bA) return { success: false, error: `Booking ${bookingAId} not found.` };
+      if (!bB) return { success: false, error: `Booking ${bookingBId} not found.` };
+
+      const matches = this.findReturnMatches(bB);
+      const match = matches.find(m => m.bookingA.id === bA.id);
+      if (!match) {
+        return { success: false, error: 'Return match criteria no longer satisfied or time conflict occurred.' };
+      }
+
+      const userName = (typeof user === 'object' && user.name) ? user.name : user;
+      const v = match.vehicle;
+      const drv = match.driver;
+
+      bB.status = 'Approved';
+      bB.assignment = {
+        vehicle_id: v.code,
+        driver_ids: drv ? [drv.id] : (bA.assignment.driver_ids || []),
+        approved_by: userName,
+        approved_at: toEgyptISOString(new Date()),
+        linked_to: bA.id,
+        repositioning: match.repositioningLeg
+      };
+
+      bA.assignment.deadhead_used_by = bB.id;
+      bA.assignment.original_deadhead = bA.deadhead ? JSON.parse(JSON.stringify(bA.deadhead)) : null;
+      bA.deadhead = null;
+
+      const settings = this.getSettings();
+      const bufferMin = (settings.rules && settings.rules.turnaroundBufferMin) || 45;
+      const aLast = bA.itinerary[bA.itinerary.length - 1];
+      const aLastArrIso = formatEgyptISO(aLast.arrive_at || `${bA.end_date} 18:00`);
+      const aEndMs = new Date(aLastArrIso).getTime() + (bufferMin * 60000);
+      const aEndIso = toEgyptISOString(new Date(aEndMs));
+
+      bA.hold_window = {
+        start: bA.hold_window ? bA.hold_window.start : toEgyptISOString(new Date(formatEgyptISO(bA.itinerary[0].depart_at))),
+        end: aEndIso,
+        buffer_minutes: bufferMin
+      };
+
+      const bLast = bB.itinerary[bB.itinerary.length - 1];
+      const bLastArrIso = formatEgyptISO(bLast.arrive_at || `${bB.end_date} 18:00`);
+      const bDeadheadMins = match.newDeadheadB ? match.newDeadheadB.drive_minutes : 0;
+      const bEndMs = new Date(bLastArrIso).getTime() + ((bDeadheadMins + bufferMin) * 60000);
+
+      bB.hold_window = {
+        start: aEndIso,
+        end: toEgyptISOString(new Date(bEndMs)),
+        buffer_minutes: bufferMin
+      };
+
+      bB.deadhead = match.newDeadheadB || null;
+
+      bA.estimate = calculateBookingEstimate(bA, v);
+      bB.estimate = calculateBookingEstimate(bB, v);
+
+      bB.return_match_savings = {
+        km_saved: match.kmSaved,
+        liters_saved: match.litersSaved,
+        egp_saved: match.egpSaved,
+        linked_booking_id: bA.id
+      };
+
+      bB.history.push({
+        status: 'Approved',
+        at: toEgyptISOString(new Date()),
+        by: userName,
+        note: note || `Approved (return match with ${bA.id})`
+      });
+      bA.history.push({
+        status: bA.status,
+        at: toEgyptISOString(new Date()),
+        by: userName,
+        note: `Return used by ${bB.id}`
+      });
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: userName,
+        action: 'Link Return Match',
+        ref: `${bB.id} ↔ ${bA.id}`,
+        details: `Assigned vehicle ${v.code} on empty return from ${bA.id} to ${bB.id}. Saved ${match.kmSaved} km / ${match.litersSaved} L.`
+      });
+
+      data.notifications = data.notifications || [];
+      data.notifications.unshift({
+        id: 'NOTIF-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        title: 'Return Trip Optimization',
+        message: `Booking ${bB.id} has been approved using vehicle ${v.code} on its return leg. Avoided ${match.kmSaved} km of empty deadhead.`,
+        role: 'Operations',
+        read: false
+      });
+      data.notifications.unshift({
+        id: 'NOTIF-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        title: 'Booking Approved',
+        message: `Your booking ${bB.id} has been approved. Your trip uses a vehicle already in the area.`,
+        role: 'Requester',
+        read: false
+      });
+
+      this.save(data);
+      return { success: true, bookingA: bA, bookingB: bB, match: match };
+    },
+
+    unlinkReturnTrip: function (bookingBId, reason = 'Operations unlink', user = 'Khaled Ibrahim (Dispatcher)') {
+      const data = this.load();
+      const bB = (data.bookings || []).find(b => b.id === bookingBId);
+      if (!bB) return { success: false, error: 'Booking not found.' };
+      if (!bB.assignment || !bB.assignment.linked_to) {
+        return { success: false, error: 'Booking is not linked to a return match.' };
+      }
+
+      const linkedAId = bB.assignment.linked_to;
+      const bA = (data.bookings || []).find(b => b.id === linkedAId);
+      const userName = (typeof user === 'object' && user.name) ? user.name : user;
+
+      bB.status = 'Pending';
+      bB.assignment = null;
+      bB.return_match_savings = null;
+      bB.deadhead = null;
+      bB.hold_window = calculateHoldWindow(bB, null);
+      bB.estimate = calculateBookingEstimate(bB, null);
+      bB.history.push({
+        status: 'Pending',
+        at: toEgyptISOString(new Date()),
+        by: userName,
+        note: `Unlinked from ${linkedAId}: ${reason}`
+      });
+
+      if (bA) {
+        const vA = (data.vehicles || []).find(v => v.code === (bA.assignment && bA.assignment.vehicle_id));
+        const homeSite = vA ? this.getSite(vA.home_site_id) : null;
+        const vehicleBase = homeSite || (vA ? vA.location : 'Base');
+
+        bA.deadhead = (bA.assignment && bA.assignment.original_deadhead) || calculateDeadheadLeg(bA.itinerary[bA.itinerary.length - 1], vehicleBase);
+        if (bA.assignment) {
+          delete bA.assignment.deadhead_used_by;
+          delete bA.assignment.original_deadhead;
+        }
+
+        bA.hold_window = calculateHoldWindow(bA, vehicleBase);
+        bA.estimate = calculateBookingEstimate(bA, vA);
+
+        bA.history.push({
+          status: bA.status,
+          at: toEgyptISOString(new Date()),
+          by: userName,
+          note: `Return unlinked from ${bookingBId}: ${reason}. Deadhead restored.`
+        });
+      }
+
+      data.auditTrail = data.auditTrail || [];
+      data.auditTrail.unshift({
+        id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        user: userName,
+        action: 'Unlink Return Match',
+        ref: `${bookingBId} ↔ ${linkedAId}`,
+        details: `Unlinked return match between ${bookingBId} and ${linkedAId}. Reason: ${reason}`
+      });
+
+      data.notifications = data.notifications || [];
+      data.notifications.unshift({
+        id: 'NOTIF-' + Math.floor(1000 + Math.random() * 9000),
+        time: 'Just now',
+        title: 'Return Trip Unlinked',
+        message: `Booking ${bookingBId} was unlinked from ${linkedAId} and returned to the Pending queue.`,
+        role: 'Operations',
+        read: false
+      });
+
+      this.save(data);
+      return { success: true, bookingA: bA, bookingB: bB };
+    },
+
+    getEmptyReturnsThisWeek: function () {
+      const data = this.load();
+      const allBookings = data.bookings || [];
+      const allVehicles = this.getVehicles();
+
+      const emptyReturns = [];
+      allBookings.forEach(b => {
+        if (!['Approved', 'Dispatched'].includes(b.status)) return;
+        if (!b.assignment || !b.assignment.vehicle_id) return;
+        if (b.assignment.deadhead_used_by) return;
+        if (!b.deadhead || !b.deadhead.distance_km) return;
+
+        const v = allVehicles.find(item => item.code === b.assignment.vehicle_id);
+        const homeSite = (v && v.home_site_id) ? this.getSite(v.home_site_id) : null;
+        const lastPt = Array.isArray(b.itinerary) && b.itinerary[b.itinerary.length - 1];
+
+        emptyReturns.push({
+          booking_id: b.id,
+          vehicle_code: b.assignment.vehicle_id,
+          vehicle_model: v ? v.model : 'Vehicle',
+          last_point: lastPt ? lastPt.place_name : 'Destination',
+          time_free: lastPt ? (lastPt.arrive_at || lastPt.depart_at) : b.end_date,
+          base_site: homeSite ? homeSite.name : (v ? v.location : 'Home Site'),
+          deadhead_km: b.deadhead.distance_km,
+          deadhead_minutes: b.deadhead.drive_minutes
+        });
+      });
+
+      return emptyReturns;
+    },
+
     getVehicleEligibility: function (booking) {
       if (!booking) return [];
       const hold = this.getHoldWindow(booking);
       const allVehicles = this.getVehicles();
       const allBookings = this.getBookings();
       const priceBook = getPriceBookForDate(booking.start_date);
+
+      let returnMatches = [];
+      try {
+        returnMatches = this.findReturnMatches(booking);
+      } catch (e) {
+        returnMatches = [];
+      }
 
       const pax = booking.passengers || 1;
       const cargoKg = booking.has_extra_cargo ? (Number(booking.cargo_kg) || 0) : 0;
@@ -2161,9 +2781,15 @@
           reasons.push(`Payload ${v.payloadKg.toLocaleString()} kg < ${cargoKg.toLocaleString()} kg`);
         }
 
+        const returnMatch = returnMatches.find(m => m.vehicle && m.vehicle.code === v.code);
+        const isPotentialReturnMatch = Boolean(returnMatch);
+
         const conflictingBooking = activeBookings.find(other => {
           const assignedCode = other.assignment ? other.assignment.vehicle_id : null;
           if (assignedCode !== v.code) return false;
+          if (isPotentialReturnMatch && returnMatch.bookingA && returnMatch.bookingA.id === other.id) {
+            return false;
+          }
           const otherHold = this.getHoldWindow(other);
           return hold.startDateObj < otherHold.endDateObj && hold.endDateObj > otherHold.startDateObj;
         });
@@ -2189,7 +2815,9 @@
             calculateHaversineKm(homeSite.lat, homeSite.lng, depPoint.lat, depPoint.lng) < 0.25)
         ));
 
-        if (isExactSameSite) {
+        if (isPotentialReturnMatch && returnMatch.repositioningLeg && reasons.length === 0) {
+          repositioningKm = returnMatch.repositioningLeg.distance_km;
+        } else if (isExactSameSite) {
           repositioningKm = 0;
         } else if (homeSite) {
           const distKey = `${homeSite.name}|${depPlace}`;
@@ -2241,6 +2869,8 @@
           vehicle: v,
           eligible: reasons.length === 0,
           reasons: reasons,
+          isReturnMatch: Boolean(isPotentialReturnMatch && reasons.length === 0),
+          returnMatch: isPotentialReturnMatch ? returnMatch : null,
           estimate: {
             distanceKm: baseDistKm,
             deadheadKm: deadheadDist,
@@ -2263,6 +2893,10 @@
         if (a.eligible && !b.eligible) return -1;
         if (!a.eligible && b.eligible) return 1;
         if (a.eligible && b.eligible) {
+          const aMatch = a.isReturnMatch ? 1 : 0;
+          const bMatch = b.isReturnMatch ? 1 : 0;
+          if (aMatch !== bMatch) return bMatch - aMatch;
+
           const aExact = a.estimate.isExactSameSite ? 1 : 0;
           const bExact = b.estimate.isExactSameSite ? 1 : 0;
           if (aExact !== bExact) return bExact - aExact;
@@ -2581,7 +3215,7 @@
         user: 'Khaled Ibrahim (Dispatcher)',
         action: 'Approve & Assign Vehicle',
         ref: b.id,
-        details: `Assigned ${vMatch.vehicle.code} + ${assignedDrivers.map(d => d.name).join(' & ')} for window ${b.hold_window.start} → ${b.hold_window.end}. Fuel estimate: ${b.estimate.fuel_liters} L (EGP ${b.estimate.cost_egp}).`
+        details: `Assigned ${vMatch.vehicle.code} + ${assignedDrivers.map(d => d.name).join(' & ')} for window ${b.hold_window.start} → ${b.hold_window.end}. Fuel estimate: ${b.estimate.fuel_liters} L.`
       });
 
       this.save(data);
@@ -2593,16 +3227,27 @@
       const b = (data.bookings || []).find(item => item.id === id);
       if (!b) return { success: false, error: 'Booking not found' };
 
-      b.status = 'Rejected';
-      b.history.push({
+      if (b.assignment && b.assignment.deadhead_used_by) {
+        const linkedBId = b.assignment.deadhead_used_by;
+        this.unlinkReturnTrip(linkedBId, `Preceding trip ${id} was rejected or cancelled`, 'Khaled Ibrahim (Dispatcher)');
+      }
+      if (b.assignment && b.assignment.linked_to) {
+        this.unlinkReturnTrip(b.id, `Trip ${id} was rejected or cancelled`, 'Khaled Ibrahim (Dispatcher)');
+      }
+
+      const refreshedData = this.load();
+      const refreshedB = (refreshedData.bookings || []).find(item => item.id === id) || b;
+
+      refreshedB.status = 'Rejected';
+      refreshedB.history.push({
         status: 'Rejected',
         at: toEgyptISOString(new Date()),
         by: 'Khaled Ibrahim (Dispatcher)',
         note: `Reason: ${reasonCode || 'Policy'}. Details: ${text || 'Rejected by Operations'}`
       });
 
-      data.auditTrail = data.auditTrail || [];
-      data.auditTrail.unshift({
+      refreshedData.auditTrail = refreshedData.auditTrail || [];
+      refreshedData.auditTrail.unshift({
         id: 'AUD-' + Math.floor(1000 + Math.random() * 9000),
         time: 'Just now',
         user: 'Khaled Ibrahim (Dispatcher)',
@@ -2611,8 +3256,8 @@
         details: `Rejected with reason: "${reasonCode}". Message: ${text}`
       });
 
-      this.save(data);
-      return { success: true, booking: b };
+      this.save(refreshedData);
+      return { success: true, booking: refreshedB };
     },
 
     requestChanges: function (id, message) {

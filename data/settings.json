@@ -14,7 +14,12 @@
     "maxDrivingHoursPerDay": 8.0,
     "fuelVarianceThresholdPct": 10.0,
     "staleSignalThresholdMin": 5,
-    "maxIdleMinutesAlert": 15
+    "maxIdleMinutesAlert": 15,
+    "returnMatch": {
+      "maxPickupDistanceKm": 15,
+      "maxWaitHours": 3,
+      "maxDetourMinutes": 30
+    }
   },
   "contacts": {
     "office": "CIRA Central Logistics Directorate, Campus Admin Bldg, G-14",

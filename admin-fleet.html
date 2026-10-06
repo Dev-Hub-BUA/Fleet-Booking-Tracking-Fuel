@@ -332,7 +332,86 @@
             </div>
           </div>
         </div>
-      </div>
+
+        <!-- Operating Policies & Return Match Rules Card -->
+        <div class="card" style="margin-top:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h2 class="card-title" style="margin:0; display:flex; align-items:center; gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <span>Operating Policies &amp; Return-Match Rules</span>
+              </h2>
+              <p style="margin:4px 0 0; font-size:13px; color:var(--text-muted);">
+                Configure automated return match matching thresholds and fleet turnaround buffers.
+              </p>
+            </div>
+            <span class="badge badge-info" style="font-size:11px;">Applies System-wide</span>
+          </div>
+
+          <form id="operating-policies-form" onsubmit="handleSaveOperatingPolicies(event)" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px;">
+            <div>
+              <label style="display:block; font-size:12.5px; font-weight:700; color:var(--navy-800); margin-bottom:4px;">
+                Max Pickup Distance from Last Point (km) *
+              </label>
+              <div style="position:relative;">
+                <input type="number" id="rule-max-pickup-km" min="1" max="100" step="1" required style="width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px; font-family:var(--font-mono);">
+                <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--text-muted);">km</span>
+              </div>
+              <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:3px;">Threshold to pair departing mission B with arriving mission A (Default: 15 km).</small>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:12.5px; font-weight:700; color:var(--navy-800); margin-bottom:4px;">
+                Max Wait at Last Point (hours) *
+              </label>
+              <div style="position:relative;">
+                <input type="number" id="rule-max-wait-hours" min="0.5" max="12" step="0.5" required style="width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px; font-family:var(--font-mono);">
+                <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--text-muted);">hours</span>
+              </div>
+              <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:3px;">Allowed idle dwell time between arrival + buffer and pickup (Default: 3 h).</small>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:12.5px; font-weight:700; color:var(--navy-800); margin-bottom:4px;">
+                Max Extra Driving / Detour (minutes) *
+              </label>
+              <div style="position:relative;">
+                <input type="number" id="rule-max-detour-mins" min="0" max="180" step="5" required style="width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px; font-family:var(--font-mono);">
+                <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--text-muted);">min</span>
+              </div>
+              <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:3px;">Max allowable extra transit compared to direct empty deadhead (Default: 30 min).</small>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:12.5px; font-weight:700; color:var(--navy-800); margin-bottom:4px;">
+                Turnaround Prep Buffer (minutes) *
+              </label>
+              <div style="position:relative;">
+                <input type="number" id="rule-turnaround-mins" min="0" max="120" step="5" required style="width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px; font-family:var(--font-mono);">
+                <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--text-muted);">min</span>
+              </div>
+              <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:3px;">Post-mission vehicle turnaround &amp; safety inspection lockout (Default: 30 min).</small>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:12.5px; font-weight:700; color:var(--navy-800); margin-bottom:4px;">
+                Max Daily Driver Duty (hours/day) *
+              </label>
+              <div style="position:relative;">
+                <input type="number" id="rule-max-drive-hours" min="4" max="16" step="0.5" required style="width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px; font-family:var(--font-mono);">
+                <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--text-muted);">hours</span>
+              </div>
+              <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:3px;">Maximum drive time per solo driver before second driver is mandated (Default: 9 h).</small>
+            </div>
+
+            <div style="display:flex; align-items:flex-end;">
+              <button type="submit" class="btn btn-primary" style="height:38px; width:100%; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Save Operating Policies</span>
+              </button>
+            </div>
+          </form>
+        </div>
     </main>
   </div>
 
@@ -597,6 +676,7 @@
       renderVehiclesTable();
       renderSitesTable();
       updateCounts();
+      loadOperatingPolicies();
     });
 
     function switchFleetTab(tab) {
@@ -624,7 +704,48 @@
         renderSitesTable();
       } else if (tab === 'vehicles') {
         renderVehiclesTable();
+      } else if (tab === 'pricing') {
+        loadOperatingPolicies();
       }
+    }
+
+    function loadOperatingPolicies() {
+      const settings = FleetStore.getSettings();
+      const rules = settings.rules || {};
+      const rm = rules.returnMatch || { maxPickupDistanceKm: 15, maxWaitHours: 3, maxDetourMinutes: 30 };
+      const pKm = document.getElementById('rule-max-pickup-km');
+      const wHr = document.getElementById('rule-max-wait-hours');
+      const dMin = document.getElementById('rule-max-detour-mins');
+      const tMin = document.getElementById('rule-turnaround-mins');
+      const dHr = document.getElementById('rule-max-drive-hours');
+
+      if (pKm) pKm.value = rm.maxPickupDistanceKm;
+      if (wHr) wHr.value = rm.maxWaitHours;
+      if (dMin) dMin.value = rm.maxDetourMinutes;
+      if (tMin) tMin.value = rules.prepBufferMin || 30;
+      if (dHr) dHr.value = rules.maxDriveHoursPerDriverPerDay || 9;
+    }
+
+    function handleSaveOperatingPolicies(e) {
+      e.preventDefault();
+      const currentSettings = FleetStore.getSettings();
+      const maxPickup = parseFloat(document.getElementById('rule-max-pickup-km').value) || 15;
+      const maxWait = parseFloat(document.getElementById('rule-max-wait-hours').value) || 3;
+      const maxDetour = parseFloat(document.getElementById('rule-max-detour-mins').value) || 30;
+      const turnaround = parseInt(document.getElementById('rule-turnaround-mins').value, 10) || 30;
+      const maxDrive = parseFloat(document.getElementById('rule-max-drive-hours').value) || 9;
+
+      currentSettings.rules = currentSettings.rules || {};
+      currentSettings.rules.returnMatch = {
+        maxPickupDistanceKm: maxPickup,
+        maxWaitHours: maxWait,
+        maxDetourMinutes: maxDetour
+      };
+      currentSettings.rules.prepBufferMin = turnaround;
+      currentSettings.rules.maxDriveHoursPerDriverPerDay = maxDrive;
+
+      FleetStore.saveSettings(currentSettings);
+      alert('Operating policies and return-match rules updated successfully.');
     }
 
     function updateCounts() {
