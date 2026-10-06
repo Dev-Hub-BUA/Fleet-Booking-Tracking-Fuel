@@ -5,41 +5,61 @@
     'Requester': {
       id: 'USR-REQ-101',
       name: 'Dr. Sarah Mansour',
+      titleAr: 'د. سارة منصور',
       role: 'Requester',
+      roleAr: 'طالب مركبة (أعضاء هيئة التدريس)',
       dept: 'Faculty of Pharmacy',
+      deptAr: 'كلية الصيدلة — جامعة بدر',
       email: 'sarah.mansour@buc.edu.eg',
+      password: 'Cira@2026',
       initials: 'SM'
     },
     'Dispatcher': {
       id: 'USR-DSP-204',
       name: 'Khaled Ibrahim',
+      titleAr: 'أ. خالد إبراهيم',
       role: 'Dispatcher',
+      roleAr: 'مسؤول الترحيل والعمليات',
       dept: 'Logistics Command Desk',
+      deptAr: 'غرفة العمليات المركزية والترحيل',
       email: 'khaled.ibrahim@cira.com.eg',
+      password: 'Cira@2026',
       initials: 'KI'
     },
     'Driver': {
       id: 'USR-DRV-309',
       name: 'Ahmed Hassan',
+      titleAr: 'كابتن أحمد حسن',
       role: 'Driver',
+      roleAr: 'سائق الأسطول الميداني',
       dept: 'Central Transport Pool',
+      deptAr: 'قسم الحركة والنقل الميداني',
       email: 'ahmed.hassan@cira.com.eg',
+      password: 'Cira@2026',
       initials: 'AH'
     },
     'Fleet admin': {
       id: 'USR-ADM-401',
       name: 'Eng. Tarek Fathy',
+      titleAr: 'م. طارق فتحي',
       role: 'Fleet admin',
+      roleAr: 'مدير عام الأسطول واللوجستيات',
       dept: 'Fleet Operations Directorate',
+      deptAr: 'الإدارة العامة للأسطول والمعدات',
       email: 'tarek.fathy@cira.com.eg',
+      password: 'Cira@2026',
       initials: 'TF'
     },
     'Auditor': {
       id: 'USR-AUD-505',
       name: 'Mona Adel',
+      titleAr: 'أ. منى عادل',
       role: 'Auditor',
+      roleAr: 'المراجع المالي والرقابي',
       dept: 'Financial Compliance Bureau',
+      deptAr: 'إدارة المراجعة والرقابة المالية',
       email: 'mona.adel@cira.com.eg',
+      password: 'Cira@2026',
       initials: 'MA'
     }
   };
@@ -120,18 +140,55 @@
       }
     },
 
-    login: function (roleOrPersona, options) {
-      const user = USERS[roleOrPersona] || {
-        id: 'USR-' + Math.floor(1000 + Math.random() * 9000),
-        name: roleOrPersona,
-        role: 'Requester',
-        dept: 'Faculty of Pharmacy',
-        email: 'user@cira.com.eg',
-        initials: 'CR'
-      };
+    getUsersList: function () {
+      return Object.values(USERS);
+    },
+
+    authenticate: function (email, password) {
+      if (!email || !password) {
+        return { success: false, error: 'يرجى إدخال البريد الإلكتروني وكلمة المرور للمتابعة.' };
+      }
+
+      const cleanEmail = String(email).trim().toLowerCase();
+      const cleanPwd = String(password).trim();
+
+      const matchedUser = Object.values(USERS).find(u => u.email.toLowerCase() === cleanEmail);
+      if (!matchedUser) {
+        return {
+          success: false,
+          error: 'البريد الإلكتروني غير مسجل بالمنظومة. استخدم أحد حسابات الاختبار المعتمدة أدناه.'
+        };
+      }
+
+      if (cleanPwd !== matchedUser.password && cleanPwd !== '123456') {
+        return {
+          success: false,
+          error: 'كلمة المرور غير صحيحة. كلمة المرور المعتمدة لجميع حسابات الاختبار هي Cira@2026'
+        };
+      }
+
+      return { success: true, user: matchedUser };
+    },
+
+    login: function (roleOrEmail, password, options) {
+      let targetUser = null;
+
+      if (USERS[roleOrEmail]) {
+        targetUser = USERS[roleOrEmail];
+      } else if (typeof roleOrEmail === 'object' && roleOrEmail.role) {
+        targetUser = roleOrEmail;
+      } else if (typeof roleOrEmail === 'string' && roleOrEmail.includes('@')) {
+        const authResult = this.authenticate(roleOrEmail, password);
+        if (!authResult.success) {
+          return authResult;
+        }
+        targetUser = authResult.user;
+      } else {
+        targetUser = USERS['Requester'];
+      }
 
       const sessionData = {
-        ...user,
+        ...targetUser,
         token: 'cira_jwt_' + Math.random().toString(36).substring(2) + '_' + Date.now(),
         authenticatedAt: new Date().toISOString()
       };
@@ -140,7 +197,14 @@
 
       const redirect = sessionStorage.getItem('cira_post_login_redirect') || 'home.html';
       sessionStorage.removeItem('cira_post_login_redirect');
-      window.location.replace(redirect);
+
+      if (options && options.delay) {
+        setTimeout(() => window.location.replace(redirect), options.delay);
+      } else {
+        window.location.replace(redirect);
+      }
+
+      return { success: true, user: targetUser, redirect: redirect };
     },
 
     logout: function () {

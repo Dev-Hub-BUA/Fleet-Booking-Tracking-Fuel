@@ -7,6 +7,67 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/auth.js"></script>
+  <style>
+    .persona-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      background: #FFFFFF;
+      transition: var(--trans);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .persona-card:hover {
+      border-color: var(--cira-burgundy);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
+    }
+    .persona-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .persona-role-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cira-burgundy);
+      background: var(--navy-50);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      width: fit-content;
+    }
+    .pwd-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .pwd-toggle-btn {
+      position: absolute;
+      left: 12px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    .pwd-toggle-btn:hover {
+      color: var(--cira-burgundy);
+    }
+    .copy-pill {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      background: var(--bg-muted);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-main);
+    }
+  </style>
 </head>
 <body style="background: var(--bg-page); min-height: 100vh; display: flex; flex-direction: column; direction: rtl; text-align: right;">
 
@@ -23,30 +84,30 @@
         </div>
 
         <div>
-          <h1 style="margin: 0; font-family: var(--font-condensed); font-size: 42px; line-height: 1.2; color: #FFFFFF; font-weight: 800;">
+          <h1 style="margin: 0; font-family: var(--font-condensed); font-size: 40px; line-height: 1.2; color: #FFFFFF; font-weight: 800;">
             بوابة العمليات المركزية لإدارة وحجز أسطول المؤسسة
           </h1>
-          <p style="margin: 16px 0 0; font-size: 16px; line-height: 1.6; color: #E8E2DD;">
-            منظومة مؤسسية موحدة تخدم جامعات ومدارس سيرا، تشمل التحقق من الصلاحيات، جدولة الرحلات، تتبع الحركة اللحظي، ومطابقة استهلاك الوقود.
+          <p style="margin: 16px 0 0; font-size: 15.5px; line-height: 1.6; color: #E8E2DD;">
+            المنصة المركزية الذكية لخدمة جامعات ومدارس سيرا، تشمل التحقق من الصلاحيات الإدارية، جدولة أسطول النقل، التتبع اللحظي، ومطابقة استهلاك الوقود إلكترونياً.
           </p>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
           <div style="border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px; background: rgba(255,255,255,0.06);">
-            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">التحقق المؤسسي الموحد</strong>
-            <span style="font-size: 12.5px; opacity: 0.9;">دخول آمن عبر SSO وربط مباشر بالصلاحيات الإدارية لكل كلية وإدارة.</span>
+            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">التحقق المؤسسي</strong>
+            <span style="font-size: 12.5px; opacity: 0.9;">صلاحيات مفصلة لكل دور وظيفي عبر نظام RBAC المحكم.</span>
           </div>
           <div style="border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px; background: rgba(255,255,255,0.06);">
             <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">فترات التجهيز الإلزامية</strong>
-            <span style="font-size: 12.5px; opacity: 0.9;">تطبيق تلقائي لفترات التجهيز (30 دقيقة) والتعقيم والتبديل (45 دقيقة).</span>
+            <span style="font-size: 12.5px; opacity: 0.9;">تطبيق فترات التجهيز (30 دقيقة) والتعقيم والتبديل (45 دقيقة).</span>
           </div>
           <div style="border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px; background: rgba(255,255,255,0.06);">
             <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">الرقابة والتتبع المباشر</strong>
-            <span style="font-size: 12.5px; opacity: 0.9;">رصد مسارات التيليماتري، إشارات التباطؤ، وإنذارات الطوارئ SOS.</span>
+            <span style="font-size: 12.5px; opacity: 0.9;">متابعة التيليماتري، إشارات السير، وإنذارات الطوارئ SOS.</span>
           </div>
           <div style="border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px; background: rgba(255,255,255,0.06);">
-            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">المطابقة المالية المحكمة</strong>
-            <span style="font-size: 12.5px; opacity: 0.9;">تطبيق حد فارق الوقود (±10%) وإقفال الرحلات بسجل تدقيق لا يُمحى.</span>
+            <strong style="color: var(--cira-gold); display: block; font-size: 14px; margin-bottom: 4px;">المطابقة المالية المقفلة</strong>
+            <span style="font-size: 12.5px; opacity: 0.9;">تطبيق حد فارق الوقود (±10%) وقفل الرحلات بفواتير معتمدة.</span>
           </div>
         </div>
       </div>
@@ -54,88 +115,147 @@
       <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #D5CECB; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 16px;">
         <span>شركة القاهرة للاستثمار والتنمية العقارية (سيرا للتعليم)</span>
         <button type="button" onclick="document.getElementById('onboarding-modal').style.display='flex';" style="background: none; border: none; color: var(--cira-gold); cursor: pointer; text-decoration: underline; font-family: inherit; font-size: 13px;">
-          دليل التشغيل وإرشادات النظام
+          دليل التشغيل وإرشادات المنظومة
         </button>
       </div>
     </section>
 
     <!-- Left Sign In Section -->
-    <section style="flex: 1 1 440px; padding: 56px 40px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; background: #FFFFFF;">
-      <div style="width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 20px;">
+    <section style="flex: 1 1 480px; padding: 48px 36px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; background: #FFFFFF; overflow-y: auto;">
+      <div style="width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 20px;">
         <div>
-          <h2 style="margin: 0; font-family: var(--font-condensed); font-size: 34px; color: var(--cira-burgundy); font-weight: 800;">بوابة تسجيل الدخول</h2>
-          <span style="font-size: 14px; color: var(--text-muted);">تسجيل الدخول للموظفين وأعضاء هيئة التدريس وسائقي الأسطول</span>
+          <h2 style="margin: 0; font-family: var(--font-condensed); font-size: 32px; color: var(--cira-burgundy); font-weight: 800;">تسجيل الدخول للمنظومة</h2>
+          <span style="font-size: 13.5px; color: var(--text-muted);">أدخل بيانات حسابك المؤسسي أو استخدم أحد حسابات الاختبار أدناه</span>
         </div>
 
-        <!-- SSO Primary Button -->
-        <button type="button" class="btn btn-primary" onclick="Auth.login('Requester');" style="width: 100%; min-height: 48px; justify-content: center; font-size: 15px; font-weight: 700; background: var(--cira-burgundy); color: #FFFFFF;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-          الدخول بالبريد المؤسسي الموحد (CIRA SSO)
-        </button>
+        <!-- Alert Notification Box -->
+        <div id="login-alert" style="display: none; padding: 12px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; line-height: 1.5;"></div>
 
-        <div style="display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 13px;">
-          <span style="flex: 1; height: 1px; background: var(--border);"></span>
-          أو الدخول بالبريد وكلمة المرور
-          <span style="flex: 1; height: 1px; background: var(--border);"></span>
-        </div>
-
-        <form onsubmit="event.preventDefault(); Auth.login('Requester');" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Real Functional Login Form -->
+        <form id="login-form" onsubmit="handleFormSubmit(event);" style="display: flex; flex-direction: column; gap: 14px;">
           <div class="form-group">
-            <label class="form-label">البريد الإلكتروني المؤسسي</label>
-            <input type="email" id="login-email" class="form-input" required placeholder="user@buc.edu.eg" value="sarah.mansour@buc.edu.eg">
+            <label class="form-label" for="login-email">البريد الإلكتروني المؤسسي</label>
+            <input type="email" id="login-email" class="form-input" required placeholder="name@cira.com.eg" value="sarah.mansour@buc.edu.eg" style="direction: ltr; text-align: left;">
           </div>
 
           <div class="form-group">
-            <label class="form-label">كلمة المرور</label>
-            <input type="password" id="login-pwd" class="form-input" required value="••••••••••••">
+            <label class="form-label" for="login-pwd">كلمة المرور</label>
+            <div class="pwd-wrapper">
+              <input type="password" id="login-pwd" class="form-input" required value="Cira@2026" style="direction: ltr; text-align: left; padding-left: 40px;">
+              <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility();" title="إظهار / إخفاء كلمة المرور" aria-label="Toggle password">
+                <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
           </div>
 
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-              <input type="checkbox" checked style="accent-color: var(--cira-burgundy); width: 16px; height: 16px;">
-              <span>تذكر الجلسة على هذا المتصفح</span>
+              <input type="checkbox" id="remember-me" checked style="accent-color: var(--cira-burgundy); width: 16px; height: 16px;">
+              <span>تذكر بياناتي في هذا المتصفح</span>
             </label>
-            <a href="#" onclick="alert('تم إرسال رابط تأكيد الهوية إلى بريدك المؤسسي المسجل.'); return false;" style="color: var(--cira-burgundy); font-weight: 700; text-decoration: none;">استعادة الحساب؟</a>
+            <a href="#" onclick="showQuickAlert('تم إرسال رابط تأكيد الحساب لبريدك المؤسسي المسجل.', 'info'); return false;" style="color: var(--cira-burgundy); font-weight: 700; text-decoration: none;">نسيت كلمة المرور؟</a>
           </div>
 
-          <button type="submit" class="btn btn-gold btn-lg" style="width: 100%; font-weight: 800; justify-content: center;">
-            دخول النظام ←
+          <button type="submit" id="submit-btn" class="btn btn-gold btn-lg" style="width: 100%; font-weight: 800; justify-content: center; min-height: 48px;">
+            <span id="btn-text">تسجيل الدخول ←</span>
           </button>
         </form>
 
-        <!-- Enterprise Identity Switcher for Demo / Quality Assurance -->
-        <div style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px;">
-          <span style="font-size: 12.5px; font-weight: 700; color: var(--cira-burgundy); display: block; margin-bottom: 8px;">
-            الهويات المؤسسية للاختبار والتدقيق (Enterprise Persona Selector):
-          </span>
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <button type="button" onclick="Auth.login('Requester');" class="btn btn-secondary btn-sm" style="justify-content: space-between; text-align: right; width: 100%;">
-              <span><strong>د. سارة منصور</strong> (Requester — كلية الصيدلة)</span>
-              <span style="color: var(--cira-gold-dark); font-weight: 700;">دخول ←</span>
-            </button>
-            <button type="button" onclick="Auth.login('Dispatcher');" class="btn btn-secondary btn-sm" style="justify-content: space-between; text-align: right; width: 100%;">
-              <span><strong>أ. خالد إبراهيم</strong> (Dispatcher — مكتب الترحيل والعمليات)</span>
-              <span style="color: var(--cira-gold-dark); font-weight: 700;">دخول ←</span>
-            </button>
-            <button type="button" onclick="Auth.login('Driver');" class="btn btn-secondary btn-sm" style="justify-content: space-between; text-align: right; width: 100%;">
-              <span><strong>كابتن أحمد حسن</strong> (Driver — سائق الأسطول المركزي)</span>
-              <span style="color: var(--cira-gold-dark); font-weight: 700;">دخول ←</span>
-            </button>
-            <button type="button" onclick="Auth.login('Fleet admin');" class="btn btn-secondary btn-sm" style="justify-content: space-between; text-align: right; width: 100%;">
-              <span><strong>م. طارق فتحي</strong> (Fleet admin — مدير عام الأسطول)</span>
-              <span style="color: var(--cira-gold-dark); font-weight: 700;">دخول ←</span>
-            </button>
-            <button type="button" onclick="Auth.login('Auditor');" class="btn btn-secondary btn-sm" style="justify-content: space-between; text-align: right; width: 100%;">
-              <span><strong>أ. منى عادل</strong> (Auditor — المراجع المالي والرقابي)</span>
-              <span style="color: var(--cira-gold-dark); font-weight: 700;">دخول ←</span>
-            </button>
+        <div style="display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 12.5px;">
+          <span style="flex: 1; height: 1px; background: var(--border);"></span>
+          أو الدخول المباشر بحساب المنظومة الموحد
+          <span style="flex: 1; height: 1px; background: var(--border);"></span>
+        </div>
+
+        <!-- SSO Primary Button -->
+        <button type="button" class="btn btn-secondary" onclick="handleSSOLogin();" style="width: 100%; min-height: 44px; justify-content: center; font-size: 14px; font-weight: 700;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          الدخول السريع عبر بوابة CIRA SSO (OIDC)
+        </button>
+
+        <!-- Test Accounts Section with One-Click Autofill -->
+        <div style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 13px; font-weight: 800; color: var(--cira-burgundy);">
+              حسابات الاختبار المعتمدة (Demo Accounts):
+            </span>
+            <span class="copy-pill" title="كلمة المرور المشتركة">Pass: Cira@2026</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            
+            <!-- Requester -->
+            <div class="persona-card">
+              <div class="persona-meta">
+                <span class="persona-role-badge">طالب مركبة · Requester</span>
+                <strong style="font-size: 13.5px; color: var(--text-main);">د. سارة منصور (كلية الصيدلة)</strong>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: right;">sarah.mansour@buc.edu.eg</span>
+              </div>
+              <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('sarah.mansour@buc.edu.eg', 'Cira@2026');" title="تعبئة الحقول في النموذج أعلاه">تعبئة</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('sarah.mansour@buc.edu.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">دخول</button>
+              </div>
+            </div>
+
+            <!-- Dispatcher -->
+            <div class="persona-card">
+              <div class="persona-meta">
+                <span class="persona-role-badge">مسؤول الترحيل · Dispatcher</span>
+                <strong style="font-size: 13.5px; color: var(--text-main);">أ. خالد إبراهيم (غرفة العمليات المركزية)</strong>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: right;">khaled.ibrahim@cira.com.eg</span>
+              </div>
+              <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('khaled.ibrahim@cira.com.eg', 'Cira@2026');">تعبئة</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('khaled.ibrahim@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">دخول</button>
+              </div>
+            </div>
+
+            <!-- Driver -->
+            <div class="persona-card">
+              <div class="persona-meta">
+                <span class="persona-role-badge">سائق أسطول · Driver</span>
+                <strong style="font-size: 13.5px; color: var(--text-main);">كابتن أحمد حسن (قسم الحركة والنقل)</strong>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: right;">ahmed.hassan@cira.com.eg</span>
+              </div>
+              <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('ahmed.hassan@cira.com.eg', 'Cira@2026');">تعبئة</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('ahmed.hassan@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">دخول</button>
+              </div>
+            </div>
+
+            <!-- Fleet Admin -->
+            <div class="persona-card">
+              <div class="persona-meta">
+                <span class="persona-role-badge">مدير الأسطول · Fleet Admin</span>
+                <strong style="font-size: 13.5px; color: var(--text-main);">م. طارق فتحي (الإدارة العامة للأسطول)</strong>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: right;">tarek.fathy@cira.com.eg</span>
+              </div>
+              <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('tarek.fathy@cira.com.eg', 'Cira@2026');">تعبئة</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('tarek.fathy@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">دخول</button>
+              </div>
+            </div>
+
+            <!-- Auditor -->
+            <div class="persona-card">
+              <div class="persona-meta">
+                <span class="persona-role-badge">المراجع المالي · Auditor</span>
+                <strong style="font-size: 13.5px; color: var(--text-main);">أ. منى عادل (إدارة الرقابة المالية)</strong>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; text-align: right;">mona.adel@cira.com.eg</span>
+              </div>
+              <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillForm('mona.adel@cira.com.eg', 'Cira@2026');">تعبئة</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="directLogin('mona.adel@cira.com.eg', 'Cira@2026');" style="background:var(--cira-burgundy);">دخول</button>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
     </section>
   </div>
 
-  <!-- Onboarding / Operating Guide Modal -->
+  <!-- Onboarding Modal -->
   <div id="onboarding-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px;">
     <div style="background:#FFFFFF; border-radius:12px; max-width:620px; width:100%; padding:32px; box-shadow:var(--shadow-xl); position:relative; max-height:90vh; overflow-y:auto;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:16px;">
@@ -166,5 +286,90 @@
     </div>
   </div>
 
+  <script>
+    function togglePasswordVisibility() {
+      const pwdInput = document.getElementById('login-pwd');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+      } else {
+        pwdInput.type = 'password';
+        eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+      }
+    }
+
+    function showQuickAlert(message, type) {
+      const alertBox = document.getElementById('login-alert');
+      alertBox.style.display = 'block';
+      alertBox.textContent = message;
+      if (type === 'error') {
+        alertBox.style.background = '#FDE8E8';
+        alertBox.style.color = '#9B1C1C';
+        alertBox.style.border = '1px solid #F8B4B4';
+      } else if (type === 'success') {
+        alertBox.style.background = '#DEF7EC';
+        alertBox.style.color = '#03543F';
+        alertBox.style.border = '1px solid #84E1BC';
+      } else {
+        alertBox.style.background = '#E1EFFE';
+        alertBox.style.color = '#1E429F';
+        alertBox.style.border = '1px solid #A4CAFE';
+      }
+    }
+
+    function fillForm(email, password) {
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-pwd').value = password;
+      const alertBox = document.getElementById('login-alert');
+      alertBox.style.display = 'none';
+      document.getElementById('login-pwd').focus();
+    }
+
+    function directLogin(email, password) {
+      fillForm(email, password);
+      handleFormSubmit();
+    }
+
+    function handleFormSubmit(e) {
+      if (e) e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const pwd = document.getElementById('login-pwd').value.trim();
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+
+      if (!email || !pwd) {
+        showQuickAlert('يرجى إدخال البريد الإلكتروني وكلمة المرور للمتابعة.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      btnText.textContent = 'جاري التحقق من بيانات الاعتماد...';
+
+      setTimeout(function () {
+        const res = Auth.login(email, pwd);
+        if (!res || !res.success) {
+          submitBtn.disabled = false;
+          btnText.textContent = 'تسجيل الدخول ←';
+          showQuickAlert(res ? res.error : 'فشل تسجيل الدخول. تأكد من البريد وكلمة المرور.', 'error');
+        } else {
+          showQuickAlert(`تم التحقق بنجاح! مرحباً ${res.user.titleAr || res.user.name}. جاري توجيهك للوحة التحكم...`, 'success');
+        }
+      }, 350);
+    }
+
+    function handleSSOLogin() {
+      const email = document.getElementById('login-email').value.trim() || 'sarah.mansour@buc.edu.eg';
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+
+      submitBtn.disabled = true;
+      btnText.textContent = 'جاري الاتصال بـ CIRA SSO...';
+
+      setTimeout(function () {
+        Auth.login(email, 'Cira@2026');
+      }, 300);
+    }
+  </script>
 </body>
 </html>
