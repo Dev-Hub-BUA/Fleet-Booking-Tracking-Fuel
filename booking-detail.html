@@ -6,12 +6,24 @@
   <title>Booking Details — CIRA Education Fleet Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="js/auth.js"></script>
   <style>
     .timeline-node {
       position: relative;
       padding-left: 28px;
       margin-bottom: 16px;
+    }
+    .timeline-node.interactive-node {
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      padding: 6px 10px 6px 28px;
+      margin-left: -6px;
+      margin-right: -6px;
+      transition: background 0.15s ease;
+    }
+    .timeline-node.interactive-node:hover {
+      background: rgba(11, 37, 69, 0.05);
     }
     .timeline-node::before {
       content: '';
@@ -117,9 +129,9 @@
     <main class="main-content" role="main">
       <div class="page-header">
         <div class="page-title-group">
-          <span class="page-pretitle">BK-2047 · Lifecycle Status</span>
+          <span class="page-pretitle">Booking · Lifecycle Status</span>
           <h1 class="page-title">Booking Details</h1>
-          <span class="page-subtitle">Assiut → Cairo → Badr City → Return to Base</span>
+          <span class="page-subtitle">Loading itinerary and reservation facts…</span>
         </div>
         <div style="display: flex; gap: 8px;">
           <button type="button" class="btn btn-gold btn-sm" id="btn-edit-itinerary" onclick="handleEditItineraryClick();" style="display:inline-flex; align-items:center; gap:6px;">
@@ -133,7 +145,25 @@
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; align-items: start;">
+      <!-- Booking Not Found View -->
+      <div id="booking-not-found-view" style="display: none; padding: 40px 20px; text-align: center;">
+        <div class="card" style="max-width: 540px; margin: 0 auto; padding: 36px 24px; text-align: center;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <h2 style="color: var(--navy-800); margin: 0 0 8px; font-size: 20px;">Booking Not Found</h2>
+          <p id="booking-not-found-msg" style="color: var(--text-muted); font-size: 14px; margin: 0 0 24px; line-height: 1.6;">
+            The requested booking does not exist in the fleet database or the ID is invalid.
+          </p>
+          <a href="bookings.html" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span>Back to Bookings</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Booking Found View -->
+      <div id="booking-found-view" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; align-items: start;">
         
         <!-- Left Column: Lifecycle, Resources & Itinerary -->
         <div style="display: flex; flex-direction: column; gap: 20px;">
@@ -141,74 +171,7 @@
           <!-- Lifecycle Progression -->
           <div class="card">
             <h2 class="card-title">Trip Lifecycle Progression</h2>
-            <div class="stepper" style="margin-top: 10px;">
-              <div class="step-item done">
-                <div class="step-marker">
-                  <div class="step-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-                  <div class="step-line"></div>
-                </div>
-                <div class="step-content">
-                  <span class="step-name">Submitted</span>
-                  <span class="step-when">Mon 12 Oct · 11:40 · Dr. Sarah Mansour</span>
-                  <span class="step-note">Multi-stop itinerary configured</span>
-                </div>
-              </div>
-              <div class="step-item done">
-                <div class="step-marker">
-                  <div class="step-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-                  <div class="step-line"></div>
-                </div>
-                <div class="step-content">
-                  <span class="step-name">Approved</span>
-                  <span class="step-when">Mon 12 Oct · 14:20 · Central Dispatch Desk</span>
-                  <span class="step-note">Vehicle assigned with turnaround buffers</span>
-                </div>
-              </div>
-              <div class="step-item done">
-                <div class="step-marker">
-                  <div class="step-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-                  <div class="step-line"></div>
-                </div>
-                <div class="step-content">
-                  <span class="step-name">Dispatched</span>
-                  <span class="step-when">Tue 13 Oct · 08:20 · Operations Command</span>
-                  <span class="step-note">Driver Ahmed Hassan accepted assignment</span>
-                </div>
-              </div>
-              <div class="step-item current">
-                <div class="step-marker">
-                  <div class="step-dot"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg></div>
-                  <div class="step-line"></div>
-                </div>
-                <div class="step-content">
-                  <span class="step-name" id="stepper-active-label">Active</span>
-                  <span class="step-when" id="stepper-active-when">En route · Driver on the road</span>
-                  <span class="step-note">GPS telemetry live on dispatch map</span>
-                </div>
-              </div>
-              <div class="step-item pending">
-                <div class="step-marker">
-                  <div class="step-dot"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="9"/></svg></div>
-                  <div class="step-line"></div>
-                </div>
-                <div class="step-content">
-                  <span class="step-name">Completed</span>
-                  <span class="step-when">Pending close-out · Driver &amp; Dispatch</span>
-                  <span class="step-note">Awaiting return odometer and fuel receipts</span>
-                </div>
-              </div>
-              <div class="step-item pending">
-                <div class="step-marker">
-                  <div class="step-dot"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="9"/></svg></div>
-                  <div class="step-line"></div>
-                </div>
-                <div class="step-content">
-                  <span class="step-name">Reconciled</span>
-                  <span class="step-when">Pending audit · Internal Audit Bureau</span>
-                  <span class="step-note">Final fuel variance and chargeback debit</span>
-                </div>
-              </div>
-            </div>
+            <div class="stepper" id="detail-stepper-container" style="margin-top: 10px;"></div>
           </div>
 
           <!-- Multi-Stop Mission Itinerary Card (Read-Only) -->
@@ -216,43 +179,33 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
               <div>
                 <h2 class="card-title" style="margin: 0;">Multi-Stop Mission Itinerary</h2>
-                <span style="font-size: 13px; color: var(--text-muted);" id="detail-itinerary-subtitle">Sequential stops, estimated driving legs, and locations</span>
+                <span style="font-size: 13px; color: var(--text-muted);" id="detail-itinerary-subtitle">Sequential stops, driving legs, and road routes</span>
               </div>
               <div style="display: flex; gap: 6px;" id="detail-itinerary-badges">
-                <span class="badge badge-info" id="detail-badge-days">5 days</span>
-                <span class="badge badge-success" id="detail-badge-stops">4 Waypoints</span>
+                <span class="badge badge-info" id="detail-badge-days">0 days</span>
+                <span class="badge badge-success" id="detail-badge-stops">0 Waypoints</span>
               </div>
             </div>
 
-            <!-- Read-only Overview Map Canvas -->
-            <div style="position: relative; height: 190px; border-radius: var(--radius-sm); overflow: hidden; background: #E2E8F0; border: 1px solid var(--border); margin-bottom: 16px;">
-              <svg id="detail-overview-map-svg" style="width: 100%; height: 100%;" preserveAspectRatio="none">
-                <!-- Lines & pins rendered by JS -->
-              </svg>
-              <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(255,255,255,0.92); border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 600; color: var(--navy-800); display:flex; align-items:center; gap:6px;">
-                <span style="display:inline-block; width:12px; height:2px; background:var(--navy-800);"></span> Outbound
-                <span style="display:inline-block; width:12px; height:2px; border-top:2px dashed var(--gold-500); margin-left:4px;"></span> Return
-              </div>
-            </div>
+            <!-- Real Leaflet Map Canvas -->
+            <div id="detail-leaflet-map" style="position: relative; height: 380px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 16px; z-index: 1;"></div>
 
             <!-- Itinerary Timeline -->
-            <div id="detail-timeline-container" style="display: flex; flex-direction: column;">
-              <!-- Timeline nodes rendered by JS -->
-            </div>
+            <div id="detail-timeline-container" style="display: flex; flex-direction: column;"></div>
 
             <!-- Totals Metrics Grid -->
             <div style="background: var(--bg-page); border-radius: var(--radius-sm); padding: 14px; margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 13px;">
               <div>
                 <span style="color: var(--text-muted); display: block;">Total Distance</span>
-                <strong id="detail-total-km" style="font-family: var(--font-mono); font-size: 14px;">865.0 km (est.)</strong>
+                <strong id="detail-total-km" style="font-family: var(--font-mono); font-size: 14px;">—</strong>
               </div>
               <div>
                 <span style="color: var(--text-muted); display: block;">Total Drive Time</span>
-                <strong id="detail-total-time" style="font-family: var(--font-mono); font-size: 14px;">11h 20m (est.)</strong>
+                <strong id="detail-total-time" style="font-family: var(--font-mono); font-size: 14px;">—</strong>
               </div>
               <div>
                 <span style="color: var(--text-muted); display: block;">Mission Window</span>
-                <strong id="detail-total-days-summary" style="font-size: 14px; color:var(--navy-800);">5 Days Mission</strong>
+                <strong id="detail-total-days-summary" style="font-size: 14px; color:var(--navy-800);">—</strong>
               </div>
             </div>
           </div>
@@ -271,46 +224,25 @@
           <!-- Trip & Request Details -->
           <div class="card">
             <h2 class="card-title">Trip &amp; Request Details</h2>
-            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
-              <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Requester:</span><strong id="detail-req-name">Dr. Sarah Mansour</strong></div>
-              <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Department / Faculty:</span><strong id="detail-dept">Faculty of Pharmacy</strong></div>
-              <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Vehicle Category:</span><strong id="detail-cat">Passenger Van / Minibus</strong></div>
-              <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Passengers:</span><strong id="detail-passengers">4 (personal luggage)</strong></div>
-              <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Approval Status:</span><strong id="detail-status-text" style="color:var(--cira-burgundy);">Active</strong></div>
-              <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Mission Period:</span><strong id="detail-period-text">18 Oct → 22 Oct 2026</strong></div>
-              <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Vehicle Hold Window:</span><strong id="detail-hold-window-text" style="font-family:var(--font-mono); font-size:12.5px;">18 Oct 08:00 → 22 Oct 18:45</strong></div>
-              <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Driver Overnight Stay:</span><strong id="detail-overnight-stay">BUC Faculty Guesthouse</strong></div>
-              <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">Mission Purpose:</span><span id="detail-purpose-text" style="text-align:right; max-width:240px; font-weight:600;">Official Delegation</span></div>
-            </div>
+            <div id="trip-details-list" style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;"></div>
+            
             <div id="detail-cargo-block" style="display: none; margin-top: 14px; padding: 12px; background: var(--bg-page); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13.5px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <span style="font-weight: 700; color: var(--navy-800); display: flex; align-items: center; gap: 6px;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                   <span>Extra Cargo Declared</span>
                 </span>
-                <span class="badge badge-gold" id="detail-cargo-weight" style="font-family: var(--font-mono); font-size: 12px;">350 kg</span>
+                <span class="badge badge-gold" id="detail-cargo-weight" style="font-family: var(--font-mono); font-size: 12px;">0 kg</span>
               </div>
-              <div id="detail-cargo-desc" style="color: var(--text-main); margin-bottom: 8px;">6 boxes of lab equipment, 2 projectors, fragile</div>
+              <div id="detail-cargo-desc" style="color: var(--text-main); margin-bottom: 8px;"></div>
               <div id="detail-cargo-flags" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
-            </div>
-            <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px;">
-              Turnaround buffers (30m pre-trip inspection, 45m post-trip cleaning) are automatically allocated.
             </div>
           </div>
 
           <!-- Messages with Operations Desk -->
           <div class="card">
             <h2 class="card-title">Messages with Operations Desk</h2>
-            <div id="chat-messages-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; padding-right: 4px;">
-              <div style="align-self: flex-start; max-width: 85%; background: var(--bg-page); padding: 10px 14px; border-radius: 10px;">
-                <div style="font-size: 11px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">Tarek El-Sayed (Dispatcher) · Mon 14:20</div>
-                <div style="font-size: 14px;">Approved multi-day itinerary BK-2047. Assigned Hyundai H-1 (V-122) with Driver Ahmed Hassan for the full 5-day duration.</div>
-              </div>
-              <div style="align-self: flex-end; max-width: 85%; background: var(--navy-100); padding: 10px 14px; border-radius: 10px;">
-                <div style="font-size: 11px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">Dr. Sarah Mansour (You) · Mon 14:31</div>
-                <div style="font-size: 14px;">Thank you Tarek. We have verified driver lodging at BUC Guesthouse in Badr City for the symposium dates.</div>
-              </div>
-            </div>
+            <div id="chat-messages-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; padding-right: 4px;"></div>
             <div style="display: flex; gap: 8px; margin-top: 12px;">
               <input type="text" id="chat-msg-input" class="form-input" placeholder="Type message to dispatch desk…" onkeydown="if(event.key==='Enter')sendChat();">
               <button type="button" class="btn btn-primary" onclick="sendChat();">Send</button>
@@ -367,13 +299,13 @@
           <a href="bookings.html" class="footer-link">My Bookings</a>
         </div>
 
-        <div class="footer-col">
+        <div class="footer-col" id="footer-contact-col">
           <h4>Fleet Operations Center</h4>
-          <span>CIRA Education HQ · Central Logistics Operations</span>
-          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
-          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
-          <span>Email: fleet.operations@cira.com.eg</span>
-          <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
+          <span id="footer-contact-loc">CIRA Education HQ · Central Logistics Operations</span>
+          <span>Operations Desk: <strong id="footer-contact-desk">Ext. 4108 / 4109</strong></span>
+          <span>Emergency Line: <strong id="footer-contact-emer">+20 10 2233 4455</strong></span>
+          <span>Email: <a href="mailto:fleet.operations@cira.com.eg" id="footer-contact-email" style="color:inherit; text-decoration:underline;">fleet.operations@cira.com.eg</a></span>
+          <span id="footer-contact-hours" style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
         </div>
       </div>
 
@@ -387,236 +319,509 @@
     </div>
   </footer>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="data/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/geo.js"></script>
   <script src="js/main.js"></script>
   <script>
     let currentBooking = null;
+    let detailMapInstance = null;
 
     document.addEventListener('DOMContentLoaded', function () {
       if (!Auth.requireAuth(["Requester", "Dispatcher", "Auditor", "Driver", "Fleet admin"])) return;
       Auth.renderAppShell('bookings');
 
+      renderFooterContact();
+
       const urlParams = new URLSearchParams(window.location.search);
       const reqId = urlParams.get('id');
-      currentBooking = reqId ? FleetStore.getBooking(reqId) : FleetStore.getBookings()[0];
+      currentBooking = reqId ? FleetStore.getBooking(reqId) : null;
 
       if (currentBooking) {
+        document.getElementById('booking-found-view').style.display = 'grid';
+        document.getElementById('booking-not-found-view').style.display = 'none';
         renderBookingDetails(currentBooking);
+      } else {
+        document.getElementById('booking-found-view').style.display = 'none';
+        document.getElementById('booking-not-found-view').style.display = 'block';
+        const notFoundMsg = document.getElementById('booking-not-found-msg');
+        if (notFoundMsg) {
+          notFoundMsg.textContent = reqId
+            ? `No fleet booking record found matching ID "${reqId}".`
+            : 'No booking ID was specified in the request.';
+        }
+        const pretitle = document.querySelector('.page-pretitle');
+        if (pretitle) pretitle.textContent = 'Error 404';
+        const title = document.querySelector('.page-title');
+        if (title) title.textContent = 'Booking Not Found';
+        const subtitle = document.querySelector('.page-subtitle');
+        if (subtitle) subtitle.textContent = 'The requested reservation record cannot be displayed.';
+        const editBtn = document.getElementById('btn-edit-itinerary');
+        if (editBtn) editBtn.style.display = 'none';
       }
     });
 
+    function renderFooterContact() {
+      if (!window.FLEET_DATA || !window.FLEET_DATA.appInfo || !window.FLEET_DATA.appInfo.contact) return;
+      const c = window.FLEET_DATA.appInfo.contact;
+      const locEl = document.getElementById('footer-contact-loc');
+      if (locEl && c.location) locEl.textContent = c.location;
+      const deskEl = document.getElementById('footer-contact-desk');
+      if (deskEl && c.dispatchDesk) deskEl.textContent = c.dispatchDesk;
+      const emerEl = document.getElementById('footer-contact-emer');
+      if (emerEl && c.emergencyLine) emerEl.textContent = c.emergencyLine;
+      const emailEl = document.getElementById('footer-contact-email');
+      if (emailEl && c.email) {
+        emailEl.textContent = c.email;
+        emailEl.href = `mailto:${c.email}`;
+      }
+      const hoursEl = document.getElementById('footer-contact-hours');
+      if (hoursEl && c.workingHours) hoursEl.textContent = c.workingHours;
+    }
+
     function renderBookingDetails(booking) {
       const pretitle = document.querySelector('.page-pretitle');
-      if (pretitle) pretitle.textContent = `${booking.id} · Lifecycle Status (${booking.status})`;
+      if (pretitle) pretitle.textContent = `${booking.id} · Lifecycle Status (${booking.status || 'Pending'})`;
       const subtitle = document.querySelector('.page-subtitle');
       if (subtitle) subtitle.textContent = booking.route || (booking.origin + ' → ' + booking.destination);
 
-      const reqNameEl = document.getElementById('detail-req-name');
-      if (reqNameEl) reqNameEl.textContent = booking.requesterName || 'Dr. Sarah Mansour';
-      const deptEl = document.getElementById('detail-dept');
-      if (deptEl) deptEl.textContent = booking.dept || 'Faculty of Pharmacy';
-      const catEl = document.getElementById('detail-cat');
-      if (catEl) catEl.textContent = booking.vehicleCategory || 'Passenger Van / Minibus';
-      const statusEl = document.getElementById('detail-status-text');
-      if (statusEl) statusEl.textContent = booking.status;
+      renderLifecycleStepper(booking);
+      renderTripDetails(booking);
+      renderCargoBlock(booking);
+      renderAssignedResources(booking);
+      renderItinerarySection(booking);
+      renderMessages(booking);
+    }
+
+    function renderLifecycleStepper(booking) {
+      const container = document.getElementById('detail-stepper-container');
+      if (!container) return;
+
+      const allSteps = [
+        { key: 'Submitted', label: 'Submitted' },
+        { key: 'Approved', label: 'Approved' },
+        { key: 'Dispatched', label: 'Dispatched' },
+        { key: 'Active', label: 'Active' },
+        { key: 'Completed', label: 'Completed' },
+        { key: 'Reconciled', label: 'Reconciled' }
+      ];
+
+      const historyMap = {};
+      if (Array.isArray(booking.history)) {
+        booking.history.forEach(h => {
+          if (h.status) historyMap[h.status] = h;
+        });
+      }
+
+      const status = booking.status || 'Pending';
+
+      if (status === 'Rejected' || status === 'Cancelled') {
+        const submittedHist = historyMap['Submitted'];
+        const subWhen = submittedHist
+          ? `${submittedHist.at || ''}${submittedHist.by ? ' · ' + submittedHist.by : ''}`
+          : (booking.createdAt ? new Date(booking.createdAt).toLocaleDateString('en-GB') : '');
+        const termHist = historyMap[status] || {};
+        const termWhen = termHist.at ? `${termHist.at}${termHist.by ? ' · ' + termHist.by : ''}` : '';
+
+        container.innerHTML = `
+          <div class="step-item done">
+            <div class="step-marker">
+              <div class="step-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-content">
+              <span class="step-name">Submitted</span>
+              <span class="step-when">${escapeHtml(subWhen)}</span>
+              <span class="step-note">${escapeHtml(submittedHist ? (submittedHist.note || '') : 'Booking requested')}</span>
+            </div>
+          </div>
+          <div class="step-item current" style="color:#DC2626;">
+            <div class="step-marker">
+              <div class="step-dot" style="background:#DC2626; border-color:#DC2626;"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg></div>
+            </div>
+            <div class="step-content">
+              <span class="step-name" style="color:#DC2626;">${escapeHtml(status)}</span>
+              ${termWhen ? `<span class="step-when">${escapeHtml(termWhen)}</span>` : ''}
+              <span class="step-note">${escapeHtml(termHist.note || 'Request terminated')}</span>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      let currentIndex = 0;
+      if (status === 'Pending') currentIndex = 1;
+      else if (status === 'Approved') currentIndex = 2;
+      else if (status === 'Dispatched') currentIndex = 3;
+      else if (status === 'Active') currentIndex = 3;
+      else if (status === 'Completed') currentIndex = 5;
+      else if (status === 'Reconciled') currentIndex = 6;
+
+      let html = '';
+      allSteps.forEach((step, idx) => {
+        let stateClass = 'pending';
+        let dotHtml = '<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="9"/></svg>';
+        let whenText = '';
+        let noteText = '';
+        let nameText = step.label;
+
+        if (idx < currentIndex) {
+          stateClass = 'done';
+          dotHtml = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>';
+          const hist = historyMap[step.key];
+          if (hist) {
+            whenText = `${hist.at || ''}${hist.by ? ' · ' + hist.by : ''}`;
+            noteText = hist.note || '';
+          } else if (step.key === 'Submitted') {
+            const atDate = booking.createdAt
+              ? new Date(booking.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+              : '';
+            whenText = `${atDate} · ${booking.requesterName || 'Requester'}`;
+            noteText = 'Booking request submitted';
+          }
+        } else if (idx === currentIndex) {
+          stateClass = 'current';
+          dotHtml = '<svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>';
+          if (status === 'Pending' && step.key === 'Approved') {
+            nameText = 'Awaiting Operations approval';
+            whenText = 'Under review · Central Operations Desk';
+            noteText = 'Awaiting vehicle & driver allocation';
+          } else if (status === 'Approved' && step.key === 'Dispatched') {
+            nameText = 'Awaiting Dispatch';
+            whenText = 'Vehicle allocated · Awaiting trip start';
+            noteText = `${booking.vehicleCode || 'Assigned vehicle'} prepared`;
+          } else if (status === 'Active' && step.key === 'Active') {
+            nameText = 'Active · En route';
+            const hist = historyMap['Active'];
+            whenText = hist ? `${hist.at || ''}${hist.by ? ' · ' + hist.by : ''}` : 'Driver on the road';
+            noteText = hist ? (hist.note || 'In transit') : 'Live mission in progress';
+          } else if (status === 'Completed' && step.key === 'Reconciled') {
+            nameText = 'Awaiting Audit Reconciliation';
+            whenText = 'Pending final audit & fuel variance check';
+            noteText = 'Logistics close-out';
+          }
+        } else {
+          stateClass = 'pending';
+          whenText = '';
+          noteText = '';
+        }
+
+        html += `
+          <div class="step-item ${stateClass}">
+            <div class="step-marker">
+              <div class="step-dot">${dotHtml}</div>
+              ${idx < allSteps.length - 1 ? '<div class="step-line"></div>' : ''}
+            </div>
+            <div class="step-content">
+              <span class="step-name">${escapeHtml(nameText)}</span>
+              ${whenText ? `<span class="step-when">${escapeHtml(whenText)}</span>` : ''}
+              ${noteText ? `<span class="step-note">${escapeHtml(noteText)}</span>` : ''}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function renderTripDetails(booking) {
+      const container = document.getElementById('trip-details-list');
+      if (!container) return;
 
       const sDate = booking.startDate || booking.start_date || '2026-10-18';
       const eDate = booking.endDate || booking.end_date || '2026-10-22';
       const days = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
 
-      const periodEl = document.getElementById('detail-period-text');
-      if (periodEl) periodEl.textContent = `${sDate} → ${eDate} (${days} days)`;
+      const currentUser = Auth.getUser();
+      const isOpsOrAdmin = currentUser && (currentUser.role === 'Dispatcher' || currentUser.role === 'Fleet admin');
 
-      const holdTextEl = document.getElementById('detail-hold-window-text');
-      if (holdTextEl) {
-        if (booking.hold_window) {
-          holdTextEl.textContent = `${booking.hold_window.start} → ${booking.hold_window.end}`;
-        } else {
-          holdTextEl.textContent = `${sDate} 08:00 → ${eDate} 18:45`;
+      let html = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Requester:</span>
+          <strong>${escapeHtml(booking.requesterName || 'Requester')}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Department:</span>
+          <strong>${escapeHtml(booking.dept || 'Faculty')}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Passengers:</span>
+          <strong>${booking.passengers || 1} (personal luggage)</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Approval Status:</span>
+          <strong style="color:var(--cira-burgundy);">${escapeHtml(booking.status || 'Pending')}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Trip Period:</span>
+          <strong>${escapeHtml(sDate)} → ${escapeHtml(eDate)}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Number of Days:</span>
+          <strong>${days} day${days > 1 ? 's' : ''}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Return with Vehicle:</span>
+          <strong>${booking.return_with_vehicle ? 'Yes' : 'No'}</strong>
+        </div>
+      `;
+
+      if (booking.driver_overnight_location && booking.driver_overnight_location.trim()) {
+        html += `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+            <span style="color:var(--text-muted);">Driver Overnight Stay:</span>
+            <strong style="text-align:right;">${escapeHtml(booking.driver_overnight_location.trim())}</strong>
+          </div>
+        `;
+      }
+
+      if (booking.notes && booking.notes.trim()) {
+        html += `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+            <span style="color:var(--text-muted);">Notes for Dispatch:</span>
+            <strong style="text-align:right; max-width:240px; font-weight:600;">${escapeHtml(booking.notes.trim())}</strong>
+          </div>
+        `;
+      }
+
+      if (isOpsOrAdmin) {
+        let holdStart = `${sDate} 08:00`;
+        let holdEnd = `${eDate} 18:45`;
+        if (booking.hold_window && booking.hold_window.start && booking.hold_window.end) {
+          holdStart = booking.hold_window.start;
+          holdEnd = booking.hold_window.end;
+        } else if (booking.itinerary && booking.itinerary.length >= 2) {
+          const p1 = booking.itinerary[0];
+          const pLast = booking.itinerary[booking.itinerary.length - 1];
+          if (p1.depart_at) holdStart = p1.depart_at;
+          if (pLast.arrive_at) holdEnd = `${pLast.arrive_at} (+45m buffer)`;
         }
+
+        html += `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; border-top:1px dashed var(--border); padding-top:8px; margin-top:4px;">
+            <span style="color:var(--text-muted);">Vehicle Hold Window (Ops):</span>
+            <strong style="font-family:var(--font-mono); font-size:12px; text-align:right;">${escapeHtml(holdStart)} → ${escapeHtml(holdEnd)}</strong>
+          </div>
+        `;
       }
 
-      const overnightEl = document.getElementById('detail-overnight-stay');
-      if (overnightEl) {
-        overnightEl.textContent = booking.driver_overnight_location || (days > 1 ? 'Provided at Campus Guesthouse' : 'Single-day trip (N/A)');
-      }
-
-      const purposeEl = document.getElementById('detail-purpose-text');
-      if (purposeEl) purposeEl.textContent = booking.purpose || 'Official delegation';
-
-      const passEl = document.getElementById('detail-passengers');
-      const paxCount = booking.passengers || 4;
-      if (passEl) passEl.textContent = `${paxCount} (personal luggage)`;
-
-      const cargoBlock = document.getElementById('detail-cargo-block');
-      const hasCargo = Boolean(booking.has_extra_cargo || (booking.cargo_kg && booking.cargo_kg > 0));
-      if (cargoBlock) {
-        if (hasCargo) {
-          cargoBlock.style.display = 'block';
-          const weightEl = document.getElementById('detail-cargo-weight');
-          if (weightEl) weightEl.textContent = `${booking.cargo_kg || booking.cargoWeightKg || 0} kg`;
-          const descEl = document.getElementById('detail-cargo-desc');
-          if (descEl) descEl.textContent = booking.cargo_description || 'Cargo manifest declared';
-          const flagsEl = document.getElementById('detail-cargo-flags');
-          if (flagsEl) {
-            flagsEl.innerHTML = '';
-            const flags = booking.cargo_flags || {};
-            if (flags.fragile) {
-              flagsEl.innerHTML += '<span class="badge badge-danger" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Fragile</span></span>';
-            }
-            if (flags.strap) {
-              flagsEl.innerHTML += '<span class="badge badge-warning" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Needs strapped</span></span>';
-            }
-            if (flags.loading_help) {
-              flagsEl.innerHTML += '<span class="badge badge-info" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Needs loading help</span></span>';
-            }
-          }
-        } else {
-          cargoBlock.style.display = 'none';
-        }
-      }
-
-      // Resources
-      const resContent = document.getElementById('assigned-resources-content');
-      if (resContent) {
-        if (booking.status === 'Pending') {
-          resContent.innerHTML = `
-            <div style="background: var(--bg-page); padding: 18px; border-radius: 8px; text-align: center;">
-              <div style="display:flex; justify-content:center; margin-bottom: 8px; color:var(--cira-gold);">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-              <strong style="color: var(--navy-800); display: block; font-size: 15px;">Pending Assignment by Operations Desk</strong>
-              <p style="font-size: 13px; color: var(--text-muted); margin: 6px 0 0;">
-                The operations dispatcher reviews schedules to assign the specific vehicle code and certified driver. Details will appear here once approved.
-              </p>
-            </div>
-          `;
-        } else if (booking.status === 'Changes requested') {
-          resContent.innerHTML = `
-            <div style="background: #FFFBEB; border: 1px solid #FCD34D; padding: 18px; border-radius: 8px;">
-              <div style="display:flex; align-items:center; gap:8px; color:#B45309; margin-bottom: 8px; font-weight:700; font-size:15px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                <span>Changes Requested by Operations Desk</span>
-              </div>
-              <p style="font-size: 13.5px; color: #92400E; margin: 0 0 12px; line-height: 1.5;">
-                ${escapeHtml(booking.changesRequestedMessage || 'Operations requested adjustments to your itinerary schedule or vehicle allocation.')}
-              </p>
-              <div>
-                <a href="booking-new.html?edit=${booking.id}" class="btn btn-gold" style="display:inline-flex; align-items:center; gap:6px; font-size:13px; padding:8px 14px; text-decoration:none;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  <span>Edit Itinerary &amp; Resubmit</span>
-                </a>
-              </div>
-            </div>
-          `;
-        } else if (booking.status === 'Rejected') {
-          resContent.innerHTML = `
-            <div style="background: #FEF2F2; border: 1px solid #FCA5A5; padding: 18px; border-radius: 8px;">
-              <div style="display:flex; align-items:center; gap:8px; color:#DC2626; margin-bottom: 8px; font-weight:700; font-size:15px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                <span>Requisition Rejected: ${escapeHtml(booking.rejectionReason || 'Outside policy')}</span>
-              </div>
-              <p style="font-size: 13.5px; color: #991B1B; margin: 0; line-height: 1.5;">
-                ${escapeHtml(booking.rejectionText || 'Your booking request cannot be accommodated by central fleet dispatch.')}
-              </p>
-            </div>
-          `;
-        } else {
-          resContent.innerHTML = `
-            <div style="display: flex; gap: 14px; align-items: center;">
-              <div style="width: 80px; height: 60px; background: #E2E8F0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--navy-800); font-family: var(--font-mono);">
-                ${booking.vehicleCode || 'V-122'}
-              </div>
-              <div>
-                <h3 style="margin: 0; font-size: 16px; color: var(--navy-800);">${booking.vehicle || 'Hyundai H-1 (2023)'}</h3>
-                <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">BDR 3307 · Assigned &amp; Sanitized</div>
-              </div>
-            </div>
-            <div style="font-size: 14px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 12px;">
-              <strong>Certified Driver:</strong> ${booking.driver || 'Ahmed Hassan (Driver A)'} · +20 10 9988 7766
-            </div>
-          `;
-        }
-      }
-
-      // Render Itinerary Timeline and Overview Map
-      renderItinerarySection(booking);
+      container.innerHTML = html;
     }
 
-    function renderItinerarySection(booking) {
+    function renderCargoBlock(booking) {
+      const cargoBlock = document.getElementById('detail-cargo-block');
+      if (!cargoBlock) return;
+
+      const hasCargo = Boolean(booking.has_extra_cargo);
+      if (!hasCargo) {
+        cargoBlock.style.display = 'none';
+        return;
+      }
+
+      cargoBlock.style.display = 'block';
+      const weightEl = document.getElementById('detail-cargo-weight');
+      if (weightEl) weightEl.textContent = `${booking.cargo_kg || booking.cargoWeightKg || 0} kg`;
+
+      const descEl = document.getElementById('detail-cargo-desc');
+      if (descEl) descEl.textContent = booking.cargo_description || 'Declared cargo items';
+
+      const flagsEl = document.getElementById('detail-cargo-flags');
+      if (flagsEl) {
+        flagsEl.innerHTML = '';
+        const flags = booking.cargo_flags || {};
+        if (flags.fragile) {
+          flagsEl.innerHTML += '<span class="badge badge-danger" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Fragile</span></span>';
+        }
+        if (flags.strap) {
+          flagsEl.innerHTML += '<span class="badge badge-warning" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Needs to be strapped</span></span>';
+        }
+        if (flags.loading_help) {
+          flagsEl.innerHTML += '<span class="badge badge-info" style="font-size:11px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Needs loading help</span></span>';
+        }
+      }
+    }
+
+    function renderAssignedResources(booking) {
+      const resContent = document.getElementById('assigned-resources-content');
+      if (!resContent) return;
+
+      if (booking.status === 'Pending') {
+        resContent.innerHTML = `
+          <div style="background: var(--bg-page); padding: 18px; border-radius: 8px; text-align: center;">
+            <div style="display:flex; justify-content:center; margin-bottom: 8px; color:var(--cira-gold);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <strong style="color: var(--navy-800); display: block; font-size: 15px;">Awaiting assignment by Operations</strong>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 6px 0 0;">
+              The operations dispatcher reviews schedules to assign the specific vehicle and certified driver. Details will appear here once approved.
+            </p>
+          </div>
+        `;
+      } else if (booking.status === 'Rejected') {
+        resContent.innerHTML = `
+          <div style="background: #FEF2F2; border: 1px solid #FCA5A5; padding: 18px; border-radius: 8px;">
+            <div style="display:flex; align-items:center; gap:8px; color:#DC2626; margin-bottom: 8px; font-weight:700; font-size:15px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <span>Requisition Rejected</span>
+            </div>
+            <p style="font-size: 13.5px; color: #991B1B; margin: 0; line-height: 1.5;">
+              ${escapeHtml(booking.rejectionReason || 'Your booking request cannot be accommodated by central fleet dispatch.')}
+            </p>
+          </div>
+        `;
+      } else {
+        resContent.innerHTML = `
+          <div style="display: flex; gap: 14px; align-items: center;">
+            <div style="width: 80px; height: 60px; background: #E2E8F0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--navy-800); font-family: var(--font-mono);">
+              ${escapeHtml(booking.vehicleCode || 'Assigned')}
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 16px; color: var(--navy-800);">${escapeHtml(booking.vehicle || 'Assigned Vehicle')}</h3>
+              <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">Assigned &amp; Sanitized</div>
+            </div>
+          </div>
+          <div style="font-size: 14px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 12px;">
+            <strong>Certified Driver:</strong> ${escapeHtml(booking.driver || 'Assigned Driver')}
+          </div>
+        `;
+      }
+    }
+
+    function formatStayDuration(arrStr, depStr) {
+      if (!arrStr || !depStr) return '';
+      try {
+        const d1 = new Date(arrStr.replace(' ', 'T'));
+        const d2 = new Date(depStr.replace(' ', 'T'));
+        const diffMs = d2 - d1;
+        if (isNaN(diffMs) || diffMs <= 0) return '';
+        const totalMinutes = Math.round(diffMs / 60000);
+        const days = Math.floor(totalMinutes / (24 * 60));
+        const remMins = totalMinutes % (24 * 60);
+        const hours = Math.floor(remMins / 60);
+        const mins = remMins % 60;
+
+        const parts = [];
+        if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
+        if (hours > 0) parts.push(`${hours}h`);
+        if (mins > 0 && days === 0) parts.push(`${mins}m`);
+        return `Stays ${parts.join(' ')}`;
+      } catch (e) {
+        return '';
+      }
+    }
+
+    async function renderItinerarySection(booking) {
       const points = Array.isArray(booking.itinerary) && booking.itinerary.length >= 2
         ? booking.itinerary
         : [
-            { sequence: 1, type: 'departure', place_name: booking.origin || 'Main Campus', depart_at: `${booking.startDate || '2026-10-18'} 08:00`, pinned: true },
-            { sequence: 2, type: 'return', place_name: booking.destination || 'Plant 3', arrive_at: `${booking.endDate || '2026-10-22'} 18:00`, pinned: true }
+            { sequence: 1, type: 'departure', place_name: booking.origin || 'Origin', depart_at: `${booking.startDate || '2026-10-18'} 08:00`, pinned: true },
+            { sequence: 2, type: 'return', place_name: booking.destination || 'Destination', arrive_at: `${booking.endDate || '2026-10-22'} 18:00`, pinned: true }
           ];
-
-      const legs = Array.isArray(booking.route_legs) && booking.route_legs.length > 0
-        ? booking.route_legs
-        : FleetStore.RouteEstimator.computeItineraryLegs(points, booking.vehicleCategory || 'Passenger Van');
 
       const sDate = booking.startDate || booking.start_date || '2026-10-18';
       const eDate = booking.endDate || booking.end_date || '2026-10-22';
       const days = FleetStore.RouteEstimator.calculateDaysCount(sDate, eDate);
 
-      document.getElementById('detail-badge-days').textContent = `${days} day${days > 1 ? 's' : ''}`;
-      document.getElementById('detail-badge-stops').textContent = `${points.length} Waypoints`;
+      const daysBadge = document.getElementById('detail-badge-days');
+      if (daysBadge) daysBadge.textContent = `${days} day${days > 1 ? 's' : ''}`;
+      const stopsBadge = document.getElementById('detail-badge-stops');
+      if (stopsBadge) stopsBadge.textContent = `${points.length} Waypoints`;
+
+      const summaryDaysEl = document.getElementById('detail-total-days-summary');
+      if (summaryDaysEl) summaryDaysEl.textContent = `${days} Day${days > 1 ? 's' : ''} Mission`;
+
+      detailMapInstance = await GeoService.drawItineraryMap('detail-leaflet-map', points, {
+        returnWithVehicle: booking.return_with_vehicle
+      });
 
       const timelineContainer = document.getElementById('detail-timeline-container');
       timelineContainer.innerHTML = '';
 
-      let totKm = 0, totMins = 0, totFuel = 0, totCost = 0;
+      const legs = Array.isArray(booking.route_legs) && booking.route_legs.length > 0
+        ? booking.route_legs
+        : (detailMapInstance && detailMapInstance.legs && detailMapInstance.legs.length > 0 ? detailMapInstance.legs : FleetStore.RouteEstimator.computeItineraryLegs(points, 'Passenger Van'));
+
+      let totKm = 0, totMins = 0;
 
       points.forEach((point, idx) => {
         const isDep = point.type === 'departure';
         const isRet = point.type === 'return';
-        let dotClass = isDep ? 'timeline-marker-dot' : (isRet ? 'timeline-marker-dot return-dot' : 'timeline-marker-dot stop-dot');
-        let nodeClass = `timeline-node ${isRet ? 'return-node' : ''}`;
+        const num = point.sequence || (idx + 1);
+        const dotBg = isDep ? '#0B2545' : (isRet ? '#D4AF37' : '#475569');
 
-        const timeStr = isDep ? `Leaves at ${point.depart_at || ''}` : (isRet ? `Arrives back at ${point.arrive_at || ''}` : `Arrives ${point.arrive_at || ''}${point.depart_at ? ` · Leaves ${point.depart_at}` : ''}`);
+        let timeStr = '';
+        if (isDep) {
+          timeStr = `Leaves at ${point.depart_at || ''}`;
+        } else if (isRet) {
+          timeStr = `Arrives back at ${point.arrive_at || ''}`;
+        } else {
+          timeStr = `Arrives ${point.arrive_at || ''}${point.depart_at ? ` · Leaves ${point.depart_at}` : ''}`;
+        }
+
+        const stayDuration = (point.type === 'stop') ? formatStayDuration(point.arrive_at, point.depart_at) : '';
+        const typeLabel = isDep ? 'Departure' : (isRet ? 'Return' : `Stop #${num}`);
 
         const nodeEl = document.createElement('div');
-        nodeEl.className = nodeClass;
+        nodeEl.className = `timeline-node interactive-node ${isRet ? 'return-node' : ''}`;
+        nodeEl.title = 'Click to focus on map';
+        nodeEl.onclick = () => {
+          if (detailMapInstance && detailMapInstance.flyToPoint) {
+            detailMapInstance.flyToPoint(idx);
+          }
+        };
+
+        const isPinned = Boolean(point.pinned);
+        const isLocationNotSet = Boolean(point.location_not_set || (!point.pinned && !point.lat));
+        let pinBadgeHtml = '<span class="badge badge-success" style="font-size:11px;">Pinned</span>';
+        if (isLocationNotSet) {
+          pinBadgeHtml = '<span class="badge badge-neutral" style="font-size:11px;">Location not set</span>';
+        } else if (!isPinned) {
+          pinBadgeHtml = '<span class="badge badge-warning" style="font-size:11px;">Approx.</span>';
+        }
+
         nodeEl.innerHTML = `
-          <div class="${dotClass}"></div>
+          <div class="timeline-marker-dot" style="background:${dotBg}; box-shadow:0 0 0 1px ${dotBg};"></div>
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
             <div>
-              <strong style="color:var(--navy-800); font-size:14.5px;">${escapeHtml(point.place_name || 'Unnamed Point')}</strong>
-              <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">${timeStr}</div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:11px; font-weight:800; background:${dotBg}; color:#fff; padding:1px 6px; border-radius:10px;">${num}</span>
+                <strong style="color:var(--navy-800); font-size:14.5px;">${escapeHtml(point.place_name || 'Unnamed Point')}</strong>
+                <span style="font-size:11.5px; color:var(--text-muted);">(${typeLabel})</span>
+              </div>
+              <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">
+                ${escapeHtml(timeStr)}
+                ${stayDuration ? ` · <strong style="color:var(--navy-700);">${escapeHtml(stayDuration)}</strong>` : ''}
+              </div>
               ${point.notes ? `<div style="font-size:12px; color:var(--navy-600); margin-top:2px;">Note: ${escapeHtml(point.notes)}</div>` : ''}
             </div>
-            <span class="badge ${point.pinned ? 'badge-success' : 'badge-neutral'}" style="font-size:11px;">
-              ${point.pinned ? 'Pinned' : 'Not pinned'}
-            </span>
+            ${pinBadgeHtml}
           </div>
         `;
         timelineContainer.appendChild(nodeEl);
 
-        // Render leg card
         if (idx < points.length - 1 && legs[idx]) {
           const leg = legs[idx];
           totKm += (leg.distance_km || 0);
           totMins += (leg.drive_minutes || 0);
-          totFuel += (leg.fuel_liters || 0);
-          totCost += (leg.cost_egp || 0);
 
           const h = Math.floor((leg.drive_minutes || 0) / 60);
           const m = (leg.drive_minutes || 0) % 60;
-          const isReturnLeg = (idx === points.length - 2 && isRet);
+          const isReturnLeg = (idx === points.length - 2 && booking.return_with_vehicle);
+          const sourceTag = leg.source || (leg.isRealRoute ? '(route)' : '(est.)');
 
           const legEl = document.createElement('div');
           legEl.className = `leg-summary-card ${isReturnLeg ? 'return-leg' : ''}`;
           legEl.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="font-weight:700; color:var(--navy-800);">${leg.distance_km} km</span>
-              <span style="color:var(--text-muted); font-family:var(--font-mono);">${h}h ${m.toString().padStart(2, '0')}m driving (est.)</span>
+              <span style="color:var(--text-muted); font-family:var(--font-mono);">${h}h ${m.toString().padStart(2, '0')}m driving <span style="font-weight:600; color:var(--navy-700);">${sourceTag}</span></span>
             </div>
             <div style="font-size:12px; color:var(--text-muted);">${leg.drive_minutes || 0} mins driving window</div>
             ${leg.warning ? `
               <div style="margin-top:4px; font-size:11.5px; color:#B91C1C; display:flex; align-items:center; gap:4px; font-weight:600;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span>${leg.warning}</span>
+                <span>${escapeHtml(leg.warning)}</span>
               </div>
             ` : ''}
           `;
@@ -624,92 +829,81 @@
         }
       });
 
-      document.getElementById('detail-total-km').textContent = `${(booking.distanceKm || totKm).toFixed(1)} km (est.)`;
-      const totH = Math.floor((booking.estDriveMinutes || totMins) / 60);
-      const totM = (booking.estDriveMinutes || totMins) % 60;
-      document.getElementById('detail-total-time').textContent = `${totH}h ${totM.toString().padStart(2, '0')}m (est.)`;
-      const summaryDaysEl = document.getElementById('detail-total-days-summary');
-      if (summaryDaysEl) summaryDaysEl.textContent = `${days} Day${days > 1 ? 's' : ''} Mission`;
+      if (!booking.return_with_vehicle) {
+        const oneWayNotice = document.createElement('div');
+        oneWayNotice.style.cssText = 'background: #F8FAFC; border-left: 3px solid #64748B; padding: 10px 14px; border-radius: 4px; font-size: 13px; color: var(--navy-800); margin-top: 10px; display:flex; align-items:center; gap:8px;';
+        oneWayNotice.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span><strong>One-way · vehicle does not return with the group</strong></span>
+        `;
+        timelineContainer.appendChild(oneWayNotice);
+      }
 
-      drawDetailOverviewMap(points, booking.return_with_vehicle);
+      const lastPoint = points[points.length - 1];
+      const mismatch = checkTripEndMismatch(booking, lastPoint);
+      if (mismatch) {
+        const warnEl = document.createElement('div');
+        warnEl.style.cssText = 'background: #FEF2F2; border-left: 3px solid #DC2626; padding: 10px 14px; border-radius: 4px; font-size: 13px; color: #991B1B; margin-top: 10px; display:flex; align-items:center; gap:8px; font-weight:600;';
+        warnEl.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>${escapeHtml(mismatch)}</span>
+        `;
+        timelineContainer.appendChild(warnEl);
+      }
+
+      const finalKm = booking.distanceKm || totKm;
+      const finalMins = booking.estDriveMinutes || totMins;
+      document.getElementById('detail-total-km').textContent = `${finalKm.toFixed(1)} km`;
+      const totH = Math.floor(finalMins / 60);
+      const totM = finalMins % 60;
+      document.getElementById('detail-total-time').textContent = `${totH}h ${totM.toString().padStart(2, '0')}m`;
     }
 
-    function drawDetailOverviewMap(points, returnWithVehicle) {
-      const svg = document.getElementById('detail-overview-map-svg');
-      if (!svg) return;
-      svg.innerHTML = '';
+    function checkTripEndMismatch(booking, lastPoint) {
+      const eDate = booking.endDate || booking.end_date;
+      if (!eDate || !lastPoint) return null;
+      const lastTimeStr = lastPoint.arrive_at || lastPoint.depart_at || '';
+      if (!lastTimeStr) return null;
 
-      if (points.length < 2) return;
-
-      const pts = points.map(p => {
-        let lat = p.lat || 30.0;
-        let lng = p.lng || 31.2;
-        return { ...p, lat, lng };
-      });
-
-      let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
-      pts.forEach(p => {
-        if (p.lat < minLat) minLat = p.lat;
-        if (p.lat > maxLat) maxLat = p.lat;
-        if (p.lng < minLng) minLng = p.lng;
-        if (p.lng > maxLng) maxLng = p.lng;
-      });
-
-      if (maxLat - minLat < 0.2) { minLat -= 0.2; maxLat += 0.2; }
-      if (maxLng - minLng < 0.2) { minLng -= 0.2; maxLng += 0.2; }
-
-      const pad = 24;
-      const width = svg.clientWidth || 360;
-      const height = svg.clientHeight || 190;
-
-      function project(lat, lng) {
-        const x = pad + ((lng - minLng) / (maxLng - minLng)) * (width - pad * 2);
-        const y = height - (pad + ((lat - minLat) / (maxLat - minLat)) * (height - pad * 2));
-        return { x: Math.round(x), y: Math.round(y) };
-      }
-
-      const coords = pts.map(p => project(p.lat, p.lng));
-
-      for (let i = 0; i < coords.length - 1; i++) {
-        const c1 = coords[i];
-        const c2 = coords[i + 1];
-        const isReturn = (i === coords.length - 2 && returnWithVehicle);
-
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', c1.x);
-        line.setAttribute('y1', c1.y);
-        line.setAttribute('x2', c2.x);
-        line.setAttribute('y2', c2.y);
-        line.setAttribute('stroke', isReturn ? '#D4AF37' : '#0B2545');
-        line.setAttribute('stroke-width', '3.5');
-        line.setAttribute('stroke-linecap', 'round');
-        if (isReturn) {
-          line.setAttribute('stroke-dasharray', '6,6');
+      try {
+        const lastDate = lastTimeStr.split(' ')[0];
+        if (lastDate && eDate > lastDate) {
+          return `Trip period ends ${eDate} but the last point is ${lastTimeStr}`;
         }
-        svg.appendChild(line);
+      } catch (e) {}
+      return null;
+    }
+
+    function renderMessages(booking) {
+      const container = document.getElementById('chat-messages-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const msgs = Array.isArray(booking.messages) ? booking.messages : [];
+      if (msgs.length === 0) {
+        container.innerHTML = `
+          <div style="padding: 24px 12px; text-align: center; color: var(--text-muted); font-size: 13.5px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:6px; opacity:0.6;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <div>No messages yet</div>
+            <div style="font-size:12px; margin-top:2px;">Communicate with Central Operations Desk regarding vehicle allocations or requests.</div>
+          </div>
+        `;
+        return;
       }
 
-      coords.forEach((c, idx) => {
-        const isDep = idx === 0;
-        const isRet = idx === coords.length - 1 && returnWithVehicle;
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', c.x);
-        circle.setAttribute('cy', c.y);
-        circle.setAttribute('r', '6');
-        circle.setAttribute('fill', isDep ? '#703845' : (isRet ? '#D4AF37' : '#1D4E89'));
-        circle.setAttribute('stroke', '#FFFFFF');
-        circle.setAttribute('stroke-width', '2');
-        svg.appendChild(circle);
-
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', c.x + 8);
-        text.setAttribute('y', c.y - 4);
-        text.setAttribute('font-size', '10');
-        text.setAttribute('font-weight', '700');
-        text.setAttribute('fill', '#0B2545');
-        text.textContent = isDep ? 'Departure' : (isRet ? 'Return' : `Stop #${idx}`);
-        svg.appendChild(text);
+      msgs.forEach(m => {
+        const isMe = (m.sender === 'requester');
+        const bubble = document.createElement('div');
+        bubble.style.cssText = `align-self: ${isMe ? 'flex-end' : 'flex-start'}; max-width: 85%; background: ${isMe ? 'var(--navy-100)' : 'var(--bg-page)'}; padding: 10px 14px; border-radius: 10px;`;
+        bubble.innerHTML = `
+          <div style="font-size: 11px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">
+            ${escapeHtml(m.senderName || (isMe ? 'You' : 'Operations Desk'))} · ${escapeHtml(m.time || '')}
+          </div>
+          <div style="font-size: 14px; color: var(--text-main);">${escapeHtml(m.text || '')}</div>
+        `;
+        container.appendChild(bubble);
       });
+      container.scrollTop = container.scrollHeight;
     }
 
     function handleEditItineraryClick() {
@@ -728,16 +922,20 @@
 
     function sendChat() {
       const input = document.getElementById('chat-msg-input');
-      const container = document.getElementById('chat-messages-container');
-      if (input && input.value.trim()) {
-        const user = Auth.getUser() || { name: 'You' };
-        const bubble = document.createElement('div');
-        bubble.style.cssText = 'align-self: flex-end; max-width: 85%; background: var(--navy-100); padding: 10px 14px; border-radius: 10px; margin-top: 6px;';
-        bubble.innerHTML = '<div style="font-size: 11px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">' + user.name + ' · Just now</div><div style="font-size: 14px;">' + escapeHtml(input.value.trim()) + '</div>';
-        container.appendChild(bubble);
-        input.value = '';
-        container.scrollTop = container.scrollHeight;
-      }
+      if (!input || !currentBooking) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      const user = Auth.getUser() || { name: 'You' };
+      FleetStore.addBookingMessage(currentBooking.id, {
+        sender: 'requester',
+        senderName: user.name || 'Dr. Sarah Mansour',
+        text: text
+      });
+
+      input.value = '';
+      currentBooking = FleetStore.getBooking(currentBooking.id);
+      renderMessages(currentBooking);
     }
 
     function escapeHtml(str) {

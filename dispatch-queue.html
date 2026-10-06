@@ -710,20 +710,24 @@
 
       const vehicleEligList = FleetStore.getVehicleEligibility(booking);
       if (!selectedVehicleCode) {
-        const firstElig = vehicleEligList.find(v => v.eligible);
-        selectedVehicleCode = firstElig ? firstElig.vehicle.code : vehicleEligList[0].vehicle.code;
+        if (booking.vehicleCode && booking.vehicleCode !== 'TBD' && booking.vehicleCode !== 'None') {
+          selectedVehicleCode = booking.vehicleCode;
+        } else {
+          const firstElig = vehicleEligList.find(v => v.eligible);
+          selectedVehicleCode = firstElig ? firstElig.vehicle.code : vehicleEligList[0].vehicle.code;
+        }
       }
 
       const driverEligList = FleetStore.getDriverEligibility(booking, selectedVehicleCode);
       const requiresSecondDriver = driverEligList[0] && driverEligList[0].requiresSecondDriver;
 
       if (selectedDriverIds.length === 0) {
-        const firstEligD = driverEligList.find(d => d.eligible);
-        if (firstEligD) {
-          selectedDriverIds = [firstEligD.driver.id];
-          if (requiresSecondDriver) {
-            const secondEligD = driverEligList.find(d => d.eligible && d.driver.id !== firstEligD.driver.id);
-            if (secondEligD) selectedDriverIds.push(secondEligD.driver.id);
+        if (Array.isArray(booking.assignedDriverIds) && booking.assignedDriverIds.length > 0) {
+          selectedDriverIds = [...booking.assignedDriverIds];
+        } else {
+          const firstEligD = driverEligList.find(d => d.eligible);
+          if (firstEligD) {
+            selectedDriverIds = [firstEligD.driver.id];
           }
         }
       }
@@ -736,6 +740,36 @@
       const legs = Array.isArray(booking.route_legs) && booking.route_legs.length > 0
         ? booking.route_legs
         : FleetStore.RouteEstimator.computeItineraryLegs(points, chosenVehicleItem.vehicle.category);
+
+      const itineraryWarnings = [];
+      for (let i = 0; i < points.length - 1; i++) {
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const leg = legs[i];
+        if (p1 && p2 && leg) {
+          const depTime = p1.depart_at ? new Date(p1.depart_at.replace(' ', 'T')).getTime() : null;
+          const arrTime = p2.arrive_at ? new Date(p2.arrive_at.replace(' ', 'T')).getTime() : null;
+          if (depTime && arrTime && arrTime > depTime) {
+            const plannedMins = Math.round((arrTime - depTime) / 60000);
+            if (plannedMins < leg.drive_minutes) {
+              itineraryWarnings.push(`Planned travel time (${Math.floor(plannedMins / 60)}h ${plannedMins % 60}m) between "${p1.place_name}" and "${p2.place_name}" is shorter than estimated drive time (${Math.floor(leg.drive_minutes / 60)}h ${leg.drive_minutes % 60}m).`);
+            }
+          }
+        }
+      }
+
+      if (booking.endDate && points.length > 0) {
+        const lastPt = points[points.length - 1];
+        const lastDate = (lastPt.arrive_at || lastPt.depart_at || '').split(' ')[0];
+        if (lastDate && booking.endDate > lastDate) {
+          itineraryWarnings.push(`Trip period ends ${booking.endDate} but the last point is scheduled for ${lastPt.arrive_at || lastDate}.`);
+        }
+      }
+
+      const hasUnpinnedLoc = points.some(p => !p.pinned || p.approx || p.location_not_set);
+      if (hasUnpinnedLoc) {
+        itineraryWarnings.push('Route includes unpinned waypoint(s). Transit distance and timing are approximate.');
+      }
 
       let statusBadge = '<span class="badge badge-warning">Pending Review</span>';
       if (booking.status === 'Approved') statusBadge = '<span class="badge badge-success">Approved</span>';
@@ -822,7 +856,7 @@
               const isPinned = Boolean(p.pinned);
 
               return `
-                <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:#F8FAFC; border:1px solid var(--border); border-radius:var(--radius-sm);">
+                <div style="cursor:pointer; display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:#F8FAFC; border:1px solid var(--border); border-radius:var(--radius-sm); transition:background 0.15s ease;" onmouseover="this.style.background='#EEF2F6'" onmouseout="this.style.background='#F8FAFC'" onclick="focusDispatchWaypoint(${idx});" title="Click to focus on map">
                   <div style="background:${isDep ? 'var(--navy-800)' : (isRet ? 'var(--cira-gold)' : 'var(--navy-600)')}; color:${isRet ? 'var(--navy-800)' : '#FFF'}; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; flex-shrink:0;">
                     ${num}
                   </div>
@@ -884,6 +918,17 @@
               </tbody>
             </table>
           </div>
+
+          ${itineraryWarnings.length > 0 ? `
+            <div style="display:flex; flex-direction:column; gap:6px; margin-top:14px;">
+              ${itineraryWarnings.map(w => `
+                <div class="alert-banner alert-warning" style="margin:0; padding:9px 12px; font-size:12.5px; display:flex; align-items:center; gap:8px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  <span>${escapeHtml(w)}</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
         </div>
 
         <!-- Section 3.3: Passengers, Cargo, Notes -->
@@ -1014,8 +1059,9 @@
           </div>
 
           ${requiresSecondDriver ? `
-            <div class="alert-banner alert-warning" style="margin-bottom:12px;">
-              <strong>Duty Alert:</strong> Day 1 exceeds 8 hours of driving. Single-driver assignment is blocked by safety policy. Please assign both a primary and relief driver.
+            <div class="alert-banner alert-warning" style="margin-bottom:12px; font-weight:700; color:#92400E; display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span>Driving exceeds 8h on Day ${overLimitDay ? overLimitDay.dayIndex : 1} — a second driver is required</span>
             </div>
           ` : ''}
 
@@ -1075,9 +1121,8 @@
         <div class="decision-sticky-footer">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div style="font-size:13.5px; color:var(--navy-800);">
-              <span style="color:var(--text-muted);">Allocation Proposal:</span>
-              <strong id="decision-summary-text" style="font-size:14px; margin-left:4px;">
-                ${chosenVehicleItem.vehicle.code} + ${primaryDriverItem ? primaryDriverItem.driver.name : 'Pending Driver'} ${secondDriverItem ? ' & ' + secondDriverItem.driver.name : ''} · ${hold.formatted} · ${chosenVehicleItem.estimate.fuelLiters} L · EGP ${chosenVehicleItem.estimate.costEGP.toLocaleString()}
+              <strong id="decision-summary-text" style="font-size:14px;">
+                Assigned: ${chosenVehicleItem ? `${chosenVehicleItem.vehicle.code} (${chosenVehicleItem.vehicle.model})` : 'Pending Vehicle'} + ${secondDriverItem ? `${primaryDriverItem.driver.name} & ${secondDriverItem.driver.name}` : (primaryDriverItem ? primaryDriverItem.driver.name : 'Pending Driver')} · Hold: ${hold.formatted} · ${chosenVehicleItem ? chosenVehicleItem.estimate.fuelLiters : 0} L · EGP ${chosenVehicleItem ? chosenVehicleItem.estimate.costEGP.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
               </strong>
             </div>
             <div style="font-size:12px; color:var(--text-muted);">
@@ -1139,6 +1184,17 @@
           returnWithVehicle: Boolean(returnWithVehicle),
           height: '290px'
         });
+      }
+    }
+
+    function focusDispatchWaypoint(idx) {
+      if (!currentItineraryMapInstance) return;
+      if (typeof currentItineraryMapInstance.then === 'function') {
+        currentItineraryMapInstance.then(inst => {
+          if (inst && typeof inst.flyToPoint === 'function') inst.flyToPoint(idx);
+        });
+      } else if (typeof currentItineraryMapInstance.flyToPoint === 'function') {
+        currentItineraryMapInstance.flyToPoint(idx);
       }
     }
 

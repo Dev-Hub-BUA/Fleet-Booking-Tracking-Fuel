@@ -36,7 +36,7 @@ const GeoService = (function () {
     }
   }
 
-  async function searchNominatim(query) {
+  async function searchNominatim(query, allowFallback = false) {
     const q = (query || '').trim();
     if (!q) return [];
 
@@ -64,21 +64,21 @@ const GeoService = (function () {
       const results = (data || []).map(item => ({
         name: item.name || (item.display_name ? item.display_name.split(',')[0].trim() : 'Location'),
         fullAddress: item.display_name || '',
-        lat: parseFloat(item.lat),
-        lng: parseFloat(item.lon)
+        lat: Number(parseFloat(item.lat).toFixed(6)),
+        lng: Number(parseFloat(item.lon).toFixed(6))
       }));
       nominatimCache.set(cacheKey, results);
       return results;
     } catch (err) {
-      if (window.FleetStore && window.FleetStore.RouteEstimator) {
+      if (allowFallback && window.FleetStore && window.FleetStore.RouteEstimator) {
         const found = window.FleetStore.RouteEstimator.locations.filter(l =>
           l.name.toLowerCase().includes(cacheKey) || (l.city && l.city.toLowerCase().includes(cacheKey))
         );
         return found.map(f => ({
           name: f.name,
           fullAddress: `${f.name}, ${f.city || 'Egypt'}`,
-          lat: f.lat,
-          lng: f.lng
+          lat: Number(f.lat.toFixed(6)),
+          lng: Number(f.lng.toFixed(6))
         }));
       }
       return [];
@@ -237,8 +237,8 @@ const GeoService = (function () {
       const num = p.sequence || (idx + 1);
       const isDep = p.type === 'departure';
       const isRet = p.type === 'return';
-      const bg = isDep ? '#0B2545' : (isRet ? '#D4AF37' : '#475569');
-      const isApprox = (!p.pinned || p.approx);
+      const bg = isDep ? '#0B2545' : (isRet ? '#D4AF37' : '#1D4E89');
+      const isApprox = Boolean(!p.pinned || p.approx);
       const border = isApprox ? '2px dashed #DC2626' : '2px solid #FFFFFF';
 
       const icon = L.divIcon({
@@ -252,10 +252,13 @@ const GeoService = (function () {
       const marker = L.marker([lat, lng], { icon: icon }).addTo(map);
       el._leaflet_layers.push(marker);
 
+      const labelPlace = p.place_name || p.name || (isDep ? 'Departure' : (isRet ? 'Return' : `Stop #${num}`));
       const timeStr = p.depart_at || p.arrive_at || '';
       const formattedTime = formatShortDateTime(timeStr);
       const approxText = isApprox ? ' (approx.)' : '';
-      const tooltipContent = formattedTime ? `${num} · ${formattedTime}${approxText}` : `${num} · ${labelPlace}${approxText}`;
+      const tooltipContent = formattedTime
+        ? `${num} · ${labelPlace} · ${formattedTime}${approxText}`
+        : `${num} · ${labelPlace}${approxText}`;
 
       marker.bindTooltip(tooltipContent, {
         permanent: true,
@@ -447,7 +450,7 @@ const GeoService = (function () {
     ATTRIBUTION,
     searchNominatim,
     geocode: async function (query) {
-      const results = await searchNominatim(query);
+      const results = await searchNominatim(query, false);
       if (results && results.length > 0) {
         return {
           lat: Number(results[0].lat.toFixed(6)),

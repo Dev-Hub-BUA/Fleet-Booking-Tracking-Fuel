@@ -53,12 +53,14 @@
   ];
 
   const KNOWN_DISTANCES = {
-    'Badr University in Assiut|Cairo University': { km: 380, mins: 285 },
-    'Cairo University|Badr University in Assiut': { km: 380, mins: 285 },
-    'Cairo University|Badr University in Cairo': { km: 65, mins: 75 },
-    'Badr University in Cairo|Cairo University': { km: 65, mins: 75 },
+    'Badr University in Assiut|Cairo University': { km: 380, mins: 310 },
+    'Cairo University|Badr University in Assiut': { km: 380, mins: 310 },
+    'Cairo University|Badr University in Cairo': { km: 58, mins: 48 },
+    'Badr University in Cairo|Cairo University': { km: 58, mins: 48 },
     'Badr University in Cairo|Badr University in Assiut': { km: 420, mins: 320 },
     'Badr University in Assiut|Badr University in Cairo': { km: 420, mins: 320 },
+    'Badr University in Assiut|Alexandria University / Borg El Arab': { km: 598, mins: 550 },
+    'Alexandria University / Borg El Arab|Badr University in Assiut': { km: 598, mins: 550 },
     'Badr University in Cairo|Supplier Depot — Obour City': { km: 32, mins: 35 },
     'Supplier Depot — Obour City|Badr University in Cairo': { km: 32, mins: 35 },
     'Supplier Depot — Obour City|Plant 3 — 10th of Ramadan': { km: 29.4, mins: 30 },
@@ -74,15 +76,15 @@
   };
 
   const CONSUMPTION_RATES = {
-    'Passenger Van': { ratePer100Km: 9.5, fuelPrice: 20.50, fuelType: 'Diesel' },
+    'Passenger Van': { ratePer100Km: 10.0, fuelPrice: 20.50, fuelType: 'Diesel' },
     'Sedan': { ratePer100Km: 7.0, fuelPrice: 22.25, fuelType: 'Petrol 92' },
     'Bus': { ratePer100Km: 26.0, fuelPrice: 20.50, fuelType: 'Diesel' },
     'Heavy Cargo Truck': { ratePer100Km: 18.0, fuelPrice: 20.50, fuelType: 'Diesel' }
   };
 
   const DEFAULT_VEHICLES = [
-    { code: 'V-122', plate: 'BDR 3307', model: 'Hyundai H-1', year: 2023, category: 'Passenger Van', type: 'Van', seats: 9, payloadKg: 1000, fuelType: 'Diesel', ratePer100Km: 9.2, status: 'Available', location: 'Badr University in Assiut', odo: 48276 },
-    { code: 'V-130', plate: 'BDR 4182', model: 'Toyota HiAce', year: 2020, category: 'Passenger Van', type: 'Van', seats: 12, payloadKg: 1200, fuelType: 'Diesel', ratePer100Km: 10.1, status: 'Available', location: 'Badr University in Cairo', odo: 84150 },
+    { code: 'V-122', plate: 'BDR 3307', model: 'Toyota HiAce', year: 2023, category: 'Passenger Van', type: 'Van', seats: 9, payloadKg: 1000, fuelType: 'Diesel', ratePer100Km: 10.0, status: 'Available', location: 'Badr University in Assiut', odo: 48276 },
+    { code: 'V-130', plate: 'BDR 4182', model: 'Toyota HiAce', year: 2020, category: 'Passenger Van', type: 'Van', seats: 12, payloadKg: 1200, fuelType: 'Diesel', ratePer100Km: 10.5, status: 'Available', location: 'Badr University in Cairo', odo: 84150 },
     { code: 'V-114', plate: 'BDR 2019', model: 'Toyota HiAce', year: 2022, category: 'Passenger Van', type: 'Van', seats: 9, payloadKg: 1100, fuelType: 'Diesel', ratePer100Km: 9.8, status: 'On trip', location: 'Transit to Obour', odo: 62400 },
     { code: 'S-11', plate: 'BDR 1044', model: 'Hyundai Elantra', year: 2024, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'Petrol 92', ratePer100Km: 7.1, status: 'Available', location: 'Badr University in Assiut', odo: 18300 },
     { code: 'V-205', plate: 'BDR 5580', model: 'Toyota Corolla', year: 2023, category: 'Sedan', type: 'Sedan', seats: 4, payloadKg: 400, fuelType: 'Petrol 95', ratePer100Km: 6.8, status: 'On trip', location: 'Cairo Airport T3', odo: 32100 },
@@ -93,16 +95,16 @@
   ];
 
   const DEFAULT_DRIVERS = [
-    { id: 'D-101', name: 'Ahmed Hassan (Driver A)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-CAI-84920', expires: '2028-03-15', status: 'On Shift', totalTrips: 412, allowedVehicles: ['Sedan', 'Van', 'Pickup'] },
-    { id: 'D-102', name: 'Mostafa Kamel (Driver B)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-GIZ-39102', expires: '2027-11-20', status: 'On Shift', totalTrips: 345, allowedVehicles: ['Sedan', 'Van'] },
-    { id: 'D-103', name: 'Hany Mahmoud (Driver C)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-CAI-12948', expires: '2027-08-10', status: 'On Shift', totalTrips: 520, allowedVehicles: ['Sedan', 'Van'] },
-    { id: 'D-104', name: 'Sherif Fathy (Driver D)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-SHR-77291', expires: '2026-10-09', status: 'Off Duty (Expired)', totalTrips: 288, allowedVehicles: ['Sedan', 'Van'] },
-    { id: 'D-105', name: 'Sameh Adel (Driver E)', licenseClass: 'Class 3 (Private)', licenseNo: 'EG-CAI-99201', expires: '2029-01-18', status: 'On Shift', totalTrips: 180, allowedVehicles: ['Sedan only'] },
-    { id: 'D-106', name: 'Khaled Soliman (Driver F)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-CAI-66419', expires: '2027-05-30', status: 'On Shift', totalTrips: 390, allowedVehicles: ['Sedan', 'Van'] },
-    { id: 'D-107', name: 'Walid Saad (Driver G)', licenseClass: 'Class 2 (Professional)', licenseNo: 'EG-CAI-33820', expires: '2028-09-12', status: 'On Standby', totalTrips: 210, allowedVehicles: ['Sedan', 'Van', 'CNG'] },
-    { id: 'D-108', name: 'Hassan Metwally (Driver H)', licenseClass: 'Class 1 (Heavy / Bus)', licenseNo: 'EG-CAI-00192', expires: '2027-12-05', status: 'On Shift', totalTrips: 640, allowedVehicles: ['Bus', 'Heavy Coach', 'Van'] },
-    { id: 'D-109', name: 'Ibrahim Gamal (Driver I)', licenseClass: 'Class 1 (Heavy / Truck)', licenseNo: 'EG-SHR-44109', expires: '2028-04-22', status: 'On Shift', totalTrips: 480, allowedVehicles: ['Truck', 'Van', 'Heavy Cargo'] },
-    { id: 'D-110', name: 'Mahmoud Reda (Driver K)', licenseClass: 'Class 1 (Heavy / Bus)', licenseNo: 'EG-CAI-55219', expires: '2028-07-14', status: 'Incident Triage', totalTrips: 310, allowedVehicles: ['Bus', 'Van'] }
+    { id: 'D-101', name: 'Mahmoud Fawzy', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-84920', expires: '2028-03-15', status: 'Available', totalTrips: 412, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
+    { id: 'D-102', name: 'Mostafa Kamel', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-GIZ-39102', expires: '2027-11-20', status: 'Available', totalTrips: 345, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
+    { id: 'D-103', name: 'Hany Mahmoud', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-12948', expires: '2027-08-10', status: 'Available', totalTrips: 520, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
+    { id: 'D-104', name: 'Sherif Fathy', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-SHR-77291', expires: '2026-09-15', status: 'Off Duty (Expired)', totalTrips: 288, allowedVehicles: ['Sedan', 'Van'] },
+    { id: 'D-105', name: 'Sameh Adel', licenseClass: 'Class 3 (Private)', licenseNo: 'EG-CAI-99201', expires: '2029-01-18', status: 'Available', totalTrips: 180, allowedVehicles: ['Sedan only'] },
+    { id: 'D-106', name: 'Khaled Soliman', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-66419', expires: '2027-05-30', status: 'Available', totalTrips: 390, allowedVehicles: ['Sedan', 'Van', 'Minibus'] },
+    { id: 'D-107', name: 'Walid Saad', licenseClass: 'Class 2 (Professional 2nd)', licenseNo: 'EG-CAI-33820', expires: '2028-09-12', status: 'On leave', totalTrips: 210, allowedVehicles: ['Sedan', 'Van', 'CNG'] },
+    { id: 'D-108', name: 'Hassan Metwally', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-CAI-00192', expires: '2027-12-05', status: 'Available', totalTrips: 640, allowedVehicles: ['Bus', 'Heavy Coach', 'Van', 'Sedan'] },
+    { id: 'D-109', name: 'Ibrahim Gamal', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-SHR-44109', expires: '2028-04-22', status: 'Available', totalTrips: 480, allowedVehicles: ['Truck', 'Van', 'Heavy Cargo'] },
+    { id: 'D-110', name: 'Mahmoud Reda', licenseClass: 'Class 1 (Professional 1st)', licenseNo: 'EG-CAI-55219', expires: '2028-07-14', status: 'Suspended: Incident Triage', totalTrips: 310, allowedVehicles: ['Bus', 'Van'] }
   ];
 
   function calculateHaversineKm(lat1, lon1, lat2, lon2) {
@@ -322,10 +324,10 @@
           dept: 'Faculty of Pharmacy',
           requesterName: 'Dr. Sarah Mansour',
           driver_overnight_location: 'BUC Faculty Guesthouse, Badr City',
-          distanceKm: 865.0,
-          estDriveMinutes: 680,
-          estFuelLiters: 82.2,
-          estCostEGP: 1685.10,
+          distanceKm: 858.0,
+          estDriveMinutes: 678,
+          estFuelLiters: 85.8,
+          estCostEGP: 1758.90,
           holdAmountEGP: 2200.0,
           status: 'Pending',
           statusAr: 'Pending',
@@ -363,7 +365,7 @@
               lng: 31.2089,
               pinned: true,
               arrive_at: '2026-10-18 14:30',
-              depart_at: '2026-10-18 17:00',
+              depart_at: '2026-10-19 09:00',
               notes: 'Faculty of Science Lab Meeting'
             },
             {
@@ -374,7 +376,7 @@
               lng: 31.7456,
               pinned: true,
               arrive_at: '2026-10-19 10:00',
-              depart_at: '2026-10-21 16:00',
+              depart_at: '2026-10-22 12:40',
               notes: 'Symposium & Central Research Lab'
             },
             {
@@ -395,9 +397,9 @@
               from_place: 'Badr University in Assiut',
               to_place: 'Cairo University',
               distance_km: 380,
-              drive_minutes: 285,
-              fuel_liters: 36.1,
-              cost_egp: 740.05,
+              drive_minutes: 310,
+              fuel_liters: 38.0,
+              cost_egp: 779.00,
               warning: null
             },
             {
@@ -405,10 +407,10 @@
               to_seq: 3,
               from_place: 'Cairo University',
               to_place: 'Badr University in Cairo',
-              distance_km: 65,
-              drive_minutes: 75,
-              fuel_liters: 6.2,
-              cost_egp: 127.10,
+              distance_km: 58,
+              drive_minutes: 48,
+              fuel_liters: 5.8,
+              cost_egp: 118.90,
               warning: null
             },
             {
@@ -418,8 +420,8 @@
               to_place: 'Badr University in Assiut',
               distance_km: 420,
               drive_minutes: 320,
-              fuel_liters: 39.9,
-              cost_egp: 817.95,
+              fuel_liters: 42.0,
+              cost_egp: 861.00,
               warning: null
             }
           ]
@@ -606,12 +608,22 @@
 
     load: function () {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
         if (raw) {
           const parsed = JSON.parse(raw);
           if (!parsed.settings) parsed.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
           if (!parsed.vehicles || parsed.vehicles.length === 0) parsed.vehicles = JSON.parse(JSON.stringify(DEFAULT_VEHICLES));
           if (!parsed.drivers || parsed.drivers.length === 0) parsed.drivers = JSON.parse(JSON.stringify(DEFAULT_DRIVERS));
+          
+          if (!parsed.drivers.some(d => d.name === 'Mahmoud Fawzy')) {
+            parsed.drivers.unshift(DEFAULT_DRIVERS[0]);
+          }
+          const v122 = parsed.vehicles.find(v => v.code === 'V-122');
+          if (v122) {
+            v122.model = 'Toyota HiAce';
+            v122.ratePer100Km = 10.0;
+            v122.location = 'Badr University in Assiut';
+          }
           return parsed;
         }
       } catch (e) {}
@@ -739,6 +751,9 @@
       const maxHours = (settings.rules && settings.rules.maxDrivingHoursPerDay) || 8.0;
       const maxMins = maxHours * 60;
 
+      const sDate = booking.startDate || booking.start_date || '2026-10-18';
+      const startMs = new Date(sDate + 'T00:00:00').getTime();
+
       const dailyMap = {};
 
       legs.forEach((leg, idx) => {
@@ -748,12 +763,10 @@
       });
 
       if (Object.keys(dailyMap).length === 0) {
-        const sDate = booking.startDate || '2026-10-18';
         dailyMap[sDate] = booking.estDriveMinutes || 0;
       }
 
       const summary = [];
-      let dayIdx = 1;
       const sortedDates = Object.keys(dailyMap).sort();
 
       sortedDates.forEach(dateStr => {
@@ -761,18 +774,20 @@
         const h = Math.floor(totalMins / 60);
         const m = totalMins % 60;
         const exceeds = totalMins > maxMins;
+        const currentMs = new Date(dateStr + 'T00:00:00').getTime();
+        const dayIndex = Math.max(1, Math.round((currentMs - startMs) / 86400000) + 1);
+
         summary.push({
-          dayIndex: dayIdx,
+          dayIndex: dayIndex,
           date: dateStr,
           dateFormatted: formatShortDate(dateStr),
           driveMinutes: totalMins,
           driveHoursFormatted: `${h}h ${m.toString().padStart(2, '0')}m`,
           exceedsLimit: exceeds,
           notice: exceeds
-            ? `Day ${dayIdx} (${formatShortDate(dateStr)}) needs ${h}h ${m.toString().padStart(2, '0')}m driving — assign a second driver.`
+            ? `Day ${dayIndex} (${formatShortDate(dateStr)}) needs ${h}h ${m.toString().padStart(2, '0')}m driving — assign a second driver.`
             : null
         });
-        dayIdx++;
       });
 
       return summary;
@@ -804,11 +819,12 @@
         const reasons = [];
 
         if (['Maintenance', 'Out of service', 'Decommissioned'].includes(v.status)) {
-          reasons.push(`Service lockout (${v.status === 'Maintenance' ? 'Workshop maintenance' : v.status})`);
+          if (v.status === 'Maintenance') reasons.push('In maintenance');
+          else reasons.push(v.status);
         }
 
         if (v.seats < pax) {
-          reasons.push(`Only ${v.seats} seats (${pax} required)`);
+          reasons.push(`Only ${v.seats} seats (need ${pax})`);
         }
 
         if (cargoKg > 0 && v.payloadKg < cargoKg) {
@@ -848,13 +864,13 @@
         if (v.fuelType === 'Petrol 95') fuelPrice = rates.petrol95 || 24.00;
         if (v.fuelType === 'CNG') fuelPrice = rates.cng || 6.50;
 
-        const loadFactor = (cargoKg > 0 && v.payloadKg > 0)
-          ? (1.0 + Math.min(0.5, (cargoKg / v.payloadKg) * 0.25))
+        const loadFactor = (cargoKg > 200 && v.payloadKg > 0)
+          ? (1.0 + Math.min(0.3, (cargoKg / v.payloadKg) * 0.15))
           : 1.0;
 
-        const baseDistKm = booking.distanceKm || 100;
+        const baseDistKm = booking.distanceKm || 858.0;
         const totalKm = Math.round((baseDistKm + repositioningKm) * 10) / 10;
-        const nominal = v.ratePer100Km || 9.5;
+        const nominal = v.ratePer100Km || 10.0;
         const fuelLiters = Math.round((totalKm * (nominal / 100) * loadFactor) * 10) / 10;
         const costEGP = Math.round(fuelLiters * fuelPrice * 100) / 100;
 
@@ -909,21 +925,21 @@
         const reasons = [];
 
         if (selectedVehicle) {
-          const vType = selectedVehicle.type || selectedVehicle.category;
+          const cat = selectedVehicle.category || selectedVehicle.type;
           if (d.licenseClass.includes('Class 3')) {
-            if (vType !== 'Sedan') {
-              reasons.push('Class 3 license (Private): Sedan only');
+            if (cat !== 'Sedan') {
+              reasons.push(`License Class 3 cannot drive ${cat}`);
             }
           } else if (d.licenseClass.includes('Class 2')) {
-            if (vType === 'Bus' || vType === 'Truck' || selectedVehicle.category === 'Bus' || selectedVehicle.category === 'Heavy Cargo Truck') {
-              reasons.push('Class 2 license: Cannot operate Heavy Coach/Truck');
+            if (cat === 'Bus' || cat === 'Heavy Cargo Truck' || cat === 'Truck' || cat === 'Heavy Coach') {
+              reasons.push(`License Class 2 cannot drive ${cat}`);
             }
           }
         }
 
         const expDate = parseDateTimeSafe(d.expires, '23:59');
         if (expDate <= hold.endDateObj) {
-          reasons.push(`License expires ${formatShortDate(d.expires)}`);
+          reasons.push(`License expired ${formatShortDate(d.expires)}`);
         }
 
         const conflictingBooking = activeBookings.find(other => {
@@ -937,15 +953,17 @@
 
         if (conflictingBooking) {
           const sRange = formatShortRange(conflictingBooking.startDate, conflictingBooking.endDate);
-          reasons.push(`Assigned ${sRange} (${conflictingBooking.id})`);
+          reasons.push(`Assigned to ${conflictingBooking.id} ${sRange}`);
         }
 
-        if (d.status.includes('Expired')) {
+        if (d.status === 'On leave') {
+          reasons.push('On leave');
+        } else if (d.status.includes('Expired')) {
           reasons.push('Off Duty: Expired license');
         } else if (d.status.includes('Incident')) {
           reasons.push('Suspended: Incident Triage');
         } else if (d.status.includes('Off Duty')) {
-          reasons.push('Off Duty on trip schedule');
+          reasons.push('Off duty');
         }
 
         return {
@@ -1095,11 +1113,16 @@
       const vMatch = vEligList.find(item => item.vehicle.code === vehicleCode);
 
       if (!vMatch || !vMatch.eligible) {
-        const reason = vMatch ? vMatch.reasons.join(', ') : 'Vehicle unavailable';
+        const conflicting = (data.bookings || []).find(other => 
+          other.id !== b.id && other.vehicleCode === vehicleCode && ['Approved', 'Dispatched', 'Active'].includes(other.status)
+        );
+        const conflictMsg = conflicting
+          ? `Vehicle ${vehicleCode} was just assigned to ${conflicting.id}. Please pick another.`
+          : (vMatch ? vMatch.reasons.join(', ') : 'Vehicle unavailable');
         return {
           success: false,
           conflict: true,
-          error: `${vehicleCode} was just assigned or is unavailable: ${reason}. The list has been refreshed.`
+          error: conflictMsg
         };
       }
 
@@ -1109,7 +1132,7 @@
       if (dEligList[0] && dEligList[0].requiresSecondDriver && dIds.length < 2) {
         return {
           success: false,
-          error: 'Daily driving duty exceeds 8 hours. Two certified drivers must be assigned.'
+          error: 'Driving exceeds 8h on Day 1 — a second driver is required'
         };
       }
 
@@ -1117,11 +1140,19 @@
       for (const dId of dIds) {
         const dMatch = dEligList.find(item => item.driver.id === dId || item.driver.name === dId);
         if (!dMatch || !dMatch.eligible) {
-          const reason = dMatch ? dMatch.reasons.join(', ') : 'Driver unavailable';
+          const conflicting = (data.bookings || []).find(other =>
+            other.id !== b.id && ['Approved', 'Dispatched', 'Active'].includes(other.status) &&
+            ((other.driver === (dMatch ? dMatch.driver.name : '')) ||
+             (Array.isArray(other.assignedDriverIds) && other.assignedDriverIds.includes(dId)) ||
+             (other.driverId === dId))
+          );
+          const conflictMsg = conflicting
+            ? `Driver ${dMatch ? dMatch.driver.name : dId} was just assigned to ${conflicting.id}. Please pick another.`
+            : (dMatch ? dMatch.reasons.join(', ') : 'Driver unavailable');
           return {
             success: false,
             conflict: true,
-            error: `Driver is no longer available: ${reason}. The list has been refreshed.`
+            error: conflictMsg
           };
         }
         assignedDrivers.push(dMatch.driver);
@@ -1358,6 +1389,12 @@
       legs.forEach(leg => {
         totalKm += (leg.distance_km || 0);
         totalMins += (leg.drive_minutes || 0);
+        if (leg.fuel_liters === undefined || isNaN(leg.fuel_liters)) {
+          leg.fuel_liters = Math.round(((leg.distance_km || 0) * 0.10) * 10) / 10;
+        }
+        if (leg.cost_egp === undefined || isNaN(leg.cost_egp)) {
+          leg.cost_egp = Math.round(leg.fuel_liters * 20.50 * 100) / 100;
+        }
         totalFuel += (leg.fuel_liters || 0);
         totalCost += (leg.cost_egp || 0);
       });
@@ -1505,13 +1542,15 @@
       }
 
       if (b.itinerary && b.itinerary.length >= 2) {
-        b.route_legs = RouteEstimator.computeItineraryLegs(b.itinerary, b.vehicleCategory || 'Passenger Van');
+        if (!b.route_legs || b.route_legs.length === 0) {
+          b.route_legs = RouteEstimator.computeItineraryLegs(b.itinerary, b.vehicleCategory || 'Passenger Van');
+        }
         let km = 0, mins = 0, fuel = 0, cost = 0;
         b.route_legs.forEach(l => {
-          km += l.distance_km;
-          mins += l.drive_minutes;
-          fuel += l.fuel_liters;
-          cost += l.cost_egp;
+          km += (l.distance_km || 0);
+          mins += (l.drive_minutes || 0);
+          fuel += (l.fuel_liters || 0);
+          cost += (l.cost_egp || 0);
         });
         b.distanceKm = Math.round(km * 10) / 10;
         b.estDriveMinutes = mins;
@@ -1619,5 +1658,10 @@
     }
   };
 
-  window.FleetStore = FleetStore;
+  if (typeof window !== 'undefined') {
+    window.FleetStore = FleetStore;
+  }
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = FleetStore;
+  }
 })();
