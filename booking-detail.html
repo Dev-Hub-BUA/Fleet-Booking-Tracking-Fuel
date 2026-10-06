@@ -139,47 +139,31 @@
       </div>
     </div>
 
-    <div class="card">
-      <h2 class="card-title">Assigned Resources</h2>
-      <div style="display: flex; flex-direction: column; gap: 14px;">
-        <div style="display: flex; gap: 14px; align-items: center;">
-          <div style="width: 80px; height: 60px; background: #E2E8F0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--navy-800);">
-            V-122
-          </div>
-          <div>
-            <h3 style="margin: 0; font-size: 16px; color: var(--navy-800);">Hyundai H-1 (2023)</h3>
-            <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">BDR 3307</div>
-          </div>
-        </div>
-        <div style="font-size: 14px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 10px;">
-          <strong>Driver:</strong> Ahmed Hassan (Driver A) · +20 10 9988 7766
-        </div>
-        <div class="alert-banner alert-info" style="font-size: 13px;">
-          Requested V-114 had buffer conflict; V-122 assigned with identical capacity.
+    <div class="card" id="assigned-resources-card">
+      <h2 class="card-title">المركبة والسائق (Assigned Resources)</h2>
+      <div id="assigned-resources-content">
+        <div style="background: var(--bg-page); padding: 18px; border-radius: 8px; text-align: center;">
+          <div style="font-size: 28px; margin-bottom: 6px;">⏳</div>
+          <strong style="color: var(--navy-800); display: block; font-size: 15px;">قيد التخصيص بواسطة إدارة التشغيل</strong>
+          <p style="font-size: 13px; color: var(--text-muted); margin: 6px 0 0;">
+            يقوم مدير التشغيل بتخصيص كود المركبة والسائق بعد مراجعة الجداول.
+          </p>
         </div>
       </div>
     </div>
   </div>
 
   <div style="display: flex; flex-direction: column; gap: 20px;">
-    <div class="card" style="background: var(--navy-800); color: #FFFFFF;">
-      <h2 class="card-title" style="color: #FFFFFF;">Cost Estimate · Locked at Approval</h2>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 8px;">
-        <div>
-          <span style="font-size: 12px; color: #9FB0C8;">Distance</span>
-          <span style="font-family: var(--font-mono); font-size: 20px; font-weight: 700;">61.4 km</span>
-        </div>
-        <div>
-          <span style="font-size: 12px; color: #9FB0C8;">Fuel</span>
-          <span style="font-family: var(--font-mono); font-size: 20px; font-weight: 700;">14.1 L</span>
-        </div>
-        <div>
-          <span style="font-size: 12px; color: #9FB0C8;">Total EGP</span>
-          <span style="font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--gold-500);">EGP 289.05</span>
-        </div>
+    <div class="card">
+      <h2 class="card-title">بيانات المهمة والطلب</h2>
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">طالب الحجز:</span><strong id="detail-req-name">Dr. Sarah Mansour</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">الجهة / الكلية:</span><strong id="detail-dept">Faculty of Pharmacy</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">الفئة المطلوبة:</span><strong id="detail-cat">فان ركاب / ميكروباص</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color:var(--text-muted);">حالة الاعتماد:</span><strong id="detail-status-text" style="color:var(--cira-burgundy);">Pending Review</strong></div>
       </div>
-      <div style="font-size: 12px; color: #9FB0C8; margin-top: 12px;">
-        ML model v1.3 · Fuel Price Book v3. Reconciled upon driver closeout.
+      <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px;">
+        يتم تحديد السائق والمركبة رسمياً من قبل إدارة التشغيل والحركة المركزية.
       </div>
     </div>
 
@@ -269,6 +253,45 @@
         if (pretitle) pretitle.textContent = `${booking.id} · Lifecycle Status (${booking.statusAr || booking.status})`;
         const subtitle = document.querySelector('.page-subtitle');
         if (subtitle) subtitle.textContent = booking.route || (booking.origin + ' → ' + booking.destination);
+
+        const reqNameEl = document.getElementById('detail-req-name');
+        if (reqNameEl) reqNameEl.textContent = booking.requesterName || 'Dr. Sarah Mansour';
+        const deptEl = document.getElementById('detail-dept');
+        if (deptEl) deptEl.textContent = booking.dept || 'Faculty of Pharmacy';
+        const catEl = document.getElementById('detail-cat');
+        if (catEl) catEl.textContent = booking.vehicleCategory || 'فان ركاب / ميكروباص';
+        const statusEl = document.getElementById('detail-status-text');
+        if (statusEl) statusEl.textContent = booking.statusAr || booking.status;
+
+        const resContent = document.getElementById('assigned-resources-content');
+        if (resContent) {
+          if (booking.status === 'Pending') {
+            resContent.innerHTML = `
+              <div style="background: var(--bg-page); padding: 18px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 28px; margin-bottom: 6px;">⏳</div>
+                <strong style="color: var(--navy-800); display: block; font-size: 15px;">قيد التخصيص بواسطة إدارة التشغيل</strong>
+                <p style="font-size: 13px; color: var(--text-muted); margin: 6px 0 0;">
+                  يقوم مدير التشغيل بمراجعة الجداول وتخصيص كود المركبة المحددة وبيانات السائق المعتمد. ستظهر لك البيانات هنا فور الاعتماد.
+                </p>
+              </div>
+            `;
+          } else {
+            resContent.innerHTML = `
+              <div style="display: flex; gap: 14px; align-items: center;">
+                <div style="width: 80px; height: 60px; background: #E2E8F0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--navy-800); font-family: var(--font-mono);">
+                  ${booking.vehicleCode || 'V-122'}
+                </div>
+                <div>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--navy-800);">${booking.vehicle || 'Hyundai H-1 (2023)'}</h3>
+                  <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">BDR 3307 · مخصصة ومعقمة</div>
+                </div>
+              </div>
+              <div style="font-size: 14px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 12px;">
+                <strong>السائق المعتمد:</strong> ${booking.driver || 'Ahmed Hassan (Driver A)'} · +20 10 9988 7766
+              </div>
+            `;
+          }
+        }
       }
     });
 

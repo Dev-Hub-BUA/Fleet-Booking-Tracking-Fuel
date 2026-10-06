@@ -80,10 +80,10 @@
       <thead>
         <tr>
           <th>Booking ID</th>
-          <th>Route &amp; Mission</th>
+          <th>Route &amp; Purpose</th>
           <th>Date / Time</th>
-          <th>Assigned Vehicle</th>
-          <th>Fuel (Est / Act)</th>
+          <th>Requested Category</th>
+          <th>Allocated Vehicle</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -149,15 +149,15 @@
     function getStatusBadge(status) {
       switch (status) {
         case 'Pending':
-          return '<span class="badge badge-warning">Pending Review</span>';
+          return '<span class="badge badge-warning">Pending Review (قيد المراجعة)</span>';
         case 'Dispatched':
-          return '<span class="badge badge-info">Dispatched</span>';
+          return '<span class="badge badge-info">Dispatched (تم التعيين)</span>';
         case 'Active':
-          return '<span class="badge badge-primary" style="background:var(--navy-600);color:#fff;">Active Run</span>';
+          return '<span class="badge badge-primary" style="background:var(--navy-600);color:#fff;">Active Run (جارية الآن)</span>';
         case 'Closed':
-          return '<span class="badge badge-warning" style="background:#FFF3E0;color:#E65100;">Audit Pending</span>';
+          return '<span class="badge badge-warning" style="background:#FFF3E0;color:#E65100;">Audit Pending (بانتظار التسوية)</span>';
         case 'Completed':
-          return '<span class="badge badge-success">Completed ✓</span>';
+          return '<span class="badge badge-success">Completed ✓ (مكتملة ومطابقة)</span>';
         default:
           return `<span class="badge badge-neutral">${status || 'Draft'}</span>`;
       }
@@ -174,7 +174,7 @@
             <td colspan="7" style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
               <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
               <strong style="display:block; font-size:16px; color:var(--navy-800); margin-bottom:4px;">لا توجد أي حجوزات مسجلة حالياً (البيانات فارغة)</strong>
-              <span style="font-size:13px;">اضغط على <strong>+ New Booking</strong> لبدء المرحلة الأولى (Stage 1) وتقديم أول حجز رسمي.</span>
+              <span style="font-size:13px;">اضغط على <strong>+ New Booking</strong> لبدء تقديم طلب حجز مركبة لمهمة عمل رسمية.</span>
               <div style="margin-top:16px;">
                 <a href="booking-new.html" class="btn btn-gold">+ تقديم طلب حجز جديد</a>
               </div>
@@ -185,9 +185,15 @@
       }
 
       tbody.innerHTML = bookings.map(b => {
-        const estActFuel = b.actualFuelLitres 
-          ? `${b.estFuelLiters || '—'} L / <strong>${b.actualFuelLitres} L</strong>`
-          : `${b.estFuelLiters || '—'} L / <span style="color:var(--text-muted);">—</span>`;
+        let allocatedVehicleHtml = '';
+        if (b.status === 'Pending') {
+          allocatedVehicleHtml = '<span class="badge badge-neutral" style="background:#F0F4F8; color:var(--text-muted); font-size:12px;">قيد التخصيص بواسطة التشغيل</span>';
+        } else {
+          allocatedVehicleHtml = `
+            <strong>${b.vehicle || 'Hyundai H-1 (V-122)'}</strong>
+            <div style="font-size:12px;color:var(--text-muted); margin-top:2px;">السائق: ${b.driver || 'Ahmed Hassan'}</div>
+          `;
+        }
 
         const trackBtn = (b.status === 'Active' || b.status === 'Dispatched')
           ? `<a href="booking-track.html?id=${b.id}" class="btn btn-gold btn-sm">Track</a>`
@@ -204,8 +210,8 @@
               <div>${b.date || 'Today'}</div>
               <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">${b.departureTime || '09:00'}–${b.expectedEnd || '14:00'}</div>
             </td>
-            <td>${b.vehicle || 'Pending Allocation'}</td>
-            <td><span style="font-family:var(--font-mono);font-size:13px;">${estActFuel}</span></td>
+            <td><span style="font-size:13px; font-weight:600; color:var(--navy-700);">${b.vehicleCategory || 'فان ركاب / ميكروباص'}</span></td>
+            <td>${allocatedVehicleHtml}</td>
             <td>${getStatusBadge(b.status)}</td>
             <td>
               <div style="display:flex;gap:6px;">

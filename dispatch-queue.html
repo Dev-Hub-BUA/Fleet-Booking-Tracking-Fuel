@@ -112,18 +112,22 @@
         <div>
           <span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">BK-2047 · Dr. Sarah Mansour (Pharmacy)</span>
           <h2 style="margin: 4px 0 0; font-size: 22px; color: var(--navy-800);">Campus → Obour → 10th of Ramadan</h2>
+          <div style="margin-top: 6px; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--text-muted);">الفئة المطلوبة من طالب الحجز:</span>
+            <span class="badge badge-info" id="detail-requested-cat">فان ركاب / ميكروباص</span>
+          </div>
         </div>
         <div style="display: flex; gap: 16px; font-size: 14px;">
           <div><span style="color:var(--text-muted);">Distance</span><div style="font-family:var(--font-mono);font-weight:700;">61.4 km</div></div>
-          <div><span style="color:var(--text-muted);">Fuel Est</span><div style="font-family:var(--font-mono);font-weight:700;">14.1 L</div></div>
-          <div><span style="color:var(--text-muted);">Hold Until</span><div style="font-family:var(--font-mono);font-weight:700;">15:43</div></div>
+          <div><span style="color:var(--text-muted);">Estimated Time</span><div style="font-family:var(--font-mono);font-weight:700;">5h 30m</div></div>
+          <div><span style="color:var(--text-muted);">Buffer Window</span><div style="font-family:var(--font-mono);font-weight:700;">45 min</div></div>
         </div>
       </div>
 
-      <div class="alert-banner alert-danger" style="margin-top: 14px;">
+      <div class="alert-banner alert-info" style="margin-top: 14px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <span><strong>Schedule Conflict Detected:</strong> Requested vehicle V-114 is held by BK-2041 until 09:15 including its mandatory 45 min buffer. Overlap: 45 min. Pick another vehicle below.</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span><strong>تخصيص مسؤول التشغيل:</strong> راجع المركبات المتاحة في فئة الطلب أدناه وحدد المركبة والسائق المناسب لاعتماد الرحلة وترحيلها.</span>
         </div>
       </div>
     </div>
@@ -288,21 +292,42 @@
         if (titleEl) titleEl.textContent = booking.route || (booking.origin + ' → ' + booking.destination);
         const metaEl = document.querySelector('.card span[style*="font-mono"]');
         if (metaEl) metaEl.textContent = `${booking.id} · ${booking.requesterName} (${booking.dept})`;
+        const catBadge = document.getElementById('detail-requested-cat');
+        if (catBadge) catBadge.textContent = booking.vehicleCategory || 'فان ركاب / ميكروباص';
       }
     }
 
     function handleApproveBooking() {
-      const approved = FleetStore.approveBooking(activeBookingId, 'V-122', 'Ahmed Hassan (Driver A)');
+      const selectedV = document.querySelector('input[name="vsel"]:checked');
+      let vehicleCode = 'V-122';
+      let vehicleModel = 'Hyundai H-1 (V-122)';
+      if (selectedV && selectedV.closest('tr')) {
+        const row = selectedV.closest('tr');
+        const codeEl = row.querySelector('span[style*="font-mono"]');
+        if (codeEl) vehicleCode = codeEl.textContent.trim();
+        const modelEl = row.querySelector('strong');
+        if (modelEl) vehicleModel = `${modelEl.textContent.trim()} (${vehicleCode})`;
+      }
+
+      const selectedD = document.querySelector('input[name="dsel"]:checked');
+      let driverName = 'Ahmed Hassan (Driver A)';
+      if (selectedD && selectedD.closest('tr')) {
+        const dRow = selectedD.closest('tr');
+        const nameEl = dRow.querySelector('strong');
+        if (nameEl) driverName = nameEl.textContent.trim();
+      }
+
+      const approved = FleetStore.approveBooking(activeBookingId, vehicleCode, driverName, vehicleModel);
       const box = document.getElementById('dispatch-actions-box');
       if (box) {
         box.innerHTML = `
           <div class="alert-banner alert-success" style="flex: 1; margin: 0;">
             ✓ <strong>تم اعتماد وترحيل الحجز (${approved ? approved.id : activeBookingId}) بنجاح!</strong> 
-            تم تخصيص المركبة V-122 والكابتن أحمد حسن. الرحلة الآن جاهزة للمرحلة 3 (بدء السائق).
+            تم تخصيص المركبة (${vehicleModel}) وتكليف السائق (${driverName}). أصبحت المركبة ظاهرة الآن في حساب طالب الحجز.
           </div>
           <div style="display:flex; gap:10px;">
+            <a href="bookings.html" class="btn btn-secondary">عرض الحجوزات</a>
             <a href="driver-trip.html" class="btn btn-gold">الانتقال لشاشة السائق (Stage 3) →</a>
-            <a href="dispatch-map.html" class="btn btn-primary">خريطة التيليماتري الحية</a>
           </div>
         `;
       }

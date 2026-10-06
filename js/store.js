@@ -211,7 +211,7 @@
       return newBooking;
     },
 
-    approveBooking: function (id, vehicleCode, driverName) {
+    approveBooking: function (id, vehicleCode, driverName, vehicleModel) {
       const data = this.load();
       const b = data.bookings.find(item => item.id === id);
       if (!b) return null;
@@ -219,7 +219,7 @@
       b.status = 'Dispatched';
       b.statusAr = 'معتمدة ومرحّلة للسائق';
       b.vehicleCode = vehicleCode || 'V-122';
-      b.vehicle = 'Hyundai H-1 (V-122)';
+      b.vehicle = vehicleModel || (vehicleCode === 'V-130' ? 'Toyota HiAce (V-130)' : 'Hyundai H-1 (V-122)');
       b.driver = driverName || 'Ahmed Hassan (Driver A)';
       b.actualOdoStart = 84210;
 

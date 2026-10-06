@@ -63,9 +63,9 @@
     <main class="main-content" role="main">
       <div class="page-header">
   <div class="page-title-group">
-    <span class="page-pretitle">BK-2047 · New Submission</span>
-    <h1 class="page-title">New Booking</h1>
-    <span class="page-subtitle">Distance, fuel consumption and cost estimate calculated upfront</span>
+    <span class="page-pretitle">Department Vehicle Requisition</span>
+    <h1 class="page-title">New Booking Request</h1>
+    <span class="page-subtitle">Submit mission requirements · Vehicle allocation handled by Central Dispatch</span>
   </div>
 </div>
 
@@ -133,41 +133,50 @@
         </div>
       </div>
     </div>
+
+    <div class="card">
+      <h2 class="card-title">4. فئة المركبة المطلوبة</h2>
+      <div class="form-group">
+        <label class="form-label">اختر نوع المركبة المناسب للمهمة</label>
+        <select class="form-select" id="route-vehicle-cat" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background:#fff;">
+          <option value="Passenger Van (فان ركاب / ميكروباص)" selected>فان ركاب / ميكروباص (7 - 12 راكب) — مثل HiAce / H-1</option>
+          <option value="Sedan (سيارة صالون)">سيارة صالون / سيدان (1 - 4 ركاب) — مثل Corolla / Elantra</option>
+          <option value="Bus (حافلة وفود)">حافلة / ميني باص وفود (15 - 28 راكب) — مثل Coaster / MCV</option>
+          <option value="Heavy Cargo Truck (شاحنة نقل)">شاحنة نقل ومعدات ثقيلة — مثل Isuzu NPR</option>
+        </select>
+        <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 8px; line-height: 1.5;">
+          ℹ️ <strong>ملاحظة:</strong> يتم اختيار وتخصيص كود المركبة المحددة وبيانات السائق بواسطة <strong>مدير التشغيل</strong> عند مراجعة واعتماد الطلب.
+        </div>
+      </div>
+    </div>
   </div>
 
   <div style="display: flex; flex-direction: column; gap: 20px;">
-    <div class="card" style="background: var(--navy-800); color: #FFFFFF; border: none; box-shadow: var(--shadow-lg);">
-      <span style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-500); font-weight: 700;">
-        Upfront Cost Estimate (ML Model v1.3)
-      </span>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 10px;">
-        <div>
-          <span style="font-size: 12px; color: #9FB0C8; display: block;">Distance</span>
-          <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700;" id="est-dist">61.4 km</span>
+    <div class="card" style="background: #FFFFFF; border: 1px solid var(--border); box-shadow: var(--shadow-sm); padding: 24px;">
+      <h3 style="margin: 0 0 14px; font-size: 18px; color: var(--cira-burgundy); font-weight: 800;">
+        إجراءات الحجز والاعتماد
+      </h3>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; color: var(--text-main); line-height: 1.6;">
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <span style="color: var(--success); font-weight: 700; font-size: 16px;">✓</span>
+          <span>يُحال الطلب مباشرة لغرفة العمليات المركزية لمراجعة الجداول وتوافر الأسطول.</span>
         </div>
-        <div>
-          <span style="font-size: 12px; color: #9FB0C8; display: block;">Fuel</span>
-          <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700;" id="est-fuel">14.1 L</span>
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <span style="color: var(--cira-gold); font-weight: 700; font-size: 16px;">✓</span>
+          <span>يتولى مدير التشغيل تخصيص المركبة المناسبة وتعيين السائق المعتمد وتطبيق فترات التجهيز.</span>
         </div>
-        <div>
-          <span style="font-size: 12px; color: #9FB0C8; display: block;">Est. Cost</span>
-          <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--gold-500);" id="est-cost">EGP 289.05</span>
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <span style="color: var(--navy-600); font-weight: 700; font-size: 16px;">✓</span>
+          <span>تظهر بيانات المركبة المعينة والسائق في قائمة حجوزاتك فور اعتماد الطلب رسمياً.</span>
         </div>
       </div>
 
-      <div style="border-top: 1px solid rgba(255,255,255,0.15); margin-top: 16px; padding-top: 16px; font-size: 13px; color: #DCE4EF; display: flex; flex-direction: column; gap: 8px;">
-        <div><strong>Pre-Auth Hold:</strong> EGP 350.00</div>
-        <div><strong>Hold Window:</strong> 08:30 – 15:30 (Includes preparation &amp; return buffers)</div>
-        <div><strong>Fuel Basis:</strong> Diesel EGP 20.50/L (Price Book v3)</div>
+      <div style="border-top: 1px solid var(--border); margin-top: 24px; padding-top: 20px;">
+        <button type="button" class="btn btn-gold btn-lg" style="width: 100%; font-weight: 800; font-size: 15px;" onclick="submitNewBooking();">
+          تقديم طلب الحجز للتشغيل →
+        </button>
       </div>
-
-      <div class="alert-banner alert-success" style="margin-top: 16px; font-size: 13px; background: rgba(27, 122, 67, 0.2); border-color: rgba(27, 122, 67, 0.5); color: #FFFFFF;">
-        ✓ <strong>Faculty Quota Check:</strong> EGP 14,200 remaining in Pharmacy Operations budget. Request is authorized.
-      </div>
-
-      <button type="button" class="btn btn-gold btn-lg" style="margin-top: 16px; width: 100%; font-weight:800;" onclick="submitNewBooking();">
-        Submit for Approval →
-      </button>
     </div>
   </div>
 </div>
@@ -237,6 +246,7 @@
       const pax = document.getElementById('route-pax').value;
       const cargo = document.getElementById('route-cargo').value;
       const purpose = document.getElementById('route-purpose').value.trim();
+      const vehicleCat = document.getElementById('route-vehicle-cat').value;
 
       const user = Auth.getUser() || { name: 'Dr. Sarah Mansour', dept: 'Faculty of Pharmacy' };
 
@@ -249,6 +259,10 @@
         passengers: pax,
         cargoWeightKg: cargo,
         purpose: purpose,
+        vehicleCategory: vehicleCat,
+        vehicle: 'Pending Allocation',
+        vehicleCode: 'TBD',
+        driver: 'Pending Assignment',
         requesterName: user.name,
         dept: user.dept,
         distanceKm: 61.4,
@@ -257,7 +271,7 @@
         holdAmountEGP: 350.0
       });
 
-      alert(`✓ تم تقديم طلب الحجز بنجاح!\n\n• رقم الحجز: ${newBooking.id}\n• خط السير: ${newBooking.route}\n• التكلفة التقديرية: ${newBooking.estCostEGP} EGP\n\nتم إحالة الطلب مباشرة إلى مسؤول الترحيل للاعتماد.`);
+      alert(`✓ تم تقديم طلب الحجز بنجاح!\n\n• رقم الحجز: ${newBooking.id}\n• خط السير: ${newBooking.route}\n• فئة المركبة المطلوبة: ${vehicleCat}\n\nتم إحالة الطلب مباشرة إلى مدير التشغيل لاختيار وتخصيص المركبة وتعيين السائق.`);
       window.location.href = 'bookings.html';
     }
   </script>
