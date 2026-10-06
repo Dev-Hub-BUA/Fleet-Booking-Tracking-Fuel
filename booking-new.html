@@ -1824,14 +1824,23 @@
     }
 
     function validateAndSubmitBooking() {
-      const errors = validateItinerary();
+      const loadValidation = validateLoadAndVehicle();
+      const itineraryErrors = validateItinerary();
+      const allErrors = [...loadValidation.errors, ...itineraryErrors];
+
       const errBox = document.getElementById('itinerary-validation-errors');
       const errList = document.getElementById('itinerary-validation-list');
 
-      if (errors.length > 0) {
-        errList.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+      if (allErrors.length > 0) {
+        errList.innerHTML = allErrors.map(e => `<li>${escapeHtml(e)}</li>`).join('');
         errBox.style.display = 'block';
-        errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        if (loadValidation.firstEl) {
+          loadValidation.firstEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          loadValidation.firstEl.focus();
+        } else {
+          errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         return;
       }
 
@@ -1852,8 +1861,15 @@
     function executeBookingSubmit(isReapproval) {
       const sDate = document.getElementById('trip-start-date').value;
       const eDate = document.getElementById('trip-end-date').value;
-      const pax = document.getElementById('route-pax').value;
-      const cargo = document.getElementById('route-cargo').value;
+      const pax = parseInt(document.getElementById('route-pax').value, 10) || 1;
+      const hasExtra = document.getElementById('has-extra-cargo').checked;
+      const cargoWeight = hasExtra ? (parseFloat(document.getElementById('cargo-weight').value) || 0) : 0;
+      const cargoDesc = hasExtra ? document.getElementById('cargo-description').value.trim() : '';
+      const cargoFlags = {
+        fragile: hasExtra && document.getElementById('cargo-flag-fragile').checked,
+        strap: hasExtra && document.getElementById('cargo-flag-strap').checked,
+        loading_help: hasExtra && document.getElementById('cargo-flag-loading-help').checked
+      };
       const vehicleCat = document.getElementById('route-vehicle-cat').value;
       const purpose = document.getElementById('route-purpose').value.trim();
       const costCenter = document.getElementById('cost-center').value.trim();
@@ -1861,7 +1877,9 @@
       const overnightLocation = document.getElementById('driver-overnight-location').value.trim();
 
       const user = Auth.getUser() || { name: 'Dr. Sarah Mansour', dept: 'Faculty of Pharmacy' };
-      const legs = FleetStore.RouteEstimator.computeItineraryLegs(itineraryPoints, vehicleCat);
+      const catSpec = VEHICLE_CATEGORIES[vehicleCat] || VEHICLE_CATEGORIES['Passenger Van'];
+      const loadFactor = (hasExtra && cargoWeight > 0) ? (1.0 + Math.min(0.5, (cargoWeight / catSpec.payloadKg) * 0.25)) : 1.0;
+      const legs = FleetStore.RouteEstimator.computeItineraryLegs(itineraryPoints, vehicleCat, loadFactor);
 
       const payload = {
         start_date: sDate,
@@ -1870,7 +1888,11 @@
         itinerary: itineraryPoints,
         route_legs: legs,
         passengers: pax,
-        cargo_kg: cargo,
+        has_extra_cargo: hasExtra,
+        cargo_kg: cargoWeight,
+        cargoWeightKg: cargoWeight,
+        cargo_description: cargoDesc,
+        cargo_flags: cargoFlags,
         purpose: purpose,
         cost_center: costCenter,
         dept: user.dept,
