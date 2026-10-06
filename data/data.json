@@ -1,0 +1,2127 @@
+{
+  "appInfo": {
+    "name": "CIRA Education Fleet Platform",
+    "shortName": "CIRA Fleet",
+    "systemTitle": "CIRA Enterprise Fleet Logistics & Dispatch",
+    "institution": "CIRA Education (Serving BUC, BUA & Futures Schools)",
+    "version": "3.0.0",
+    "contact": {
+      "location": "CIRA Education HQ · Central Fleet Operations Command",
+      "dispatchDesk": "Ext. 4108 / 4109",
+      "emergencyLine": "+20 10 2233 4455",
+      "email": "fleet.operations@cira.com.eg",
+      "workingHours": "24/7 Operations Command & Dispatch"
+    }
+  },
+  "users": {
+    "Requester": {
+      "id": "USR-RQ-101",
+      "name": "Dr. Sarah Mansour",
+      "role": "Requester",
+      "title": "Associate Professor & Lab Director",
+      "dept": "Faculty of Pharmacy",
+      "email": "sarah.mansour@buc.edu.eg",
+      "initials": "SM",
+      "bell": 3,
+      "avatarBg": "#0B2545",
+      "quotaRemainingEGP": 14200,
+      "quotaUsedPct": 64
+    },
+    "Dispatcher": {
+      "id": "USR-DS-202",
+      "name": "Tarek El-Sayed",
+      "role": "Dispatcher",
+      "title": "Chief Dispatch Officer",
+      "dept": "Central Fleet Operations Desk",
+      "email": "tarek.elsayed@buc.edu.eg",
+      "initials": "TE",
+      "bell": 6,
+      "avatarBg": "#1D4E89",
+      "activeShiftsCount": 8,
+      "pendingRequestsCount": 4
+    },
+    "Driver": {
+      "id": "USR-DR-303",
+      "name": "Ahmed Hassan (Driver A)",
+      "role": "Driver",
+      "title": "Senior Fleet Driver",
+      "dept": "Transport & Fleet Services",
+      "email": "ahmed.hassan@buc.edu.eg",
+      "initials": "AH",
+      "bell": 2,
+      "avatarBg": "#D4AF37",
+      "assignedVehicle": "Hyundai H-1 (V-122)",
+      "shiftDuty": "6.5 / 8.0 h"
+    },
+    "Fleet admin": {
+      "id": "USR-FA-404",
+      "name": "Eng. Mahmoud Fawzy",
+      "role": "Fleet admin",
+      "title": "Director of Transport & Logistics",
+      "dept": "Campus Operations & Logistics",
+      "email": "mahmoud.fawzy@buc.edu.eg",
+      "initials": "MF",
+      "bell": 4,
+      "avatarBg": "#0B2545",
+      "totalVehicles": 24,
+      "fleetAvailabilityPct": 87.5
+    },
+    "Auditor": {
+      "id": "USR-AU-505",
+      "name": "Laila Rostom",
+      "role": "Auditor",
+      "title": "Internal Audit & Financial Controller",
+      "dept": "Internal Audit Bureau",
+      "email": "laila.rostom@buc.edu.eg",
+      "initials": "LR",
+      "bell": 3,
+      "avatarBg": "#3B82F6",
+      "unreconciledTrips": 2,
+      "flaggedVarianceCount": 1
+    }
+  },
+  "roleDescriptions": {
+    "Requester": "Staff and faculty who need university vehicles: calculate fuel costs upfront, submit bookings, and track live trips.",
+    "Dispatcher": "Central desk approving vehicle requests, preventing schedule overlaps, assigning certified drivers, and triaging incidents.",
+    "Driver": "Mobile dashboard for shift check-ins, circle inspections, step-by-step waypoint navigation, SOS reporting, and fuel receipt closeouts.",
+    "Fleet admin": "Fleet governance: vehicle asset registry, maintenance lockouts, fuel price book versions, quota limits, and performance KPIs.",
+    "Auditor": "Read-only financial audit trails, fuel variance anomaly detection, tamper-proof logs, and department cost-center chargeback reports."
+  },
+  "steps": [
+    {
+      "key": null,
+      "role": "Website",
+      "title": "Landing page",
+      "say": "Public entrance presenting fleet capabilities, university policies, and single sign-on access.",
+      "tries": [
+        "Click \"Sign in\" or browse \"Who it's for\""
+      ]
+    },
+    {
+      "key": "Login",
+      "role": "Sign in",
+      "title": "One sign-in, five roles",
+      "say": "Staff sign in with their university account; permissions decide their view and accessible actions.",
+      "tries": [
+        "Pick any role badge under \"Demo · Sign in as\" to enter"
+      ]
+    },
+    {
+      "key": "Home:Requester",
+      "role": "Requester",
+      "title": "Requester home",
+      "say": "Department fuel quota at a glance, pending approvals, and active trip tracking shortcut.",
+      "tries": [
+        "Click \"+ New booking\" button"
+      ]
+    },
+    {
+      "key": "Catalog",
+      "role": "Requester",
+      "title": "Find the right vehicle",
+      "say": "Browse university fleet by vehicle type, seats, payload, fuel type, and accessibility.",
+      "tries": [
+        "Filter by \"Van\"",
+        "Click \"Book this vehicle\" on Hyundai H-1"
+      ]
+    },
+    {
+      "key": "Main",
+      "role": "Requester",
+      "title": "Book with cost known",
+      "say": "Calculate trip distance, fuel consumption, and EGP cost upfront with machine-learning accuracy.",
+      "tries": [
+        "Review route & schedule",
+        "Click \"Submit for approval\""
+      ]
+    },
+    {
+      "key": "Home:Dispatcher",
+      "role": "Dispatcher",
+      "title": "Dispatch desk",
+      "say": "Central triage hub: schedule clashes, maintenance lockouts, and pending trip requests.",
+      "tries": [
+        "Click \"Resolve\" on the BK-2047 conflict"
+      ]
+    },
+    {
+      "key": "Dispatch",
+      "role": "Dispatcher",
+      "title": "Approve without double-booking",
+      "say": "Requested V-114 has a 45-min buffer conflict; swap to available V-122 and verify driver eligibility.",
+      "tries": [
+        "Select V-122 & Driver A",
+        "Click \"Approve & assign\""
+      ]
+    },
+    {
+      "key": "Schedule",
+      "role": "Dispatcher",
+      "title": "Timeline & Gantt schedule",
+      "say": "Visual timeline showing booked trips, cleaning/prep buffers, and maintenance lockouts.",
+      "tries": [
+        "Inspect vehicle rows",
+        "Click the red clash block on V-114"
+      ]
+    },
+    {
+      "key": "Home:Driver",
+      "role": "Driver",
+      "title": "Driver home",
+      "say": "Assigned vehicle, next pickup waypoint, duty hours countdown, and pre-trip checklist status.",
+      "tries": [
+        "Click \"My shift & checklist\""
+      ]
+    },
+    {
+      "key": "DriverShift",
+      "role": "Driver",
+      "title": "Shift and duty limits",
+      "say": "Clock-in verification, 5-point safety inspection, and 8-hour maximum driving safety bar.",
+      "tries": [
+        "Toggle checklist inspection items",
+        "Verify duty bar"
+      ]
+    },
+    {
+      "key": "DriverTrip",
+      "role": "Driver",
+      "title": "Active trip manifest",
+      "say": "Stop-by-stop waypoints, passenger manifests, dispatch notes, and offline data sync indicator.",
+      "tries": [
+        "Mark \"Arrived at Plant 3\""
+      ]
+    },
+    {
+      "key": "DriverRun",
+      "role": "Driver",
+      "title": "Live run & navigation",
+      "say": "Turn-by-turn simulation, live GPS speed, telemetry signal quality, and emergency SOS button.",
+      "tries": [
+        "Click \"Report incident\"",
+        "Select Breakdown and send"
+      ]
+    },
+    {
+      "key": "RequesterTrack",
+      "role": "Requester",
+      "title": "Requester live tracker",
+      "say": "Trip requester follows their assigned vehicle in real-time with strict privacy safeguards.",
+      "tries": [
+        "Watch vehicle progress along the Obour-Ramadan corridor"
+      ]
+    },
+    {
+      "key": "LiveMap",
+      "role": "Dispatcher",
+      "title": "Telemetry hub & fleet map",
+      "say": "Live GPS telemetry for all university vehicles with speed, fuel level, and status filters.",
+      "tries": [
+        "Click pin V-122 or B-03",
+        "Filter by Moving / Incident"
+      ]
+    },
+    {
+      "key": "Incident",
+      "role": "Dispatcher",
+      "title": "Incident triage & emergency",
+      "say": "Photo damage inspection, passenger safety verification, tow truck dispatch, and replacement vehicle.",
+      "tries": [
+        "Select tow provider",
+        "Click \"Dispatch tow truck\""
+      ]
+    },
+    {
+      "key": "Notifications:Dispatcher",
+      "role": "Dispatcher",
+      "title": "Notification center",
+      "say": "Role-filtered alert feed: safety warnings, schedule change alerts, and automated shift reminders.",
+      "tries": [
+        "Filter by \"Safety\" alerts"
+      ]
+    },
+    {
+      "key": "DriverClose",
+      "role": "Driver",
+      "title": "Close trip with proof",
+      "say": "Return odometer entry, fuel litres purchased, receipt photo attachment, and circle check.",
+      "tries": [
+        "Input end odometer 48,276 km",
+        "Click \"Complete & close trip\""
+      ]
+    },
+    {
+      "key": "MyBookings",
+      "role": "Requester",
+      "title": "My bookings list",
+      "say": "History of university vehicle bookings with status badges and estimated vs. actual fuel reconciliation.",
+      "tries": [
+        "Click \"View details\" on BK-2047"
+      ]
+    },
+    {
+      "key": "BookingDetail",
+      "role": "Requester",
+      "title": "Booking detail & audit",
+      "say": "6-stage lifecycle stepper, assigned vehicle specs, locked cost estimate, and dispatch chat log.",
+      "tries": [
+        "Send a message to dispatch desk"
+      ]
+    },
+    {
+      "key": "Home:Fleet admin",
+      "role": "Fleet admin",
+      "title": "Fleet admin dashboard",
+      "say": "Overall fleet utilization rate, maintenance compliance, fuel price updates, and department quotas.",
+      "tries": [
+        "Click \"Manage fleet & price book\""
+      ]
+    },
+    {
+      "key": "FleetAdmin",
+      "role": "Fleet admin",
+      "title": "Vehicles & price book",
+      "say": "Vehicle asset details, scheduled preventive maintenance, historical fuel price book, and department budgets.",
+      "tries": [
+        "Switch tabs: Maintenance, Price book, Quotas"
+      ]
+    },
+    {
+      "key": "Drivers",
+      "role": "Fleet admin",
+      "title": "Drivers & license governance",
+      "say": "Driver license expiration monitoring, permitted vehicle classes, and license renewal upload.",
+      "tries": [
+        "Filter by \"Expiring soon\"",
+        "Simulate license renewal upload"
+      ]
+    },
+    {
+      "key": "KPI",
+      "role": "Fleet admin",
+      "title": "Fleet KPI analytics",
+      "say": "Operational intelligence: vehicle utilization, dispatch approval velocity, fuel accuracy, and uptime.",
+      "tries": [
+        "Toggle month filter (October / September / August)"
+      ]
+    },
+    {
+      "key": "Home:Auditor",
+      "role": "Auditor",
+      "title": "Auditor dashboard",
+      "say": "Internal audit overview: financial fuel variance anomalies, pending reconciliations, and chargebacks.",
+      "tries": [
+        "Click \"Audit log & reconciliation\""
+      ]
+    },
+    {
+      "key": "Auditor",
+      "role": "Auditor",
+      "title": "Audit reconciliation & export",
+      "say": "Tamper-proof event log, trip fuel variance analysis with anomaly detection, and department chargeback export.",
+      "tries": [
+        "Filter by Anomaly",
+        "Click \"Export chargeback CSV/PDF\""
+      ]
+    }
+  ],
+  "vehicles": [
+    {
+      "code": "V-122",
+      "plate": "BDR 3307",
+      "model": "Hyundai H-1",
+      "year": 2023,
+      "type": "Van",
+      "seats": 9,
+      "payload": "1,000 kg",
+      "fuel": "Diesel",
+      "trans": "Manual",
+      "nominal": "9.2 L/100 km",
+      "status": "Available",
+      "odo": "48,276 km",
+      "location": "Main Campus · Gate 2",
+      "wheelchair": false,
+      "assignedDriver": "Driver A"
+    },
+    {
+      "code": "V-130",
+      "plate": "BDR 4182",
+      "model": "Toyota HiAce",
+      "year": 2020,
+      "type": "Van",
+      "seats": 12,
+      "payload": "1,200 kg",
+      "fuel": "Diesel",
+      "trans": "Manual",
+      "nominal": "10.1 L/100 km",
+      "status": "Available",
+      "odo": "84,150 km",
+      "location": "Main Campus · Depot",
+      "wheelchair": true,
+      "assignedDriver": "Driver B"
+    },
+    {
+      "code": "V-114",
+      "plate": "BDR 2019",
+      "model": "Toyota HiAce",
+      "year": 2022,
+      "type": "Van",
+      "seats": 9,
+      "payload": "1,100 kg",
+      "fuel": "Diesel",
+      "trans": "Manual",
+      "nominal": "9.8 L/100 km",
+      "status": "On trip",
+      "odo": "62,400 km",
+      "location": "Transit to Obour",
+      "wheelchair": false,
+      "assignedDriver": "Driver C"
+    },
+    {
+      "code": "S-11",
+      "plate": "BDR 1044",
+      "model": "Hyundai Elantra",
+      "year": 2024,
+      "type": "Sedan",
+      "seats": 4,
+      "payload": "400 kg",
+      "fuel": "Petrol 92",
+      "trans": "Automatic",
+      "nominal": "7.1 L/100 km",
+      "status": "Available",
+      "odo": "18,300 km",
+      "location": "VIP Parking · Gate 1",
+      "wheelchair": false,
+      "assignedDriver": "Driver E"
+    },
+    {
+      "code": "V-205",
+      "plate": "BDR 5580",
+      "model": "Toyota Corolla",
+      "year": 2023,
+      "type": "Sedan",
+      "seats": 4,
+      "payload": "400 kg",
+      "fuel": "Petrol 95",
+      "trans": "Automatic",
+      "nominal": "6.8 L/100 km",
+      "status": "On trip",
+      "odo": "32,100 km",
+      "location": "Cairo Airport T3",
+      "wheelchair": false,
+      "assignedDriver": "Driver F"
+    },
+    {
+      "code": "C-04",
+      "plate": "BDR 7712",
+      "model": "Hyundai Accent",
+      "year": 2022,
+      "type": "Sedan",
+      "seats": 4,
+      "payload": "400 kg",
+      "fuel": "CNG",
+      "trans": "Manual",
+      "nominal": "7.4 m³/100 km",
+      "status": "Available",
+      "odo": "51,900 km",
+      "location": "Faculty of Engineering",
+      "wheelchair": false,
+      "assignedDriver": "Driver G"
+    },
+    {
+      "code": "B-07",
+      "plate": "BDR 9901",
+      "model": "MCV 500 Coach",
+      "year": 2021,
+      "type": "Bus",
+      "seats": 45,
+      "payload": "4,000 kg",
+      "fuel": "Diesel",
+      "trans": "Manual",
+      "nominal": "27.5 L/100 km",
+      "status": "Available",
+      "odo": "112,000 km",
+      "location": "Bus Terminal",
+      "wheelchair": false,
+      "assignedDriver": "Driver H"
+    },
+    {
+      "code": "T-02",
+      "plate": "BDR 6623",
+      "model": "Isuzu NPR Box Truck",
+      "year": 2021,
+      "type": "Truck",
+      "seats": 3,
+      "payload": "4,500 kg",
+      "fuel": "Diesel",
+      "trans": "Manual",
+      "nominal": "16.5 L/100 km",
+      "status": "On trip",
+      "odo": "95,800 km",
+      "location": "10th of Ramadan Zone",
+      "wheelchair": false,
+      "assignedDriver": "Driver I"
+    },
+    {
+      "code": "V-108",
+      "plate": "BDR 1198",
+      "model": "Nissan Urvan",
+      "year": 2019,
+      "type": "Van",
+      "seats": 12,
+      "payload": "1,150 kg",
+      "fuel": "Diesel",
+      "trans": "Manual",
+      "nominal": "10.4 L/100 km",
+      "status": "Maintenance",
+      "odo": "143,200 km",
+      "location": "Central Workshop",
+      "wheelchair": false,
+      "assignedDriver": "None (In Shop)"
+    }
+  ],
+  "myBookings": [
+    {
+      "id": "BK-2047",
+      "route": "Campus → Obour → 10th of Ramadan",
+      "date": "Tue 13 Oct 2026",
+      "time": "08:30–14:00",
+      "dept": "Faculty of Pharmacy",
+      "purpose": "Industrial Lab Equipment Collection & Student Site Visit",
+      "vehicle": "Hyundai H-1 (V-122)",
+      "driver": "Driver A",
+      "status": "Active",
+      "estFuel": "14.1 L",
+      "actFuel": "13.6 L",
+      "estCost": "289.05 EGP",
+      "actCost": "278.80 EGP",
+      "note": "Active on road · ETA Plant 3 at 09:52"
+    },
+    {
+      "id": "BK-2045",
+      "route": "Campus → Cairo Airport T3 (VIP Guest)",
+      "date": "Mon 12 Oct 2026",
+      "time": "14:00–17:00",
+      "dept": "President’s Office",
+      "purpose": "Visiting International Delegation Reception",
+      "vehicle": "Toyota Corolla (V-205)",
+      "driver": "Driver F",
+      "status": "Completed",
+      "estFuel": "7.2 L",
+      "actFuel": "7.0 L",
+      "estCost": "172.80 EGP",
+      "actCost": "168.00 EGP",
+      "note": "Closed with receipt #4102"
+    },
+    {
+      "id": "BK-2040",
+      "route": "Campus → Ain Sokhna Marine Research Station",
+      "date": "Fri 09 Oct 2026",
+      "time": "06:00–20:00",
+      "dept": "Faculty of Science",
+      "purpose": "Marine Ecology Fieldwork Sample Collection",
+      "vehicle": "MCV 500 Bus (B-07)",
+      "driver": "Driver H",
+      "status": "Completed",
+      "estFuel": "68.0 L",
+      "actFuel": "71.5 L",
+      "estCost": "1,394.00 EGP",
+      "actCost": "1,465.75 EGP",
+      "note": "Reconciled by Audit · +5.1% variance"
+    },
+    {
+      "id": "BK-2038",
+      "route": "Campus → Ministry of Higher Education",
+      "date": "Thu 08 Oct 2026",
+      "time": "09:00–13:00",
+      "dept": "University Administration",
+      "purpose": "Official Accreditation Dossier Submission",
+      "vehicle": "Hyundai Elantra (S-11)",
+      "driver": "Driver E",
+      "status": "Completed",
+      "estFuel": "8.4 L",
+      "actFuel": "8.1 L",
+      "estCost": "186.90 EGP",
+      "actCost": "180.22 EGP",
+      "note": "Reconciled by Audit"
+    },
+    {
+      "id": "BK-2031",
+      "route": "Campus → Heliopolis Medical Complex",
+      "date": "Mon 05 Oct 2026",
+      "time": "10:00–15:00",
+      "dept": "Faculty of Physical Therapy",
+      "purpose": "Clinical Internship Supervisor Round",
+      "vehicle": "Nissan Urvan (V-108)",
+      "driver": "Driver D",
+      "status": "Cancelled",
+      "estFuel": "11.0 L",
+      "actFuel": "—",
+      "estCost": "225.50 EGP",
+      "actCost": "0.00 EGP",
+      "note": "Cancelled by requester · Meeting rescheduled"
+    },
+    {
+      "id": "BK-2022",
+      "route": "Depot → New Administrative Capital Site",
+      "date": "Sun 27 Sep 2026",
+      "time": "08:00–16:00",
+      "dept": "Engineering & Projects",
+      "purpose": "Construction Surveying & Material Testing",
+      "vehicle": "Isuzu NPR Truck (T-02)",
+      "driver": "Driver I",
+      "status": "Completed",
+      "estFuel": "24.5 L",
+      "actFuel": "24.0 L",
+      "estCost": "502.25 EGP",
+      "actCost": "492.00 EGP",
+      "note": "Closed & Reconciled"
+    }
+  ],
+  "bookingDetail": {
+    "id": "BK-2047",
+    "requester": "Dr. Sarah Mansour · Faculty of Pharmacy",
+    "dept": "Faculty of Pharmacy",
+    "purpose": "Industrial Lab Equipment Collection & Student Site Visit",
+    "costCenter": "CC-410 (Pharmacy Operations)",
+    "status": "Active",
+    "route": "Badr University Main Campus → Supplier Depot Obour City → Plant 3 10th of Ramadan → Return to Base",
+    "date": "Tue 13 Oct 2026",
+    "timeWindow": "08:30 – 14:00",
+    "assignedVehicle": {
+      "code": "V-122",
+      "plate": "BDR 3307",
+      "name": "Hyundai H-1 (2023)",
+      "type": "Van (9 Seats, 1,000 kg payload)",
+      "note": "Requested V-114 had buffer conflict; V-122 assigned with identical capacity."
+    },
+    "assignedDriver": {
+      "name": "Ahmed Hassan (Driver A)",
+      "phone": "+20 10 9988 7766",
+      "license": "Professional Class 2 · Valid to 03/2028",
+      "dutyToday": "6.5 / 8.0 h"
+    },
+    "costEstimate": {
+      "distanceKm": 61.4,
+      "nominalL100": 9.2,
+      "estFuelL": 14.1,
+      "fuelType": "Diesel",
+      "unitPriceEGP": 20.5,
+      "estCostEGP": 289.05,
+      "preAuthHoldEGP": 350,
+      "pricingBasis": "ML model v1.3 · Fuel Price Book v3"
+    },
+    "timeline": [
+      {
+        "step": "Submitted",
+        "when": "Mon 12 Oct · 11:40",
+        "who": "Dr. Sarah Mansour",
+        "status": "done",
+        "note": "Route and specs configured"
+      },
+      {
+        "step": "Approved",
+        "when": "Mon 12 Oct · 14:20",
+        "who": "Tarek El-Sayed (Dispatcher 2)",
+        "status": "done",
+        "note": "Vehicle swapped to V-122 due to V-114 buffer overlap"
+      },
+      {
+        "step": "Dispatched",
+        "when": "Tue 13 Oct · 08:20",
+        "who": "Central Operations Desk",
+        "status": "done",
+        "note": "Driver Ahmed Hassan accepted assignment"
+      },
+      {
+        "step": "Active",
+        "when": "Tue 13 Oct · 08:31",
+        "who": "Driver A on the road",
+        "status": "current",
+        "note": "Current waypoint: En route to Plant 3 (ETA 09:52)"
+      },
+      {
+        "step": "Completed",
+        "when": "Pending close-out",
+        "who": "Driver & Dispatch",
+        "status": "pending",
+        "note": "Awaiting return odometer and fuel receipts"
+      },
+      {
+        "step": "Reconciled",
+        "when": "Pending audit",
+        "who": "Internal Audit Bureau",
+        "status": "pending",
+        "note": "Final fuel variance and chargeback debit"
+      }
+    ],
+    "messages": [
+      {
+        "who": "Tarek El-Sayed (Dispatcher)",
+        "at": "Mon 14:20",
+        "text": "Approved request BK-2047. Note: V-114 was busy in a morning return buffer, so I assigned V-122 (Hyundai H-1, 9 seats) with Driver Ahmed Hassan.",
+        "mine": false
+      },
+      {
+        "who": "Dr. Sarah Mansour (You)",
+        "at": "Mon 14:31",
+        "text": "Thank you Tarek. The cargo includes 2 fragile reagent crates; please ensure the driver has cargo securing straps.",
+        "mine": true
+      },
+      {
+        "who": "Tarek El-Sayed (Dispatcher)",
+        "at": "Mon 14:40",
+        "text": "Confirmed. Cargo tie-down straps added to Driver Ahmed's trip manifest checklist.",
+        "mine": false
+      }
+    ]
+  },
+  "dispatchQueue": [
+    {
+      "id": "BK-2047",
+      "route": "Main Campus → Obour → 10th of Ramadan",
+      "meta": "Tue 13 Oct · 08:30–14:00 · 4 pax · 350 kg · CC-410 (Pharmacy)",
+      "requester": "Dr. Sarah Mansour · Faculty of Pharmacy",
+      "dist": "61.4 km",
+      "fuel": "14.1 L",
+      "hold": "15:43",
+      "conflict": true,
+      "conflictDetails": "Requested vehicle V-114 is held by trip BK-2041 until 09:15 including mandatory 45-min post-trip inspection buffer. Overlap: 45 min. Recommended solution: Switch to V-122.",
+      "reapproval": false,
+      "flag": "CONFLICT",
+      "kind": "danger",
+      "suggestedVehicle": "V-122",
+      "suggestedDriver": "Ahmed Hassan (Driver A)"
+    },
+    {
+      "id": "BK-2049",
+      "route": "Main Campus → Cairo International Airport Terminal 3",
+      "meta": "Tue 13 Oct · 05:00–07:30 · 2 pax · CC-120 (President’s Office)",
+      "requester": "Prof. Hesham Badawi · President’s Office",
+      "dist": "38.2 km",
+      "fuel": "7.0 L",
+      "hold": "08:15",
+      "conflict": false,
+      "reapproval": true,
+      "conflictDetails": "Requester modified departure time from 06:00 to 05:00. Safety audit auto-checked driver rest compliance and re-validated fuel estimate.",
+      "flag": "RE-APPROVAL",
+      "kind": "warn",
+      "suggestedVehicle": "V-205",
+      "suggestedDriver": "Driver F"
+    },
+    {
+      "id": "BK-2051",
+      "route": "Main Campus → Ain Sokhna Marine Research Facility",
+      "meta": "Wed 14 Oct · 07:00–18:00 · 22 pax · Bus Class · CC-300 (Student Affairs)",
+      "requester": "Dr. Mona Wagdy · Student Activities & Trips",
+      "dist": "118.0 km",
+      "fuel": "68.2 L",
+      "hold": "20:45",
+      "conflict": false,
+      "reapproval": false,
+      "conflictDetails": "Requires heavy passenger coach. MCV 500 (B-07) and Driver H are available and rest-certified.",
+      "flag": "NEW",
+      "kind": "info",
+      "suggestedVehicle": "B-07",
+      "suggestedDriver": "Driver H"
+    },
+    {
+      "id": "BK-2052",
+      "route": "Plant 3 Industrial Zone → Campus Central Warehouse B",
+      "meta": "Wed 14 Oct · 10:00–12:00 · Heavy Cargo 2,400 kg · CC-410 (Procurement)",
+      "requester": "Eng. Karim Nabil · Central Procurement Bureau",
+      "dist": "18.5 km",
+      "fuel": "3.4 L",
+      "hold": "12:45",
+      "conflict": false,
+      "reapproval": false,
+      "conflictDetails": "Cargo weight exceeds standard van limits; Isuzu Box Truck (T-02) assigned with cargo hydraulic lift.",
+      "flag": "NEW",
+      "kind": "info",
+      "suggestedVehicle": "T-02",
+      "suggestedDriver": "Driver I"
+    }
+  ],
+  "scheduleData": [
+    {
+      "code": "V-114",
+      "model": "Toyota HiAce (9-Seat Van)",
+      "driver": "Driver C",
+      "utilizationPct": 78,
+      "blocks": [
+        {
+          "type": "trip",
+          "title": "BK-2041 Airport Run",
+          "start": 6,
+          "end": 8.5,
+          "label": "06:00–08:30 Trip"
+        },
+        {
+          "type": "buffer",
+          "title": "Cleaning & Fuel Buffer",
+          "start": 8.5,
+          "end": 9.25,
+          "label": "08:30–09:15 Buffer"
+        },
+        {
+          "type": "clash",
+          "title": "BK-2047 Clash (Overlap 45m)",
+          "start": 8.5,
+          "end": 9.25,
+          "label": "CLASH 45m"
+        },
+        {
+          "type": "trip",
+          "title": "BK-2048 Downtown Transit",
+          "start": 10,
+          "end": 14,
+          "label": "10:00–14:00 Trip"
+        },
+        {
+          "type": "buffer",
+          "title": "Return Buffer",
+          "start": 14,
+          "end": 14.75,
+          "label": "Buffer"
+        }
+      ]
+    },
+    {
+      "code": "V-122",
+      "model": "Hyundai H-1 (9-Seat Van)",
+      "driver": "Driver A",
+      "utilizationPct": 82,
+      "blocks": [
+        {
+          "type": "buffer",
+          "title": "Pre-Trip Inspection Buffer",
+          "start": 7.75,
+          "end": 8.5,
+          "label": "07:45–08:30 Prep"
+        },
+        {
+          "type": "trip",
+          "title": "BK-2047 Pharmacy Run",
+          "start": 8.5,
+          "end": 14,
+          "label": "08:30–14:00 Active"
+        },
+        {
+          "type": "buffer",
+          "title": "Post-Trip Buffer",
+          "start": 14,
+          "end": 15,
+          "label": "14:00–15:00 Buffer"
+        }
+      ]
+    },
+    {
+      "code": "V-130",
+      "model": "Toyota HiAce (12-Seat Van)",
+      "driver": "Driver B",
+      "utilizationPct": 45,
+      "blocks": [
+        {
+          "type": "trip",
+          "title": "Staff Shuttle Routine",
+          "start": 7,
+          "end": 9,
+          "label": "07:00–09:00 Shuttle"
+        },
+        {
+          "type": "idle",
+          "title": "Available at Depot",
+          "start": 9,
+          "end": 15,
+          "label": "Standby / Free"
+        }
+      ]
+    },
+    {
+      "code": "S-11",
+      "model": "Hyundai Elantra (Executive Sedan)",
+      "driver": "Driver E",
+      "utilizationPct": 60,
+      "blocks": [
+        {
+          "type": "trip",
+          "title": "BK-2050 Dean Travel",
+          "start": 9.5,
+          "end": 13.5,
+          "label": "09:30–13:30 Trip"
+        },
+        {
+          "type": "buffer",
+          "title": "Return Buffer",
+          "start": 13.5,
+          "end": 14.25,
+          "label": "Buffer"
+        }
+      ]
+    },
+    {
+      "code": "V-205",
+      "model": "Toyota Corolla (Sedan)",
+      "driver": "Driver F",
+      "utilizationPct": 85,
+      "blocks": [
+        {
+          "type": "trip",
+          "title": "BK-2049 Airport Guest Reception",
+          "start": 5,
+          "end": 8,
+          "label": "05:00–08:00 Trip"
+        },
+        {
+          "type": "buffer",
+          "title": "Buffer",
+          "start": 8,
+          "end": 8.75,
+          "label": "Buffer"
+        },
+        {
+          "type": "trip",
+          "title": "University Board Transit",
+          "start": 11,
+          "end": 16,
+          "label": "11:00–16:00 Trip"
+        }
+      ]
+    },
+    {
+      "code": "C-04",
+      "model": "Hyundai Accent (CNG Eco Sedan)",
+      "driver": "Driver G",
+      "utilizationPct": 40,
+      "blocks": [
+        {
+          "type": "trip",
+          "title": "Inter-Campus Mail Run",
+          "start": 8,
+          "end": 11,
+          "label": "08:00–11:00 Mail Run"
+        },
+        {
+          "type": "idle",
+          "title": "Standby on Campus",
+          "start": 11,
+          "end": 17,
+          "label": "Available"
+        }
+      ]
+    },
+    {
+      "code": "B-07",
+      "model": "MCV 500 (45-Seat Bus)",
+      "driver": "Driver H",
+      "utilizationPct": 90,
+      "blocks": [
+        {
+          "type": "trip",
+          "title": "Morning Faculty Route #4",
+          "start": 6.5,
+          "end": 8.5,
+          "label": "06:30–08:30 Route"
+        },
+        {
+          "type": "idle",
+          "title": "Bus Depot Standby",
+          "start": 8.5,
+          "end": 15.5,
+          "label": "Standby"
+        },
+        {
+          "type": "trip",
+          "title": "Evening Return Route #4",
+          "start": 15.5,
+          "end": 17.5,
+          "label": "15:30–17:30 Route"
+        }
+      ]
+    },
+    {
+      "code": "T-02",
+      "model": "Isuzu NPR Box Truck (4.5t Cargo)",
+      "driver": "Driver I",
+      "utilizationPct": 70,
+      "blocks": [
+        {
+          "type": "trip",
+          "title": "Lab Chemical Supplies Transfer",
+          "start": 8,
+          "end": 12,
+          "label": "08:00–12:00 Cargo"
+        },
+        {
+          "type": "buffer",
+          "title": "Unloading & Wash",
+          "start": 12,
+          "end": 13,
+          "label": "Buffer"
+        }
+      ]
+    },
+    {
+      "code": "V-108",
+      "model": "Nissan Urvan (Van)",
+      "driver": "Unassigned",
+      "utilizationPct": 0,
+      "blocks": [
+        {
+          "type": "lockout",
+          "title": "Scheduled Preventive Maintenance (Brakes & Clutch)",
+          "start": 6,
+          "end": 18,
+          "label": "MAINTENANCE LOCKOUT"
+        }
+      ]
+    }
+  ],
+  "telemetryFleet": [
+    {
+      "code": "V-122",
+      "model": "Hyundai H-1",
+      "driver": "Driver A",
+      "lat": 30.185,
+      "lng": 31.625,
+      "x": 42,
+      "y": 50,
+      "speedKmH": 72,
+      "fuelPct": 82,
+      "status": "Moving",
+      "statusClass": "moving",
+      "tripId": "BK-2047",
+      "route": "Obour → 10th of Ramadan",
+      "eta": "09:52",
+      "heading": "NE",
+      "tempC": 22,
+      "odoKm": 48260
+    },
+    {
+      "code": "V-130",
+      "model": "Toyota HiAce",
+      "driver": "Driver B",
+      "lat": 30.142,
+      "lng": 31.745,
+      "x": 78,
+      "y": 65,
+      "speedKmH": 0,
+      "fuelPct": 94,
+      "status": "Idle",
+      "statusClass": "idle",
+      "tripId": "Standby",
+      "route": "Campus Depot",
+      "eta": "—",
+      "heading": "N",
+      "tempC": 21,
+      "odoKm": 84150
+    },
+    {
+      "code": "V-114",
+      "model": "Toyota HiAce",
+      "driver": "Driver C",
+      "lat": 30.22,
+      "lng": 31.51,
+      "x": 25,
+      "y": 35,
+      "speedKmH": 58,
+      "fuelPct": 68,
+      "status": "Moving",
+      "statusClass": "moving",
+      "tripId": "BK-2041",
+      "route": "Cairo Airport Corridor",
+      "eta": "09:15",
+      "heading": "SW",
+      "tempC": 23,
+      "odoKm": 62410
+    },
+    {
+      "code": "B-03",
+      "model": "MCV Coach 45",
+      "driver": "Driver K",
+      "lat": 30.201,
+      "lng": 31.67,
+      "x": 55,
+      "y": 40,
+      "speedKmH": 0,
+      "fuelPct": 45,
+      "status": "Incident",
+      "statusClass": "incident",
+      "tripId": "BK-2039",
+      "route": "Cairo-Ismailia Desert Rd Km 42",
+      "eta": "Delayed",
+      "heading": "E",
+      "tempC": 38,
+      "odoKm": 99420
+    },
+    {
+      "code": "T-02",
+      "model": "Isuzu Box Truck",
+      "driver": "Driver I",
+      "lat": 30.29,
+      "lng": 31.75,
+      "x": 72,
+      "y": 22,
+      "speedKmH": 64,
+      "fuelPct": 75,
+      "status": "Moving",
+      "statusClass": "moving",
+      "tripId": "BK-2044",
+      "route": "10th of Ramadan Zone 3",
+      "eta": "11:15",
+      "heading": "NW",
+      "tempC": 24,
+      "odoKm": 95820
+    },
+    {
+      "code": "S-11",
+      "model": "Hyundai Elantra",
+      "driver": "Driver E",
+      "lat": 30.128,
+      "lng": 31.732,
+      "x": 75,
+      "y": 72,
+      "speedKmH": 0,
+      "fuelPct": 88,
+      "status": "Idle",
+      "statusClass": "idle",
+      "tripId": "Standby",
+      "route": "Badr University Gate 1",
+      "eta": "—",
+      "heading": "S",
+      "tempC": 22,
+      "odoKm": 18300
+    },
+    {
+      "code": "V-205",
+      "model": "Toyota Corolla",
+      "driver": "Driver F",
+      "lat": 30.11,
+      "lng": 31.4,
+      "x": 15,
+      "y": 80,
+      "speedKmH": 68,
+      "fuelPct": 62,
+      "status": "Moving",
+      "statusClass": "moving",
+      "tripId": "BK-2049",
+      "route": "Terminal 3 VIP Road",
+      "eta": "07:30",
+      "heading": "W",
+      "tempC": 23,
+      "odoKm": 32110
+    }
+  ],
+  "incident": {
+    "id": "INC-2026-084",
+    "tripId": "BK-2039",
+    "vehicleCode": "B-03",
+    "vehicleModel": "MCV 500 Bus (45 Seats)",
+    "driverName": "Driver K (Mahmoud Reda)",
+    "driverPhone": "+20 10 5544 3322",
+    "reportedAt": "13 Oct 2026 · 09:12",
+    "location": "Cairo–Ismailia Desert Road, Km 42 (Opposite Shurouk City Gate 3)",
+    "type": "Mechanical Breakdown · Coolant Line Rupture & Overheating",
+    "severity": "Medium",
+    "passengerCount": 18,
+    "safetyStatus": "All passengers evacuated safely to roadside shaded rest area behind crash barriers.",
+    "checklist": [
+      {
+        "id": "head",
+        "text": "Hazard warning flashers activated immediately",
+        "done": true
+      },
+      {
+        "id": "off",
+        "text": "Vehicle pulled completely onto right shoulder off active lanes",
+        "done": true
+      },
+      {
+        "id": "triangle",
+        "text": "Reflective warning triangles placed 50m behind coach",
+        "done": true
+      },
+      {
+        "id": "safe",
+        "text": "Passengers escorted behind guardrails into safe zone",
+        "done": true
+      },
+      {
+        "id": "aid",
+        "text": "First-aid kit checked (No injuries reported)",
+        "done": true
+      },
+      {
+        "id": "tow",
+        "text": "Heavy recovery tow vehicle requested & dispatched",
+        "done": true
+      }
+    ],
+    "photos": [
+      {
+        "title": "Coolant leak pooling beneath radiator",
+        "url": "incident-radiator.jpg",
+        "time": "09:15"
+      },
+      {
+        "title": "Vehicle positioned on roadside shoulder",
+        "url": "incident-shoulder.jpg",
+        "time": "09:17"
+      },
+      {
+        "title": "Passengers safely situated in rest perimeter",
+        "url": "incident-passengers.jpg",
+        "time": "09:18"
+      }
+    ],
+    "passengers": [
+      {
+        "name": "Dr. Tamer Shawky",
+        "role": "Faculty Leader · Faculty of Nursing",
+        "phone": "+20 12 1122 3344"
+      },
+      {
+        "name": "Nouran Mostafa",
+        "role": "Senior Student Rep (Group 1 - 9 pax)",
+        "phone": "+20 11 4455 6677"
+      },
+      {
+        "name": "Ziad Abdel-Rahman",
+        "role": "Student Rep (Group 2 - 9 pax)",
+        "phone": "+20 10 7788 9900"
+      }
+    ],
+    "tows": [
+      {
+        "id": "tow-a",
+        "name": "Al-Ahram Heavy Recovery & Towing",
+        "phone": "16223",
+        "eta": "18 mins",
+        "base": "Obour City Branch",
+        "rate": "950 EGP"
+      },
+      {
+        "id": "tow-b",
+        "name": "Cairo Highway Patrol Emergency Recovery",
+        "phone": "128",
+        "eta": "25 mins",
+        "base": "Ismailia Toll Station",
+        "rate": "Official Service"
+      }
+    ],
+    "replacementVehicle": {
+      "code": "B-07",
+      "model": "MCV 500 Bus (45 Seats)",
+      "driver": "Driver H (Hassan Metwally)",
+      "eta": "22 mins",
+      "status": "Dispatched from Badr Campus at 09:20"
+    },
+    "activityLog": [
+      {
+        "time": "09:12",
+        "who": "Driver K",
+        "note": "SOS reported via driver run dashboard. High coolant temperature warning."
+      },
+      {
+        "time": "09:14",
+        "who": "Tarek El-Sayed (Dispatcher)",
+        "note": "Contacted Driver K. Confirmed all 18 passengers uninjured and off the highway."
+      },
+      {
+        "time": "09:20",
+        "who": "Tarek El-Sayed (Dispatcher)",
+        "note": "Dispatched standby coach B-07 to transfer students to clinical training."
+      },
+      {
+        "time": "09:22",
+        "who": "Fleet Admin",
+        "note": "Al-Ahram Heavy Towing booked for recovery to Central Workshop."
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "id": "D-101",
+      "name": "Ahmed Hassan (Driver A)",
+      "licenseClass": "Class 2 (Professional)",
+      "licenseNo": "EG-CAI-84920",
+      "expires": "2028-03-15",
+      "status": "On Shift",
+      "dutyHours": "6.5 / 8.0 h",
+      "tripsToday": 2,
+      "totalTrips": 412,
+      "incidentsCount": 0,
+      "allowedVehicles": [
+        "Sedan",
+        "Van",
+        "Pickup"
+      ]
+    },
+    {
+      "id": "D-102",
+      "name": "Mostafa Kamel (Driver B)",
+      "licenseClass": "Class 2 (Professional)",
+      "licenseNo": "EG-GIZ-39102",
+      "expires": "2027-11-20",
+      "status": "On Shift",
+      "dutyHours": "3.0 / 8.0 h",
+      "tripsToday": 1,
+      "totalTrips": 345,
+      "incidentsCount": 0,
+      "allowedVehicles": [
+        "Sedan",
+        "Van"
+      ]
+    },
+    {
+      "id": "D-103",
+      "name": "Hany Mahmoud (Driver C)",
+      "licenseClass": "Class 2 (Professional)",
+      "licenseNo": "EG-CAI-12948",
+      "expires": "2027-08-10",
+      "status": "On Shift",
+      "dutyHours": "7.5 / 8.0 h",
+      "tripsToday": 3,
+      "totalTrips": 520,
+      "incidentsCount": 1,
+      "allowedVehicles": [
+        "Sedan",
+        "Van"
+      ]
+    },
+    {
+      "id": "D-104",
+      "name": "Sherif Fathy (Driver D)",
+      "licenseClass": "Class 2 (Professional)",
+      "licenseNo": "EG-SHR-77291",
+      "expires": "2026-10-09",
+      "status": "Off Duty (Expired)",
+      "dutyHours": "0.0 / 8.0 h",
+      "tripsToday": 0,
+      "totalTrips": 288,
+      "incidentsCount": 0,
+      "allowedVehicles": [
+        "Sedan",
+        "Van"
+      ]
+    },
+    {
+      "id": "D-105",
+      "name": "Sameh Adel (Driver E)",
+      "licenseClass": "Class 3 (Private)",
+      "licenseNo": "EG-CAI-99201",
+      "expires": "2029-01-18",
+      "status": "On Shift",
+      "dutyHours": "4.2 / 8.0 h",
+      "tripsToday": 1,
+      "totalTrips": 180,
+      "incidentsCount": 0,
+      "allowedVehicles": [
+        "Sedan only"
+      ]
+    },
+    {
+      "id": "D-106",
+      "name": "Khaled Soliman (Driver F)",
+      "licenseClass": "Class 2 (Professional)",
+      "licenseNo": "EG-CAI-66419",
+      "expires": "2027-05-30",
+      "status": "On Shift",
+      "dutyHours": "5.8 / 8.0 h",
+      "tripsToday": 2,
+      "totalTrips": 390,
+      "incidentsCount": 0,
+      "allowedVehicles": [
+        "Sedan",
+        "Van"
+      ]
+    },
+    {
+      "id": "D-107",
+      "name": "Walid Saad (Driver G)",
+      "licenseClass": "Class 2 (Professional)",
+      "licenseNo": "EG-CAI-33820",
+      "expires": "2028-09-12",
+      "status": "On Standby",
+      "dutyHours": "2.5 / 8.0 h",
+      "tripsToday": 1,
+      "totalTrips": 210,
+      "incidentsCount": 0,
+      "allowedVehicles": [
+        "Sedan",
+        "Van",
+        "CNG"
+      ]
+    },
+    {
+      "id": "D-108",
+      "name": "Hassan Metwally (Driver H)",
+      "licenseClass": "Class 1 (Heavy / Bus)",
+      "licenseNo": "EG-CAI-00192",
+      "expires": "2027-12-05",
+      "status": "On Shift",
+      "dutyHours": "4.0 / 8.0 h",
+      "tripsToday": 2,
+      "totalTrips": 640,
+      "incidentsCount": 0,
+      "allowedVehicles": [
+        "Bus",
+        "Heavy Coach",
+        "Van"
+      ]
+    },
+    {
+      "id": "D-109",
+      "name": "Ibrahim Gamal (Driver I)",
+      "licenseClass": "Class 1 (Heavy / Truck)",
+      "licenseNo": "EG-SHR-44109",
+      "expires": "2028-04-22",
+      "status": "On Shift",
+      "dutyHours": "5.0 / 8.0 h",
+      "tripsToday": 1,
+      "totalTrips": 480,
+      "incidentsCount": 0,
+      "allowedVehicles": [
+        "Truck",
+        "Van",
+        "Heavy Cargo"
+      ]
+    },
+    {
+      "id": "D-110",
+      "name": "Mahmoud Reda (Driver K)",
+      "licenseClass": "Class 1 (Heavy / Bus)",
+      "licenseNo": "EG-CAI-55219",
+      "expires": "2028-07-14",
+      "status": "Incident Triage",
+      "dutyHours": "3.5 / 8.0 h",
+      "tripsToday": 1,
+      "totalTrips": 310,
+      "incidentsCount": 1,
+      "allowedVehicles": [
+        "Bus",
+        "Van"
+      ]
+    }
+  ],
+  "driverShiftData": {
+    "driverName": "Ahmed Hassan (Driver A)",
+    "assignedVehicle": "V-122 · Hyundai H-1",
+    "clockInTime": "07:40",
+    "currentDutyHours": 6.5,
+    "maxDutyHours": 8,
+    "remainingDutyHours": 1.5,
+    "checks": [
+      {
+        "id": "fit",
+        "label": "I am fit to drive (well-rested, no medication affecting driving ability)",
+        "done": true
+      },
+      {
+        "id": "lic",
+        "label": "Valid professional driver license and university security badge on me",
+        "done": true
+      },
+      {
+        "id": "insp",
+        "label": "Pre-trip circle check: tyres pressure, headlights, brake lights, mirrors, glass clean",
+        "done": true
+      },
+      {
+        "id": "fuel",
+        "label": "Fuel level verified sufficient for assigned route (tank is > 80% full)",
+        "done": true
+      },
+      {
+        "id": "docs",
+        "label": "Vehicle registration license, insurance card, logbook, and trip sheet in glove box",
+        "done": true
+      }
+    ]
+  },
+  "driverTripData": {
+    "tripId": "BK-2047",
+    "vehicleCode": "V-122 (Hyundai H-1)",
+    "plate": "BDR 3307",
+    "leadPassenger": "Dr. Sarah Mansour (+20 10 2233 4455)",
+    "offlineStorageStatus": "Synced (Cache valid for 72 hrs)",
+    "stops": [
+      {
+        "id": 1,
+        "name": "Badr University Main Campus · Gate 2",
+        "time": "Departed 08:31",
+        "detail": "Boarding 4 passengers and loading 2 equipment crates.",
+        "contact": "Campus Security Desk · Ext. 101",
+        "done": true,
+        "current": false
+      },
+      {
+        "id": 2,
+        "name": "Supplier Depot · Obour City Industrial Zone",
+        "time": "Departed 09:18",
+        "detail": "Collected 350 kg lab reagent supplies and pallet straps.",
+        "contact": "Depot Warehouse Manager · +20 12 3344 5566",
+        "done": true,
+        "current": false
+      },
+      {
+        "id": 3,
+        "name": "Plant 3 Industrial Facility · 10th of Ramadan City",
+        "time": "ETA 09:52",
+        "detail": "Unload cargo at Bay 4; escort faculty delegates to main conference hall.",
+        "contact": "Plant 3 Receiving Bureau · +20 11 9988 7766",
+        "done": false,
+        "current": true
+      },
+      {
+        "id": 4,
+        "name": "Return to Badr University Main Campus Depot",
+        "time": "Est. 13:45",
+        "detail": "Disembark passengers, return cargo straps, complete closeout log.",
+        "contact": "Fleet Services Gate 2",
+        "done": false,
+        "current": false
+      }
+    ]
+  },
+  "driverRunData": {
+    "currentSpeedKmH": 72,
+    "speedLimitKmH": 90,
+    "distanceTravelledKm": 33.4,
+    "distanceRemainingKm": 28,
+    "eta": "09:52 (In 14 mins)",
+    "gpsAccuracy": "High Precision (±2.5m · 12 Satellites)",
+    "nextInstruction": "In 1.2 km, take the ramp onto 10th of Ramadan South Boulevard",
+    "sosActive": false
+  },
+  "driverCloseData": {
+    "tripId": "BK-2047",
+    "vehicleCode": "V-122",
+    "startOdoKm": "48,215",
+    "endOdoKm": "48,276",
+    "calculatedDistanceKm": 61,
+    "estDistanceKm": 61.4,
+    "distanceVariancePct": "-0.6%",
+    "fuelEstimatedL": 14.1,
+    "fuelReportedL": 13.6,
+    "fuelVariancePct": "-3.5%",
+    "purchases": [
+      {
+        "id": "FP-901",
+        "station": "TotalEnergies · Obour Industrial Corridor",
+        "litres": 20,
+        "pricePerL": "20.50 EGP",
+        "totalCost": "410.00 EGP",
+        "paymentMethod": "University Fleet Card #4018",
+        "odo": "48,240 km",
+        "time": "09:10",
+        "receiptAttached": true
+      }
+    ],
+    "checklist": [
+      {
+        "id": "body",
+        "label": "No new vehicle body scratches, dents, glass chips or tyre damage",
+        "done": true
+      },
+      {
+        "id": "clean",
+        "label": "Vehicle cabin swept clean, no personal items or waste left behind",
+        "done": true
+      },
+      {
+        "id": "lights",
+        "label": "All exterior and cabin lights switched off",
+        "done": true
+      },
+      {
+        "id": "keys",
+        "label": "Keys, fuel card, and logbook deposited at Dispatch Gate 2 locker",
+        "done": true
+      }
+    ]
+  },
+  "fleetAdmin": {
+    "maintenanceSchedule": [
+      {
+        "vehicle": "V-108 (Nissan Urvan)",
+        "service": "Clutch plate overhaul & 140k major service",
+        "dueOdo": "143,000 km",
+        "currentOdo": "143,200 km",
+        "status": "In Workshop",
+        "technician": "Central Auto Workshop"
+      },
+      {
+        "vehicle": "V-114 (Toyota HiAce)",
+        "service": "Front brake pads & rotor skimming",
+        "dueOdo": "65,000 km",
+        "currentOdo": "62,400 km",
+        "status": "Scheduled (in 2,600 km)",
+        "technician": "Authorized Dealer"
+      },
+      {
+        "vehicle": "B-07 (MCV Coach)",
+        "service": "Engine oil, coolant flush & air filters",
+        "dueOdo": "115,000 km",
+        "currentOdo": "112,000 km",
+        "status": "Scheduled (in 3,000 km)",
+        "technician": "MCV Service Center"
+      },
+      {
+        "vehicle": "S-11 (Hyundai Elantra)",
+        "service": "20,000 km routine factory inspection",
+        "dueOdo": "20,000 km",
+        "currentOdo": "18,300 km",
+        "status": "Upcoming",
+        "technician": "Hyundai Express Service"
+      }
+    ],
+    "fuelPriceVersions": [
+      {
+        "version": "v3 (Current)",
+        "effectiveDate": "01 Aug 2026 – Present",
+        "p92": "22.25 EGP/L",
+        "p95": "24.00 EGP/L",
+        "diesel": "20.50 EGP/L",
+        "cng": "6.50 EGP/m³",
+        "status": "Active"
+      },
+      {
+        "version": "v2",
+        "effectiveDate": "01 Mar 2026 – 31 Jul 2026",
+        "p92": "20.50 EGP/L",
+        "p95": "22.00 EGP/L",
+        "diesel": "18.50 EGP/L",
+        "cng": "5.50 EGP/m³",
+        "status": "Archived"
+      },
+      {
+        "version": "v1",
+        "effectiveDate": "01 Oct 2025 – 28 Feb 2026",
+        "p92": "18.00 EGP/L",
+        "p95": "19.50 EGP/L",
+        "diesel": "16.50 EGP/L",
+        "cng": "5.00 EGP/m³",
+        "status": "Archived"
+      }
+    ],
+    "departmentQuotas": [
+      {
+        "code": "CC-410",
+        "dept": "Faculty of Pharmacy",
+        "totalBudgetEGP": 40000,
+        "consumedBudgetEGP": 25800,
+        "remainingBudgetEGP": 14200,
+        "usedPct": 64.5,
+        "tripsThisMonth": 18,
+        "status": "On Track"
+      },
+      {
+        "code": "CC-120",
+        "dept": "President’s Office & Executive Bureau",
+        "totalBudgetEGP": 60000,
+        "consumedBudgetEGP": 48500,
+        "remainingBudgetEGP": 11500,
+        "usedPct": 80.8,
+        "tripsThisMonth": 34,
+        "status": "Near Warning"
+      },
+      {
+        "code": "CC-300",
+        "dept": "Student Activities & Athletics",
+        "totalBudgetEGP": 50000,
+        "consumedBudgetEGP": 31200,
+        "remainingBudgetEGP": 18800,
+        "usedPct": 62.4,
+        "tripsThisMonth": 12,
+        "status": "On Track"
+      },
+      {
+        "code": "CC-220",
+        "dept": "Faculty of Engineering & Architecture",
+        "totalBudgetEGP": 45000,
+        "consumedBudgetEGP": 29800,
+        "remainingBudgetEGP": 15200,
+        "usedPct": 66.2,
+        "tripsThisMonth": 22,
+        "status": "On Track"
+      },
+      {
+        "code": "CC-510",
+        "dept": "Faculty of Oral & Dental Medicine",
+        "totalBudgetEGP": 35000,
+        "consumedBudgetEGP": 18400,
+        "remainingBudgetEGP": 16600,
+        "usedPct": 52.6,
+        "tripsThisMonth": 11,
+        "status": "Under Budget"
+      }
+    ]
+  },
+  "kpiData": {
+    "periods": {
+      "oct": {
+        "label": "October 2026 (Month-to-Date)",
+        "tiles": [
+          {
+            "label": "Fleet Utilization",
+            "value": "78.4%",
+            "sub": "+3.2% vs target (75%)",
+            "trend": "up",
+            "status": "good"
+          },
+          {
+            "label": "Dispatch Approval Speed",
+            "value": "18.4 min",
+            "sub": "Target < 30 mins",
+            "trend": "up",
+            "status": "good"
+          },
+          {
+            "label": "Fuel Model Accuracy",
+            "value": "96.2%",
+            "sub": "Est vs. Actual within ±3.8%",
+            "trend": "up",
+            "status": "good"
+          },
+          {
+            "label": "Fleet Availability Uptime",
+            "value": "91.7%",
+            "sub": "22 of 24 vehicles active",
+            "trend": "neutral",
+            "status": "good"
+          }
+        ],
+        "weeklyUtilization": [
+          {
+            "week": "W1 (Oct 1–7)",
+            "rate": 76
+          },
+          {
+            "week": "W2 (Oct 8–14)",
+            "rate": 81
+          },
+          {
+            "week": "W3 (Oct 15–21)",
+            "rate": 79
+          },
+          {
+            "week": "W4 (Oct 22–28)",
+            "rate": 77
+          }
+        ]
+      },
+      "sep": {
+        "label": "September 2026",
+        "tiles": [
+          {
+            "label": "Fleet Utilization",
+            "value": "75.1%",
+            "sub": "Met university baseline",
+            "trend": "neutral",
+            "status": "good"
+          },
+          {
+            "label": "Dispatch Approval Speed",
+            "value": "22.1 min",
+            "sub": "Target < 30 mins",
+            "trend": "up",
+            "status": "good"
+          },
+          {
+            "label": "Fuel Model Accuracy",
+            "value": "94.8%",
+            "sub": "Est vs. Actual within ±5.2%",
+            "trend": "neutral",
+            "status": "good"
+          },
+          {
+            "label": "Fleet Availability Uptime",
+            "value": "89.5%",
+            "sub": "2 vehicles in major service",
+            "trend": "down",
+            "status": "warn"
+          }
+        ],
+        "weeklyUtilization": [
+          {
+            "week": "W1",
+            "rate": 72
+          },
+          {
+            "week": "W2",
+            "rate": 74
+          },
+          {
+            "week": "W3",
+            "rate": 77
+          },
+          {
+            "week": "W4",
+            "rate": 76
+          }
+        ]
+      },
+      "aug": {
+        "label": "August 2026",
+        "tiles": [
+          {
+            "label": "Fleet Utilization",
+            "value": "68.2%",
+            "sub": "Summer semester schedule",
+            "trend": "down",
+            "status": "neutral"
+          },
+          {
+            "label": "Dispatch Approval Speed",
+            "value": "25.6 min",
+            "sub": "Target < 30 mins",
+            "trend": "neutral",
+            "status": "good"
+          },
+          {
+            "label": "Fuel Model Accuracy",
+            "value": "95.1%",
+            "sub": "Stable ML v1.2",
+            "trend": "up",
+            "status": "good"
+          },
+          {
+            "label": "Fleet Availability Uptime",
+            "value": "95.8%",
+            "sub": "Annual preventive maintenance completed",
+            "trend": "up",
+            "status": "good"
+          }
+        ],
+        "weeklyUtilization": [
+          {
+            "week": "W1",
+            "rate": 64
+          },
+          {
+            "week": "W2",
+            "rate": 68
+          },
+          {
+            "week": "W3",
+            "rate": 70
+          },
+          {
+            "week": "W4",
+            "rate": 71
+          }
+        ]
+      }
+    }
+  },
+  "auditData": {
+    "auditLog": [
+      {
+        "id": "LOG-8812",
+        "timestamp": "13 Oct 2026 · 08:31:04",
+        "actor": "System (GPS Geo-Trigger)",
+        "action": "TRIP_ACTIVATED",
+        "entity": "BK-2047 · V-122",
+        "details": "Vehicle departed campus perimeter. Real-time telemetry streaming started."
+      },
+      {
+        "id": "LOG-8811",
+        "timestamp": "13 Oct 2026 · 08:20:19",
+        "actor": "Driver Ahmed Hassan (D-101)",
+        "action": "ASSIGNMENT_ACCEPTED",
+        "entity": "BK-2047 · V-122",
+        "details": "Pre-trip checklist validated. Duty hour window confirmed 6.5h / 8h."
+      },
+      {
+        "id": "LOG-8810",
+        "timestamp": "12 Oct 2026 · 14:20:44",
+        "actor": "Tarek El-Sayed (DS-202)",
+        "action": "VEHICLE_SUBSTITUTION",
+        "entity": "BK-2047 · V-114 → V-122",
+        "details": "Automated conflict detector identified 45-min buffer overlap on V-114. Swapped to V-122."
+      },
+      {
+        "id": "LOG-8809",
+        "timestamp": "12 Oct 2026 · 14:20:30",
+        "actor": "Tarek El-Sayed (DS-202)",
+        "action": "REQUEST_APPROVED",
+        "entity": "BK-2047",
+        "details": "Booking approved for Faculty of Pharmacy (CC-410). Pre-authorization hold 350.00 EGP logged."
+      },
+      {
+        "id": "LOG-8808",
+        "timestamp": "12 Oct 2026 · 11:40:12",
+        "actor": "Dr. Sarah Mansour (RQ-101)",
+        "action": "BOOKING_SUBMITTED",
+        "entity": "BK-2047",
+        "details": "Initial request submitted via web portal: 61.4 km, estimated fuel 14.1 L Diesel."
+      },
+      {
+        "id": "LOG-8807",
+        "timestamp": "12 Oct 2026 · 09:15:00",
+        "actor": "Eng. Mahmoud Fawzy (FA-404)",
+        "action": "PRICE_BOOK_AUDIT",
+        "entity": "Price Book v3",
+        "details": "Quarterly fuel prices cross-checked against official Egyptian Petroleum pricing gazette."
+      }
+    ],
+    "reconciliationTrips": [
+      {
+        "id": "BK-2045",
+        "vehicle": "V-205",
+        "driver": "Driver F",
+        "dept": "President’s Office",
+        "route": "Campus → Cairo Airport T3",
+        "estFuel": 7.2,
+        "actFuel": 7,
+        "deltaL": -0.2,
+        "deltaPct": -2.8,
+        "status": "Reconciled",
+        "flag": "Normal"
+      },
+      {
+        "id": "BK-2040",
+        "vehicle": "B-07",
+        "driver": "Driver H",
+        "dept": "Faculty of Science",
+        "route": "Campus → Ain Sokhna Site",
+        "estFuel": 68,
+        "actFuel": 71.5,
+        "deltaL": 3.5,
+        "deltaPct": 5.1,
+        "status": "Flagged (Anomaly)",
+        "flag": "Traffic/Mountainous incline variance documented"
+      },
+      {
+        "id": "BK-2038",
+        "vehicle": "S-11",
+        "driver": "Driver E",
+        "dept": "University Admin",
+        "route": "Campus → Ministry of Higher Ed",
+        "estFuel": 8.4,
+        "actFuel": 8.1,
+        "deltaL": -0.3,
+        "deltaPct": -3.6,
+        "status": "Reconciled",
+        "flag": "Normal"
+      },
+      {
+        "id": "BK-2022",
+        "vehicle": "T-02",
+        "driver": "Driver I",
+        "dept": "Engineering Projects",
+        "route": "Depot → New Administrative Capital",
+        "estFuel": 24.5,
+        "actFuel": 24,
+        "deltaL": -0.5,
+        "deltaPct": -2,
+        "status": "Reconciled",
+        "flag": "Normal"
+      }
+    ],
+    "chargebackSummary": [
+      {
+        "cc": "CC-410",
+        "dept": "Faculty of Pharmacy",
+        "tripsCount": 18,
+        "totalDistanceKm": 1420,
+        "fuelCostEGP": 6850.5,
+        "adminShareEGP": 1200,
+        "totalDebitEGP": 8050.5
+      },
+      {
+        "cc": "CC-120",
+        "dept": "President’s Office & Protocol",
+        "tripsCount": 34,
+        "totalDistanceKm": 2890,
+        "fuelCostEGP": 15420,
+        "adminShareEGP": 2200,
+        "totalDebitEGP": 17620
+      },
+      {
+        "cc": "CC-300",
+        "dept": "Student Activities & Athletics",
+        "tripsCount": 12,
+        "totalDistanceKm": 1840,
+        "fuelCostEGP": 9800,
+        "adminShareEGP": 1500,
+        "totalDebitEGP": 11300
+      },
+      {
+        "cc": "CC-220",
+        "dept": "Faculty of Engineering & Architecture",
+        "tripsCount": 22,
+        "totalDistanceKm": 1980,
+        "fuelCostEGP": 9450,
+        "adminShareEGP": 1400,
+        "totalDebitEGP": 10850
+      },
+      {
+        "cc": "CC-510",
+        "dept": "Faculty of Oral & Dental Medicine",
+        "tripsCount": 11,
+        "totalDistanceKm": 890,
+        "fuelCostEGP": 4320,
+        "adminShareEGP": 800,
+        "totalDebitEGP": 5120
+      }
+    ]
+  },
+  "notifications": {
+    "Requester": [
+      {
+        "id": "N-RQ-1",
+        "category": "Bookings",
+        "title": "Trip BK-2047 is now Active on the road",
+        "body": "Driver Ahmed Hassan departed Obour Depot en route to Plant 3. Live tracking is active.",
+        "time": "12 mins ago",
+        "unread": true
+      },
+      {
+        "id": "N-RQ-2",
+        "category": "Bookings",
+        "title": "Booking BK-2047 Approved with vehicle update",
+        "body": "Vehicle V-122 assigned in place of V-114 to prevent buffer overlap. Cost locked at EGP 289.05.",
+        "time": "Yesterday",
+        "unread": false
+      },
+      {
+        "id": "N-RQ-3",
+        "category": "System",
+        "title": "October Fuel Quota 64% utilized",
+        "body": "Your department has EGP 14,200 remaining in the current operating budget.",
+        "time": "3 days ago",
+        "unread": false
+      }
+    ],
+    "Dispatcher": [
+      {
+        "id": "N-DS-1",
+        "category": "Safety",
+        "title": "CRITICAL: Breakdown reported for Bus B-03",
+        "body": "Driver K reported coolant overheating on Ismailia Desert Rd Km 42. Passengers safe. Tow truck required.",
+        "time": "18 mins ago",
+        "unread": true
+      },
+      {
+        "id": "N-DS-2",
+        "category": "Bookings",
+        "title": "Schedule Conflict: BK-2047 overlaps V-114 buffer",
+        "body": "Requested departure 08:30 conflicts with prior trip return window (buffer until 09:15). Resolve required.",
+        "time": "45 mins ago",
+        "unread": true
+      },
+      {
+        "id": "N-DS-3",
+        "category": "Bookings",
+        "title": "Booking BK-2049 Modified (Re-Approval)",
+        "body": "Departure moved from 06:00 to 05:00. Auto-check verified driver rest compliance.",
+        "time": "2 hours ago",
+        "unread": true
+      },
+      {
+        "id": "N-DS-4",
+        "category": "Shift",
+        "title": "Driver D license expiring in 48 hours",
+        "body": "Driver Sherif Fathy cannot be assigned trips after 09 Oct 2026 without renewed license upload.",
+        "time": "4 hours ago",
+        "unread": false
+      },
+      {
+        "id": "N-DS-5",
+        "category": "Shift",
+        "title": "Driver C duty limit alert (7.5 / 8.0 h)",
+        "body": "Driver Hany Mahmoud is approaching maximum daily driving regulation.",
+        "time": "5 hours ago",
+        "unread": false
+      },
+      {
+        "id": "N-DS-6",
+        "category": "System",
+        "title": "Weekly fuel telemetry sync completed",
+        "body": "All OBD-II fleet tracking units online and calibrated with ±1.5% precision.",
+        "time": "Yesterday",
+        "unread": false
+      }
+    ],
+    "Driver": [
+      {
+        "id": "N-DR-1",
+        "category": "Shift",
+        "title": "Assigned Trip BK-2047 Active",
+        "body": "Next stop: Plant 3 Industrial Zone · 10th of Ramadan City. ETA 09:52.",
+        "time": "10 mins ago",
+        "unread": true
+      },
+      {
+        "id": "N-DR-2",
+        "category": "Safety",
+        "title": "Pre-Trip Inspection Verified",
+        "body": "Circle checklist complete for V-122. Fuel level 82%. Safe travels!",
+        "time": "1 hour ago",
+        "unread": false
+      }
+    ],
+    "Fleet admin": [
+      {
+        "id": "N-FA-1",
+        "category": "Safety",
+        "title": "Incident INC-2026-084 logged for B-03",
+        "body": "Mechanical breakdown coolant leak under investigation. Replacement coach dispatched.",
+        "time": "20 mins ago",
+        "unread": true
+      },
+      {
+        "id": "N-FA-2",
+        "category": "Maintenance",
+        "title": "V-108 Maintenance Lockout active",
+        "body": "Nissan Urvan is in Central Workshop for clutch overhaul.",
+        "time": "Yesterday",
+        "unread": true
+      },
+      {
+        "id": "N-FA-3",
+        "category": "System",
+        "title": "Quarterly Price Book v3 in effect",
+        "body": "Diesel EGP 20.50/L and Petrol 92 EGP 22.25/L configured across all cost calculation formulas.",
+        "time": "2 days ago",
+        "unread": false
+      },
+      {
+        "id": "N-FA-4",
+        "category": "Shift",
+        "title": "Driver D license renewal alert",
+        "body": "Renewal submission pending from HR Transport Division.",
+        "time": "3 days ago",
+        "unread": false
+      }
+    ],
+    "Auditor": [
+      {
+        "id": "N-AU-1",
+        "category": "System",
+        "title": "Fuel variance anomaly detected in Trip BK-2040",
+        "body": "MCV Bus B-07 recorded +5.1% actual fuel variance over ML estimate. Justification attached.",
+        "time": "2 hours ago",
+        "unread": true
+      },
+      {
+        "id": "N-AU-2",
+        "category": "System",
+        "title": "September chargeback reconciled & closed",
+        "body": "184 trips reconciled across 14 university faculties totaling EGP 142,650.",
+        "time": "Yesterday",
+        "unread": false
+      },
+      {
+        "id": "N-AU-3",
+        "category": "System",
+        "title": "Audit trail integrity hash: VALID",
+        "body": "All 8,812 logged system transactions verified against immutable cryptographic chain.",
+        "time": "3 days ago",
+        "unread": false
+      }
+    ]
+  }
+}

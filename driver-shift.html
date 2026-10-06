@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver Shift & Safety Checklist — CIRA Education Fleet Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/auth.js"></script>
+</head>
+<body>
+
+  <!-- Master Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="home.html" class="logo-btn" style="text-decoration:none;">
+        <span class="logo-badge" style="background:var(--cira-burgundy); color:var(--cira-gold); font-size:12px; font-weight:900; letter-spacing:0.06em;">CIRA</span>
+        <span class="logo-text">
+          <span class="univ-name">CIRA EDUCATION</span>
+          <span class="portal-title">Fleet &amp; Logistics Directorate</span>
+        </span>
+      </a>
+
+      <!-- Authenticated Controls -->
+      <div class="header-actions">
+        <div class="search-wrapper">
+          <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          </span>
+          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
+        </div>
+
+        <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <span class="badge-counter">3</span>
+        </a>
+
+        <!-- User Dropdown Menu -->
+        <div class="user-menu-wrapper">
+          <button type="button" class="user-btn">
+            <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
+            <span class="user-info">
+              <span class="user-name">Loading...</span>
+              <span class="user-role-badge">Authenticating</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="dropdown-menu" id="user-dropdown-menu" role="menu"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-container">
+    <aside class="sidebar-nav" aria-label="Sidebar Navigation">
+      <div>
+        <span class="nav-section-title">Navigation</span>
+        <div class="nav-links"></div>
+      </div>
+    </aside>
+
+    <main class="main-content" role="main">
+      <div class="page-header">
+  <div class="page-title-group">
+    <span class="page-pretitle">Driver Protocol</span>
+    <h1 class="page-title">My Shift &amp; Circle Inspection</h1>
+    <span class="page-subtitle">Verify duty hour limits and 5-point safety inspection</span>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; align-items: start;">
+  <div class="card">
+    <h2 class="card-title">Shift Status</h2>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span>Assigned Vehicle:</span>
+        <strong>V-122 · Hyundai H-1</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span>Checked in today at:</span>
+        <strong style="font-family:var(--font-mono);">07:40</strong>
+      </div>
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+          <span>Daily Driving Safety Limit</span>
+          <span style="font-family:var(--font-mono); font-weight:700;">6.5 / 8.0 h (1.5h Remaining)</span>
+        </div>
+        <div style="height: 12px; background: var(--bg-muted); border-radius: 6px; overflow: hidden;">
+          <div style="width: 81%; height: 100%; background: var(--warning);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Pre-Trip Circle Inspection Checklist</h2>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>I am fit to drive (well-rested, no medication affecting driving ability)</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Valid professional driver license and university security badge on me</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Pre-trip circle check: tyres pressure, headlights, brake lights, mirrors, glass clean</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Fuel level verified sufficient for assigned route (tank is > 80% full)</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Vehicle registration license, insurance card, logbook, and trip sheet in glove box</span></label>
+    </div>
+    <a href="driver-trip.html" class="btn btn-primary" style="margin-top: 16px; text-align:center;">
+      Proceed to Active Trip Manifest →
+    </a>
+  </div>
+</div>
+    </main>
+  </div>
+
+  <!-- Master Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-col" style="flex: 1 1 280px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="logo-badge" style="width: 36px; height: 36px; font-size: 11px; font-weight:900; background:var(--cira-gold); color:var(--cira-burgundy);">CIRA</div>
+            <div class="logo-text">
+              <span class="univ-name" style="color: #FFFFFF; font-size: 17px; font-weight:800;">CIRA EDUCATION</span>
+              <span class="portal-title" style="color: var(--cira-gold); font-size: 10px;">Fleet &amp; Logistics Directorate</span>
+            </div>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 13px; color: #DCE4EF; line-height: 1.6;">
+            Enterprise fleet logistics, vehicle booking, live GPS tracking and algorithmic fuel chargeback across CIRA Education universities and institutions.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Portal Services</h4>
+          <a href="booking-new.html" class="footer-link">Book a Vehicle</a>
+          <a href="vehicles.html" class="footer-link">Vehicle Catalog</a>
+          <a href="booking-track.html" class="footer-link">Track Active Trip</a>
+          <a href="bookings.html" class="footer-link">My Bookings</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Fleet Operations Center</h4>
+          <span>CIRA Education HQ · Central Logistics Operations</span>
+          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
+          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
+          <span>Email: fleet.operations@cira.com.eg</span>
+          <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 CIRA Education (Cairo for Investment and Real Estate Development S.A.E.)</span>
+        <div style="display: flex; gap: 20px;">
+          <a href="policies.html" class="footer-link">Policies &amp; Rules</a>
+          <a href="help.html" class="footer-link">Fleet Help Desk</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!Auth.requireAuth(["Driver"])) return;
+      Auth.renderAppShell('shift');
+      
+    });
+  </script>
+</body>
+</html>

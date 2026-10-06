@@ -1,0 +1,35 @@
+{
+  "system": {
+    "organization": "CIRA Education",
+    "portalName": "Fleet Logistics & Dispatch Platform",
+    "version": "3.2.0",
+    "timezone": "Africa/Cairo",
+    "currency": "EGP"
+  },
+  "rules": {
+    "bookingLeadTimeHours": 4,
+    "selfCancelWindowHours": 2,
+    "prepBufferMin": 30,
+    "turnaroundBufferMin": 45,
+    "maxDrivingHoursPerDay": 8.0,
+    "fuelVarianceThresholdPct": 10.0,
+    "staleSignalThresholdMin": 5,
+    "maxIdleMinutesAlert": 15
+  },
+  "contacts": {
+    "office": "CIRA Central Logistics Directorate, Campus Admin Bldg, G-14",
+    "dispatchDesk": "Ext. 4108 / 4109",
+    "emergencyHotline": "+20 10 2233 4455",
+    "email": "fleet.operations@cira.com.eg",
+    "hours": "24/7 Operations Command & Dispatch"
+  },
+  "fuelPrices": {
+    "activeVersion": "v3 (Effective 01 Aug 2026)",
+    "rates": {
+      "petrol92": 22.25,
+      "petrol95": 24.00,
+      "diesel": 20.50,
+      "cng": 6.50
+    }
+  }
+}

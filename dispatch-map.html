@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Map Telemetry Hub — CIRA Education Fleet Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/auth.js"></script>
+</head>
+<body>
+
+  <!-- Master Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="home.html" class="logo-btn" style="text-decoration:none;">
+        <span class="logo-badge" style="background:var(--cira-burgundy); color:var(--cira-gold); font-size:12px; font-weight:900; letter-spacing:0.06em;">CIRA</span>
+        <span class="logo-text">
+          <span class="univ-name">CIRA EDUCATION</span>
+          <span class="portal-title">Fleet &amp; Logistics Directorate</span>
+        </span>
+      </a>
+
+      <!-- Authenticated Controls -->
+      <div class="header-actions">
+        <div class="search-wrapper">
+          <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          </span>
+          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
+        </div>
+
+        <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <span class="badge-counter">3</span>
+        </a>
+
+        <!-- User Dropdown Menu -->
+        <div class="user-menu-wrapper">
+          <button type="button" class="user-btn">
+            <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
+            <span class="user-info">
+              <span class="user-name">Loading...</span>
+              <span class="user-role-badge">Authenticating</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="dropdown-menu" id="user-dropdown-menu" role="menu"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-container">
+    <aside class="sidebar-nav" aria-label="Sidebar Navigation">
+      <div>
+        <span class="nav-section-title">Navigation</span>
+        <div class="nav-links"></div>
+      </div>
+    </aside>
+
+    <main class="main-content" role="main">
+      <div class="page-header">
+  <div class="page-title-group">
+    <span class="page-pretitle">Fleet Radar</span>
+    <h1 class="page-title">Live Telemetry Map Hub</h1>
+    <span class="page-subtitle">Real-time GPS telemetry, speed, engine health and active paths</span>
+  </div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: start;">
+  <div class="map-canvas-container" style="flex: 999 1 600px; min-height: 600px;">
+    <div class="map-toolbar">
+      <span style="font-size: 13px; font-weight: 700; color: var(--navy-800);">Filter Fleet:</span>
+      <button type="button" class="btn btn-sm btn-primary">All</button>
+      <button type="button" class="btn btn-sm btn-secondary">Moving</button>
+      <button type="button" class="btn btn-sm btn-secondary">Idle</button>
+      <button type="button" class="btn btn-sm btn-secondary">Incident</button>
+    </div>
+
+    <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" preserveAspectRatio="none">
+      <line x1="100" y1="520" x2="780" y2="180" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+      <line x1="200" y1="150" x2="600" y2="480" stroke="#CBD5E1" stroke-width="4" stroke-dasharray="6,6"/>
+      <line x1="50" y1="400" x2="850" y2="400" stroke="#CBD5E1" stroke-width="4"/>
+    </svg>
+
+    <div class="map-vehicle-pin" style="left: 42%; top: 50%;" onclick="inspectVehicle('V-122', 'Hyundai H-1', 'Driver A', 'BK-2047', 'Obour → 10th of Ramadan', 72, 82, 22, 'Moving');">
+      <div class="pin-bubble">V-122 · 72 km/h</div>
+      <div class="pin-marker moving"></div>
+    </div><div class="map-vehicle-pin" style="left: 78%; top: 65%;" onclick="inspectVehicle('V-130', 'Toyota HiAce', 'Driver B', 'Standby', 'Campus Depot', 0, 94, 21, 'Idle');">
+      <div class="pin-bubble">V-130 · 0 km/h</div>
+      <div class="pin-marker idle"></div>
+    </div><div class="map-vehicle-pin" style="left: 25%; top: 35%;" onclick="inspectVehicle('V-114', 'Toyota HiAce', 'Driver C', 'BK-2041', 'Cairo Airport Corridor', 58, 68, 23, 'Moving');">
+      <div class="pin-bubble">V-114 · 58 km/h</div>
+      <div class="pin-marker moving"></div>
+    </div><div class="map-vehicle-pin" style="left: 55%; top: 40%;" onclick="inspectVehicle('B-03', 'MCV Coach 45', 'Driver K', 'BK-2039', 'Cairo-Ismailia Desert Rd Km 42', 0, 45, 38, 'Incident');">
+      <div class="pin-bubble">B-03 · 0 km/h</div>
+      <div class="pin-marker incident"></div>
+    </div><div class="map-vehicle-pin" style="left: 72%; top: 22%;" onclick="inspectVehicle('T-02', 'Isuzu Box Truck', 'Driver I', 'BK-2044', '10th of Ramadan Zone 3', 64, 75, 24, 'Moving');">
+      <div class="pin-bubble">T-02 · 64 km/h</div>
+      <div class="pin-marker moving"></div>
+    </div><div class="map-vehicle-pin" style="left: 75%; top: 72%;" onclick="inspectVehicle('S-11', 'Hyundai Elantra', 'Driver E', 'Standby', 'Badr University Gate 1', 0, 88, 22, 'Idle');">
+      <div class="pin-bubble">S-11 · 0 km/h</div>
+      <div class="pin-marker idle"></div>
+    </div><div class="map-vehicle-pin" style="left: 15%; top: 80%;" onclick="inspectVehicle('V-205', 'Toyota Corolla', 'Driver F', 'BK-2049', 'Terminal 3 VIP Road', 68, 62, 23, 'Moving');">
+      <div class="pin-bubble">V-205 · 68 km/h</div>
+      <div class="pin-marker moving"></div>
+    </div>
+  </div>
+
+  <div style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 16px;">
+    <div class="card" id="map-inspector-card">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <h2 style="margin: 0; font-size: 24px; color: var(--navy-800);" id="mi-model">Hyundai H-1</h2>
+        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--navy-600);" id="mi-code">V-122</span>
+      </div>
+      <span class="badge badge-info" id="mi-badge">Moving</span>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px; margin-top: 8px;">
+        <div style="display: flex; justify-content: space-between;"><span>Driver:</span><strong id="mi-driver">Ahmed Hassan (Driver A)</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Active Mission:</span><strong id="mi-trip">BK-2047</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Current Route:</span><strong id="mi-route">Obour → 10th of Ramadan</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Current Speed:</span><strong style="font-family:var(--font-mono);" id="mi-speed">72 km/h</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Fuel Remaining:</span><strong style="font-family:var(--font-mono);" id="mi-fuel">82%</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Engine Temp:</span><strong style="font-family:var(--font-mono);" id="mi-temp">22 °C</strong></div>
+      </div>
+
+      <div id="mi-incident-cta" style="margin-top: 14px; display: none;">
+        <a href="incident.html" class="btn btn-danger" style="width: 100%; box-sizing:border-box; text-align:center;">
+          Open Emergency Incident Triage →
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+    </main>
+  </div>
+
+  <!-- Master Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-col" style="flex: 1 1 280px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="logo-badge" style="width: 36px; height: 36px; font-size: 11px; font-weight:900; background:var(--cira-gold); color:var(--cira-burgundy);">CIRA</div>
+            <div class="logo-text">
+              <span class="univ-name" style="color: #FFFFFF; font-size: 17px; font-weight:800;">CIRA EDUCATION</span>
+              <span class="portal-title" style="color: var(--cira-gold); font-size: 10px;">Fleet &amp; Logistics Directorate</span>
+            </div>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 13px; color: #DCE4EF; line-height: 1.6;">
+            Enterprise fleet logistics, vehicle booking, live GPS tracking and algorithmic fuel chargeback across CIRA Education universities and institutions.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Portal Services</h4>
+          <a href="booking-new.html" class="footer-link">Book a Vehicle</a>
+          <a href="vehicles.html" class="footer-link">Vehicle Catalog</a>
+          <a href="booking-track.html" class="footer-link">Track Active Trip</a>
+          <a href="bookings.html" class="footer-link">My Bookings</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Fleet Operations Center</h4>
+          <span>CIRA Education HQ · Central Logistics Operations</span>
+          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
+          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
+          <span>Email: fleet.operations@cira.com.eg</span>
+          <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 CIRA Education (Cairo for Investment and Real Estate Development S.A.E.)</span>
+        <div style="display: flex; gap: 20px;">
+          <a href="policies.html" class="footer-link">Policies &amp; Rules</a>
+          <a href="help.html" class="footer-link">Fleet Help Desk</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!Auth.requireAuth(["Dispatcher"])) return;
+      Auth.renderAppShell('map');
+      
+function inspectVehicle(code, model, driver, trip, route, speed, fuel, temp, status) {
+  document.getElementById('mi-code').textContent = code;
+  document.getElementById('mi-model').textContent = model;
+  document.getElementById('mi-driver').textContent = driver;
+  document.getElementById('mi-trip').textContent = trip;
+  document.getElementById('mi-route').textContent = route;
+  document.getElementById('mi-speed').textContent = speed + ' km/h';
+  document.getElementById('mi-fuel').textContent = fuel + '%';
+  document.getElementById('mi-temp').textContent = temp + ' °C';
+  
+  const b = document.getElementById('mi-badge');
+  b.textContent = status;
+  b.className = 'badge ' + (status === 'Incident' ? 'badge-danger' : status === 'Moving' ? 'badge-info' : 'badge-success');
+  
+  const cta = document.getElementById('mi-incident-cta');
+  if (code === 'B-03' || status === 'Incident') {
+    cta.style.display = 'block';
+  } else {
+    cta.style.display = 'none';
+  }
+}
+    });
+  </script>
+</body>
+</html>

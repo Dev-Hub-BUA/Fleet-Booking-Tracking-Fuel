@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleet Vehicles & Price Book — CIRA Education Fleet Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/auth.js"></script>
+</head>
+<body>
+
+  <!-- Master Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="home.html" class="logo-btn" style="text-decoration:none;">
+        <span class="logo-badge" style="background:var(--cira-burgundy); color:var(--cira-gold); font-size:12px; font-weight:900; letter-spacing:0.06em;">CIRA</span>
+        <span class="logo-text">
+          <span class="univ-name">CIRA EDUCATION</span>
+          <span class="portal-title">Fleet &amp; Logistics Directorate</span>
+        </span>
+      </a>
+
+      <!-- Authenticated Controls -->
+      <div class="header-actions">
+        <div class="search-wrapper">
+          <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          </span>
+          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
+        </div>
+
+        <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <span class="badge-counter">3</span>
+        </a>
+
+        <!-- User Dropdown Menu -->
+        <div class="user-menu-wrapper">
+          <button type="button" class="user-btn">
+            <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
+            <span class="user-info">
+              <span class="user-name">Loading...</span>
+              <span class="user-role-badge">Authenticating</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="dropdown-menu" id="user-dropdown-menu" role="menu"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-container">
+    <aside class="sidebar-nav" aria-label="Sidebar Navigation">
+      <div>
+        <span class="nav-section-title">Navigation</span>
+        <div class="nav-links"></div>
+      </div>
+    </aside>
+
+    <main class="main-content" role="main">
+      <div class="page-header">
+  <div class="page-title-group">
+    <span class="page-pretitle">Fleet &amp; Asset Administration</span>
+    <h1 class="page-title">Fleet Management &amp; Settings</h1>
+    <span class="page-subtitle">Vehicles register, fuel price index versions, and department allocation quotas</span>
+  </div>
+  <button class="btn btn-gold" onclick="alert('Add vehicle dialog simulated.');">+ Add Vehicle</button>
+</div>
+
+<div class="card" style="margin-bottom: 24px;">
+  <h2 class="card-title">1. Vehicle Master Register (9 vehicles)</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Plate</th>
+          <th>Brand / Model</th>
+          <th>Fuel</th>
+          <th style="text-align:right;">Nominal/100km</th>
+          <th style="text-align:right;">Odometer</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">V-122</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">BDR 3307</td>
+      <td><strong>Hyundai H-1</strong></td>
+      <td>Diesel</td>
+      <td style="font-family:var(--font-mono); text-align:right;">9.2 L/100 km</td>
+      <td style="font-family:var(--font-mono); text-align:right;">48,276 km</td>
+      <td><span class="badge badge-success">Available</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="alert('Edit parameters for vehicle V-122');">Edit</button></td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">V-130</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">BDR 4182</td>
+      <td><strong>Toyota HiAce</strong></td>
+      <td>Diesel</td>
+      <td style="font-family:var(--font-mono); text-align:right;">10.1 L/100 km</td>
+      <td style="font-family:var(--font-mono); text-align:right;">84,150 km</td>
+      <td><span class="badge badge-success">Available</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="alert('Edit parameters for vehicle V-130');">Edit</button></td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">V-114</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">BDR 2019</td>
+      <td><strong>Toyota HiAce</strong></td>
+      <td>Diesel</td>
+      <td style="font-family:var(--font-mono); text-align:right;">9.8 L/100 km</td>
+      <td style="font-family:var(--font-mono); text-align:right;">62,400 km</td>
+      <td><span class="badge badge-warning">On trip</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="alert('Edit parameters for vehicle V-114');">Edit</button></td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">S-11</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">BDR 1044</td>
+      <td><strong>Hyundai Elantra</strong></td>
+      <td>Petrol 92</td>
+      <td style="font-family:var(--font-mono); text-align:right;">7.1 L/100 km</td>
+      <td style="font-family:var(--font-mono); text-align:right;">18,300 km</td>
+      <td><span class="badge badge-success">Available</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="alert('Edit parameters for vehicle S-11');">Edit</button></td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">V-205</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">BDR 5580</td>
+      <td><strong>Toyota Corolla</strong></td>
+      <td>Petrol 95</td>
+      <td style="font-family:var(--font-mono); text-align:right;">6.8 L/100 km</td>
+      <td style="font-family:var(--font-mono); text-align:right;">32,100 km</td>
+      <td><span class="badge badge-warning">On trip</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="alert('Edit parameters for vehicle V-205');">Edit</button></td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">C-04</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">BDR 7712</td>
+      <td><strong>Hyundai Accent</strong></td>
+      <td>CNG</td>
+      <td style="font-family:var(--font-mono); text-align:right;">7.4 m³/100 km</td>
+      <td style="font-family:var(--font-mono); text-align:right;">51,900 km</td>
+      <td><span class="badge badge-success">Available</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="alert('Edit parameters for vehicle C-04');">Edit</button></td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">B-07</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">BDR 9901</td>
+      <td><strong>MCV 500 Coach</strong></td>
+      <td>Diesel</td>
+      <td style="font-family:var(--font-mono); text-align:right;">27.5 L/100 km</td>
+      <td style="font-family:var(--font-mono); text-align:right;">112,000 km</td>
+      <td><span class="badge badge-success">Available</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="alert('Edit parameters for vehicle B-07');">Edit</button></td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">T-02</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">BDR 6623</td>
+      <td><strong>Isuzu NPR Box Truck</strong></td>
+      <td>Diesel</td>
+      <td style="font-family:var(--font-mono); text-align:right;">16.5 L/100 km</td>
+      <td style="font-family:var(--font-mono); text-align:right;">95,800 km</td>
+      <td><span class="badge badge-warning">On trip</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="alert('Edit parameters for vehicle T-02');">Edit</button></td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">V-108</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">BDR 1198</td>
+      <td><strong>Nissan Urvan</strong></td>
+      <td>Diesel</td>
+      <td style="font-family:var(--font-mono); text-align:right;">10.4 L/100 km</td>
+      <td style="font-family:var(--font-mono); text-align:right;">143,200 km</td>
+      <td><span class="badge badge-danger">Maintenance</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="alert('Edit parameters for vehicle V-108');">Edit</button></td>
+    </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 24px;">
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h2 class="card-title" style="margin:0;">2. Fuel Price Index Books</h2>
+      <button class="btn btn-secondary btn-sm" onclick="alert('Create new price book index v4.');">+ New Version</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: var(--navy-50);">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong style="color:var(--navy-800); font-size:16px;">Price Book v3 (Current)</strong>
+          <span style="font-size:12px; color:var(--text-muted); margin-left: 8px;">Effective 01 Aug 2026 – Present</span>
+        </div>
+        <span class="badge badge-success">Active &amp; Locked</span>
+      </div>
+      <div style="display: flex; gap: 20px; margin-top: 10px; font-size: 13px; font-family: var(--font-mono);">
+        <div>Petrol 92: <strong>22.25 EGP/L</strong></div>
+        <div>Petrol 95: <strong>24.00 EGP/L</strong></div>
+        <div>Diesel: <strong>20.50 EGP/L</strong></div>
+        <div>CNG: <strong>6.50 EGP/m³</strong></div>
+      </div>
+    </div><div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: #FFFFFF;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong style="color:var(--navy-800); font-size:16px;">Price Book v2</strong>
+          <span style="font-size:12px; color:var(--text-muted); margin-left: 8px;">Effective 01 Mar 2026 – 31 Jul 2026</span>
+        </div>
+        <span class="badge badge-neutral">Archived</span>
+      </div>
+      <div style="display: flex; gap: 20px; margin-top: 10px; font-size: 13px; font-family: var(--font-mono);">
+        <div>Petrol 92: <strong>20.50 EGP/L</strong></div>
+        <div>Petrol 95: <strong>22.00 EGP/L</strong></div>
+        <div>Diesel: <strong>18.50 EGP/L</strong></div>
+        <div>CNG: <strong>5.50 EGP/m³</strong></div>
+      </div>
+    </div><div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: #FFFFFF;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong style="color:var(--navy-800); font-size:16px;">Price Book v1</strong>
+          <span style="font-size:12px; color:var(--text-muted); margin-left: 8px;">Effective 01 Oct 2025 – 28 Feb 2026</span>
+        </div>
+        <span class="badge badge-neutral">Archived</span>
+      </div>
+      <div style="display: flex; gap: 20px; margin-top: 10px; font-size: 13px; font-family: var(--font-mono);">
+        <div>Petrol 92: <strong>18.00 EGP/L</strong></div>
+        <div>Petrol 95: <strong>19.50 EGP/L</strong></div>
+        <div>Diesel: <strong>16.50 EGP/L</strong></div>
+        <div>CNG: <strong>5.00 EGP/m³</strong></div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">3. Department October 2026 Quotas</h2>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Department</th>
+            <th style="text-align:right;">Allowance</th>
+            <th style="text-align:right;">Spent</th>
+            <th style="text-align:right;">Remaining</th>
+            <th>Utilization</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+      <td><strong>Faculty of Pharmacy</strong></td>
+      <td style="font-family:var(--font-mono); text-align:right;">40,000 EGP</td>
+      <td style="font-family:var(--font-mono); text-align:right;">25,800 EGP</td>
+      <td style="font-family:var(--font-mono); text-align:right;">14,200 EGP</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+            <div style="height:100%; width:64.5%; background: var(--navy-600);"></div>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:12px;">64.5%</span>
+        </div>
+      </td>
+    </tr><tr>
+      <td><strong>President’s Office & Executive Bureau</strong></td>
+      <td style="font-family:var(--font-mono); text-align:right;">60,000 EGP</td>
+      <td style="font-family:var(--font-mono); text-align:right;">48,500 EGP</td>
+      <td style="font-family:var(--font-mono); text-align:right;">11,500 EGP</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+            <div style="height:100%; width:80.8%; background: var(--warning);"></div>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:12px;">80.8%</span>
+        </div>
+      </td>
+    </tr><tr>
+      <td><strong>Student Activities & Athletics</strong></td>
+      <td style="font-family:var(--font-mono); text-align:right;">50,000 EGP</td>
+      <td style="font-family:var(--font-mono); text-align:right;">31,200 EGP</td>
+      <td style="font-family:var(--font-mono); text-align:right;">18,800 EGP</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+            <div style="height:100%; width:62.4%; background: var(--navy-600);"></div>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:12px;">62.4%</span>
+        </div>
+      </td>
+    </tr><tr>
+      <td><strong>Faculty of Engineering & Architecture</strong></td>
+      <td style="font-family:var(--font-mono); text-align:right;">45,000 EGP</td>
+      <td style="font-family:var(--font-mono); text-align:right;">29,800 EGP</td>
+      <td style="font-family:var(--font-mono); text-align:right;">15,200 EGP</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+            <div style="height:100%; width:66.2%; background: var(--navy-600);"></div>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:12px;">66.2%</span>
+        </div>
+      </td>
+    </tr><tr>
+      <td><strong>Faculty of Oral & Dental Medicine</strong></td>
+      <td style="font-family:var(--font-mono); text-align:right;">35,000 EGP</td>
+      <td style="font-family:var(--font-mono); text-align:right;">18,400 EGP</td>
+      <td style="font-family:var(--font-mono); text-align:right;">16,600 EGP</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+            <div style="height:100%; width:52.6%; background: var(--navy-600);"></div>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:12px;">52.6%</span>
+        </div>
+      </td>
+    </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+    </main>
+  </div>
+
+  <!-- Master Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-col" style="flex: 1 1 280px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="logo-badge" style="width: 36px; height: 36px; font-size: 11px; font-weight:900; background:var(--cira-gold); color:var(--cira-burgundy);">CIRA</div>
+            <div class="logo-text">
+              <span class="univ-name" style="color: #FFFFFF; font-size: 17px; font-weight:800;">CIRA EDUCATION</span>
+              <span class="portal-title" style="color: var(--cira-gold); font-size: 10px;">Fleet &amp; Logistics Directorate</span>
+            </div>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 13px; color: #DCE4EF; line-height: 1.6;">
+            Enterprise fleet logistics, vehicle booking, live GPS tracking and algorithmic fuel chargeback across CIRA Education universities and institutions.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Portal Services</h4>
+          <a href="booking-new.html" class="footer-link">Book a Vehicle</a>
+          <a href="vehicles.html" class="footer-link">Vehicle Catalog</a>
+          <a href="booking-track.html" class="footer-link">Track Active Trip</a>
+          <a href="bookings.html" class="footer-link">My Bookings</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Fleet Operations Center</h4>
+          <span>CIRA Education HQ · Central Logistics Operations</span>
+          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
+          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
+          <span>Email: fleet.operations@cira.com.eg</span>
+          <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 CIRA Education (Cairo for Investment and Real Estate Development S.A.E.)</span>
+        <div style="display: flex; gap: 20px;">
+          <a href="policies.html" class="footer-link">Policies &amp; Rules</a>
+          <a href="help.html" class="footer-link">Fleet Help Desk</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!Auth.requireAuth(["Fleet admin"])) return;
+      Auth.renderAppShell('fleet');
+      
+    });
+  </script>
+</body>
+</html>

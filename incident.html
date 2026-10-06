@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Incident Triage & Roadside SOS — CIRA Education Fleet Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/auth.js"></script>
+</head>
+<body>
+
+  <!-- Master Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="home.html" class="logo-btn" style="text-decoration:none;">
+        <span class="logo-badge" style="background:var(--cira-burgundy); color:var(--cira-gold); font-size:12px; font-weight:900; letter-spacing:0.06em;">CIRA</span>
+        <span class="logo-text">
+          <span class="univ-name">CIRA EDUCATION</span>
+          <span class="portal-title">Fleet &amp; Logistics Directorate</span>
+        </span>
+      </a>
+
+      <!-- Authenticated Controls -->
+      <div class="header-actions">
+        <div class="search-wrapper">
+          <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          </span>
+          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
+        </div>
+
+        <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <span class="badge-counter">3</span>
+        </a>
+
+        <!-- User Dropdown Menu -->
+        <div class="user-menu-wrapper">
+          <button type="button" class="user-btn">
+            <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
+            <span class="user-info">
+              <span class="user-name">Loading...</span>
+              <span class="user-role-badge">Authenticating</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="dropdown-menu" id="user-dropdown-menu" role="menu"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-container">
+    <aside class="sidebar-nav" aria-label="Sidebar Navigation">
+      <div>
+        <span class="nav-section-title">Navigation</span>
+        <div class="nav-links"></div>
+      </div>
+    </aside>
+
+    <main class="main-content" role="main">
+      <div class="page-header">
+  <div class="page-title-group">
+    <span class="page-pretitle">INC-2026-084 · Critical Response</span>
+    <h1 class="page-title">Incident Triage Desk</h1>
+    <span class="page-subtitle">Mechanical Breakdown · Coolant Line Rupture & Overheating</span>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 24px; align-items: start;">
+  <div style="display: flex; flex-direction: column; gap: 20px;">
+    <div class="card" style="border-left: 4px solid var(--danger);">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span class="badge badge-danger">Medium Severity</span>
+        <span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">13 Oct 2026 · 09:12</span>
+      </div>
+      <h2 style="margin: 0; font-size: 20px; color: var(--navy-800);">MCV 500 Bus (45 Seats) (B-03)</h2>
+      <div style="font-size: 14px; color: var(--text-muted);">
+        <div><strong>Driver:</strong> Driver K (Mahmoud Reda) · +20 10 5544 3322</div>
+        <div><strong>Location:</strong> Cairo–Ismailia Desert Road, Km 42 (Opposite Shurouk City Gate 3)</div>
+      </div>
+      <div class="alert-banner alert-success" style="font-size: 13px;">
+        ✓ <strong>Passenger Safety:</strong> All passengers evacuated safely to roadside shaded rest area behind crash barriers.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Driver Safety Protocol Verification</h3>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Hazard warning flashers activated immediately</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Vehicle pulled completely onto right shoulder off active lanes</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Reflective warning triangles placed 50m behind coach</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Passengers escorted behind guardrails into safe zone</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>First-aid kit checked (No injuries reported)</span></label><label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked style="accent-color: var(--success); width: 18px; height: 18px;"><span>Heavy recovery tow vehicle requested & dispatched</span></label>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 20px;">
+    <div class="card">
+      <h3 class="card-title">Recovery &amp; Tow Dispatch</h3>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>Al-Ahram Heavy Recovery & Towing</strong>
+              <div style="font-size: 12px; color: var(--text-muted);">ETA: 18 mins · Rate: 950 EGP</div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="this.textContent = 'Dispatched ✓'; this.disabled = true; alert('Heavy recovery tow truck dispatched: Al-Ahram Heavy Recovery & Towing');">
+              Dispatch Tow
+            </button>
+          </div><div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>Cairo Highway Patrol Emergency Recovery</strong>
+              <div style="font-size: 12px; color: var(--text-muted);">ETA: 25 mins · Rate: Official Service</div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="this.textContent = 'Dispatched ✓'; this.disabled = true; alert('Heavy recovery tow truck dispatched: Cairo Highway Patrol Emergency Recovery');">
+              Dispatch Tow
+            </button>
+          </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Replacement Relief Coach</h3>
+      <div style="font-size: 14px; display: flex; flex-direction: column; gap: 8px;">
+        <div><strong>Assigned Coach:</strong> MCV 500 Bus (45 Seats) (B-07)</div>
+        <div><strong>Relief Driver:</strong> Driver H (Hassan Metwally)</div>
+        <div><strong>Status:</strong> <span class="badge badge-info">Dispatched from Badr Campus at 09:20</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+    </main>
+  </div>
+
+  <!-- Master Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-col" style="flex: 1 1 280px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="logo-badge" style="width: 36px; height: 36px; font-size: 11px; font-weight:900; background:var(--cira-gold); color:var(--cira-burgundy);">CIRA</div>
+            <div class="logo-text">
+              <span class="univ-name" style="color: #FFFFFF; font-size: 17px; font-weight:800;">CIRA EDUCATION</span>
+              <span class="portal-title" style="color: var(--cira-gold); font-size: 10px;">Fleet &amp; Logistics Directorate</span>
+            </div>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 13px; color: #DCE4EF; line-height: 1.6;">
+            Enterprise fleet logistics, vehicle booking, live GPS tracking and algorithmic fuel chargeback across CIRA Education universities and institutions.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Portal Services</h4>
+          <a href="booking-new.html" class="footer-link">Book a Vehicle</a>
+          <a href="vehicles.html" class="footer-link">Vehicle Catalog</a>
+          <a href="booking-track.html" class="footer-link">Track Active Trip</a>
+          <a href="bookings.html" class="footer-link">My Bookings</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Fleet Operations Center</h4>
+          <span>CIRA Education HQ · Central Logistics Operations</span>
+          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
+          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
+          <span>Email: fleet.operations@cira.com.eg</span>
+          <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 CIRA Education (Cairo for Investment and Real Estate Development S.A.E.)</span>
+        <div style="display: flex; gap: 20px;">
+          <a href="policies.html" class="footer-link">Policies &amp; Rules</a>
+          <a href="help.html" class="footer-link">Fleet Help Desk</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!Auth.requireAuth(["Dispatcher"])) return;
+      Auth.renderAppShell('incident');
+      
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Policies & Operating Rules — CIRA Education Fleet Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/auth.js"></script>
+</head>
+<body>
+
+  <!-- Master Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="home.html" class="logo-btn" style="text-decoration:none;">
+        <span class="logo-badge" style="background:var(--cira-burgundy); color:var(--cira-gold); font-size:12px; font-weight:900; letter-spacing:0.06em;">CIRA</span>
+        <span class="logo-text">
+          <span class="univ-name">CIRA EDUCATION</span>
+          <span class="portal-title">Fleet &amp; Logistics Directorate</span>
+        </span>
+      </a>
+
+      <!-- Authenticated Controls -->
+      <div class="header-actions">
+        <div class="search-wrapper">
+          <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          </span>
+          <input type="search" class="search-input" placeholder="Search fleet policies & rules…" aria-label="Search policies">
+        </div>
+
+        <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <span class="badge-counter">3</span>
+        </a>
+
+        <!-- User Dropdown Menu -->
+        <div class="user-menu-wrapper">
+          <button type="button" class="user-btn">
+            <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
+            <span class="user-info">
+              <span class="user-name">Loading...</span>
+              <span class="user-role-badge">Authenticating</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="dropdown-menu" id="user-dropdown-menu" role="menu"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-container">
+    <aside class="sidebar-nav" aria-label="Sidebar Navigation">
+      <div>
+        <span class="nav-section-title">Navigation</span>
+        <div class="nav-links"></div>
+      </div>
+    </aside>
+
+    <main class="main-content" role="main">
+      <div class="page-header">
+        <div class="page-title-group">
+          <span class="page-pretitle">Governance &amp; Standard Operating Procedures</span>
+          <h1 class="page-title">Fleet Logistics Policies &amp; Operating Thresholds</h1>
+          <span class="page-subtitle">Parameters enforced in real-time by the dispatch engine and audit bureau</span>
+        </div>
+        <div>
+          <span class="badge badge-success" style="font-size:13px; padding:6px 12px;" id="policy-version-badge">Rules Engine v3.2 · Active</span>
+        </div>
+      </div>
+
+      <!-- Live Dynamic Parameters Grid -->
+      <div style="margin-top: 24px;">
+        <h2 style="font-size: 18px; color: var(--navy-800); margin-bottom: 12px; font-weight: 700;">Live Enforced System Rules (Loaded from Settings API)</h2>
+        <div class="stat-grid" id="rules-stat-grid">
+          <div class="stat-tile">
+            <span class="stat-label">Booking Lead Time</span>
+            <span class="stat-value" id="rule-lead-time">...</span>
+            <span class="stat-sub">Minimum notice required prior to trip departure</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-label">Turnaround Buffer</span>
+            <span class="stat-value" id="rule-turnaround">...</span>
+            <span class="stat-sub">Mandatory post-trip turnaround &amp; cleaning</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-label">Preparation Buffer</span>
+            <span class="stat-value" id="rule-prep">...</span>
+            <span class="stat-sub">Pre-departure safety check &amp; fueling staging</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-label">Fuel Variance Threshold</span>
+            <span class="stat-value" id="rule-fuel-variance" style="color:var(--navy-600);">...</span>
+            <span class="stat-sub">Flagged for audit if actual exceeds standard by this margin</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-label">Max Driver Duty Hours</span>
+            <span class="stat-value" id="rule-max-driving">...</span>
+            <span class="stat-sub">Maximum continuous daily hours before lockout</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-label">Self-Cancellation Window</span>
+            <span class="stat-value" id="rule-cancel-window">...</span>
+            <span class="stat-sub">Prior to departure without fleet penalty</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Policy Sections -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; margin-top: 28px;">
+        
+        <!-- Booking & Approval Rules -->
+        <div class="card">
+          <h3 class="card-title">1. Booking Submission &amp; Modifications</h3>
+          <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14.5px; line-height: 1.6; color: var(--text-main);">
+            <div style="padding: 12px; background: var(--navy-50); border-radius: 8px; border-left: 4px solid var(--cira-burgundy);">
+              <strong style="color: var(--cira-burgundy); display: block; margin-bottom: 4px;">Modification Warning:</strong>
+              Any alteration to an already-approved booking automatically revokes the approval and returns the booking status to <strong>Pending</strong>, requiring re-authorization by the Operations Desk.
+            </div>
+            <div>
+              <strong>Lead Time Rule:</strong> Bookings submitted with less than <span id="text-lead-time" style="font-weight:700;">4 hours</span> lead time require emergency dispatch override with written justification.
+            </div>
+            <div>
+              <strong>Concurrent Approval Guard (409 Conflict):</strong> If two dispatchers attempt to assign the same vehicle or driver concurrently, the system issues a 409 Conflict exception and refreshes the manifest.
+            </div>
+          </div>
+        </div>
+
+        <!-- Fuel Price Book & Rates -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 class="card-title" style="margin: 0;">2. Fuel Price Book &amp; Chargeback</h3>
+            <span class="badge badge-info" id="pricebook-version-label">Version v3</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14.5px; line-height: 1.6;">
+            <p style="margin: 0; color: var(--text-muted);">
+              All trips are reconciled against the fuel price book active on the exact <strong>date of trip execution</strong>, regardless of subsequent tariff updates.
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-family: var(--font-mono); font-size: 13.5px;" id="fuel-rates-display">
+              <div style="padding: 10px; background: var(--bg-muted); border-radius: 6px;">Petrol 92: <strong id="rate-p92">--</strong></div>
+              <div style="padding: 10px; background: var(--bg-muted); border-radius: 6px;">Petrol 95: <strong id="rate-p95">--</strong></div>
+              <div style="padding: 10px; background: var(--bg-muted); border-radius: 6px;">Diesel: <strong id="rate-diesel">--</strong></div>
+              <div style="padding: 10px; background: var(--bg-muted); border-radius: 6px;">CNG: <strong id="rate-cng">--</strong></div>
+            </div>
+            <div style="font-size: 13px; color: var(--text-muted);">
+              Fuel variance exceeding <span id="text-variance" style="font-weight:700;">±10%</span> prevents automated settlement and routes the record to the Internal Audit Bureau.
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry & Driver Shift Rules -->
+        <div class="card">
+          <h3 class="card-title">3. Telemetry, GPS Pings &amp; Telematics</h3>
+          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 14.5px; line-height: 1.6;">
+            <div>
+              <strong>Stale Signal Threshold:</strong> Vehicles with no GPS ping for <span id="text-stale" style="font-weight:700;">5 minutes</span> trigger a <em>Stale Telemetry</em> warning on the Dispatch Live Map.
+            </div>
+            <div>
+              <strong>Excessive Idle Alert:</strong> Stationary engines exceeding <span id="text-idle" style="font-weight:700;">15 minutes</span> with ignition active trigger an idling fuel waste flag.
+            </div>
+            <div>
+              <strong>Offline Driver Queue:</strong> In areas with weak GSM coverage, driver mobile pings are cached in IndexedDB and uploaded in sequence with a delayed sync flag.
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip Closeout Requirements -->
+        <div class="card">
+          <h3 class="card-title">4. Mandatory Trip Closeout Flow</h3>
+          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 14.5px; line-height: 1.6;">
+            <div style="padding: 12px; background: #FFFBEB; border-radius: 8px; border-left: 4px solid var(--cira-gold);">
+              <strong style="color: var(--cira-gold-dark); display: block; margin-bottom: 4px;">Closeout Gate:</strong>
+              Trip completion is strictly blocked until the driver has entered the certified end odometer reading and attached valid photo receipts for every fuel purchase made.
+            </div>
+            <div>
+              <strong>SOS Protocol:</strong> Emergency distress signals bypass all validation gates and notify the Central Operations Command Desk immediately.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Master Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-col" style="flex: 1 1 280px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="logo-badge" style="width: 36px; height: 36px; font-size: 11px; font-weight:900; background:var(--cira-gold); color:var(--cira-burgundy);">CIRA</div>
+            <div class="logo-text">
+              <span class="univ-name" style="color: #FFFFFF; font-size: 17px; font-weight:800;">CIRA EDUCATION</span>
+              <span class="portal-title" style="color: var(--cira-gold); font-size: 10px;">Fleet &amp; Logistics Directorate</span>
+            </div>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 13px; color: #DCE4EF; line-height: 1.6;">
+            Enterprise fleet logistics, vehicle booking, live GPS tracking and algorithmic fuel chargeback across CIRA Education universities and institutions.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Portal Services</h4>
+          <a href="booking-new.html" class="footer-link">Book a Vehicle</a>
+          <a href="vehicles.html" class="footer-link">Vehicle Catalog</a>
+          <a href="booking-track.html" class="footer-link">Track Active Trip</a>
+          <a href="bookings.html" class="footer-link">My Bookings</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Fleet Operations Center</h4>
+          <span>CIRA Education HQ · Central Logistics Operations</span>
+          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
+          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
+          <span>Email: fleet.operations@cira.com.eg</span>
+          <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 CIRA Education (Cairo for Investment and Real Estate Development S.A.E.)</span>
+        <div style="display: flex; gap: 20px;">
+          <a href="policies.html" class="footer-link" style="color:var(--cira-gold);">Policies &amp; Rules</a>
+          <a href="help.html" class="footer-link">Fleet Help Desk</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!Auth.requireAuth(['all'])) return;
+      Auth.renderAppShell('policies');
+
+      Auth.getSettings(function (settings) {
+        if (!settings) return;
+        const r = settings.rules;
+        const f = settings.fuelPrices;
+
+        document.getElementById('rule-lead-time').textContent = r.bookingLeadTimeHours + ' Hours';
+        document.getElementById('rule-turnaround').textContent = r.turnaroundBufferMin + ' Min';
+        document.getElementById('rule-prep').textContent = r.prepBufferMin + ' Min';
+        document.getElementById('rule-fuel-variance').textContent = '±' + r.fuelVarianceThresholdPct.toFixed(1) + '%';
+        document.getElementById('rule-max-driving').textContent = r.maxDrivingHoursPerDay.toFixed(1) + ' Hours';
+        document.getElementById('rule-cancel-window').textContent = r.selfCancelWindowHours + ' Hours';
+
+        document.getElementById('text-lead-time').textContent = r.bookingLeadTimeHours + ' hours';
+        document.getElementById('text-variance').textContent = '±' + r.fuelVarianceThresholdPct.toFixed(1) + '%';
+        document.getElementById('text-stale').textContent = r.staleSignalThresholdMin + ' minutes';
+        document.getElementById('text-idle').textContent = r.maxIdleMinutesAlert + ' minutes';
+
+        if (f) {
+          document.getElementById('pricebook-version-label').textContent = f.activeVersion;
+          document.getElementById('rate-p92').textContent = f.rates.petrol92.toFixed(2) + ' EGP / L';
+          document.getElementById('rate-p95').textContent = f.rates.petrol95.toFixed(2) + ' EGP / L';
+          document.getElementById('rate-diesel').textContent = f.rates.diesel.toFixed(2) + ' EGP / L';
+          document.getElementById('rate-cng').textContent = f.rates.cng.toFixed(2) + ' EGP / m³';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

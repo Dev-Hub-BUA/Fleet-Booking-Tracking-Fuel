@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Catalog — CIRA Education Fleet Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/auth.js"></script>
+</head>
+<body>
+
+  <!-- Master Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="home.html" class="logo-btn" style="text-decoration:none;">
+        <span class="logo-badge" style="background:var(--cira-burgundy); color:var(--cira-gold); font-size:12px; font-weight:900; letter-spacing:0.06em;">CIRA</span>
+        <span class="logo-text">
+          <span class="univ-name">CIRA EDUCATION</span>
+          <span class="portal-title">Fleet &amp; Logistics Directorate</span>
+        </span>
+      </a>
+
+      <!-- Authenticated Controls -->
+      <div class="header-actions">
+        <div class="search-wrapper">
+          <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          </span>
+          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
+        </div>
+
+        <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <span class="badge-counter">3</span>
+        </a>
+
+        <!-- User Dropdown Menu -->
+        <div class="user-menu-wrapper">
+          <button type="button" class="user-btn">
+            <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
+            <span class="user-info">
+              <span class="user-name">Loading...</span>
+              <span class="user-role-badge">Authenticating</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="dropdown-menu" id="user-dropdown-menu" role="menu"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-container">
+    <aside class="sidebar-nav" aria-label="Sidebar Navigation">
+      <div>
+        <span class="nav-section-title">Navigation</span>
+        <div class="nav-links"></div>
+      </div>
+    </aside>
+
+    <main class="main-content" role="main">
+      <div class="page-header">
+  <div class="page-title-group">
+    <span class="page-pretitle">Fleet Directory</span>
+    <h1 class="page-title">Vehicle Catalog</h1>
+    <span class="page-subtitle">Showing 9 university vehicles</span>
+  </div>
+  <a href="booking-new.html" class="btn btn-gold">+ New Booking Request</a>
+</div>
+
+<div class="card" style="padding: 16px 20px;">
+  <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+    <span style="font-size: 13px; font-weight: 700; color: var(--navy-800); margin-right: 8px;">Vehicle Type:</span>
+    <button type="button" class="btn btn-sm btn-primary catalog-pill" onclick="filterCatalog('All', this)">All</button>
+    <button type="button" class="btn btn-sm btn-secondary catalog-pill" onclick="filterCatalog('Sedan', this)">Sedan</button>
+    <button type="button" class="btn btn-sm btn-secondary catalog-pill" onclick="filterCatalog('Van', this)">Van</button>
+    <button type="button" class="btn btn-sm btn-secondary catalog-pill" onclick="filterCatalog('Bus', this)">Bus</button>
+    <button type="button" class="btn btn-sm btn-secondary catalog-pill" onclick="filterCatalog('Truck', this)">Truck</button>
+  </div>
+</div>
+
+<div id="catalog-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px;">
+  <article class="card" style="padding: 0; overflow: hidden; border-radius: var(--radius-md);" data-type="Van">
+      <div style="height: 140px; background: #E2E8F0; display: flex; align-items: center; justify-content: center; position: relative;">
+        <span style="font-family: var(--font-condensed); font-size: 32px; font-weight: 700; color: var(--navy-600); opacity: 0.5;">Hyundai H-1</span>
+        <span class="badge badge-success" style="position: absolute; top: 12px; right: 12px;">Available</span>
+      </div>
+      <div style="padding: 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--navy-800);">Hyundai H-1 (2023)</h3>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-weight: 700;">V-122</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: var(--text-muted);">
+          <div><strong>Type:</strong> Van</div>
+          <div><strong>Seats:</strong> 9 pax</div>
+          <div><strong>Fuel:</strong> Diesel</div>
+          <div><strong>Trans:</strong> Manual</div>
+          <div style="grid-column: span 2;"><strong>Nominal:</strong> <span style="font-family:var(--font-mono);">9.2 L/100 km</span></div>
+        </div>
+        <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border);">
+          <a href="booking-new.html" class="btn btn-secondary btn-sm" style="width: 100%; font-weight: 700; text-align:center; box-sizing:border-box;">
+            Book this vehicle →
+          </a>
+        </div>
+      </div>
+    </article><article class="card" style="padding: 0; overflow: hidden; border-radius: var(--radius-md);" data-type="Van">
+      <div style="height: 140px; background: #E2E8F0; display: flex; align-items: center; justify-content: center; position: relative;">
+        <span style="font-family: var(--font-condensed); font-size: 32px; font-weight: 700; color: var(--navy-600); opacity: 0.5;">Toyota HiAce</span>
+        <span class="badge badge-success" style="position: absolute; top: 12px; right: 12px;">Available</span>
+      </div>
+      <div style="padding: 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--navy-800);">Toyota HiAce (2020)</h3>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-weight: 700;">V-130</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: var(--text-muted);">
+          <div><strong>Type:</strong> Van</div>
+          <div><strong>Seats:</strong> 12 pax</div>
+          <div><strong>Fuel:</strong> Diesel</div>
+          <div><strong>Trans:</strong> Manual</div>
+          <div style="grid-column: span 2;"><strong>Nominal:</strong> <span style="font-family:var(--font-mono);">10.1 L/100 km</span></div>
+        </div>
+        <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border);">
+          <a href="booking-new.html" class="btn btn-secondary btn-sm" style="width: 100%; font-weight: 700; text-align:center; box-sizing:border-box;">
+            Book this vehicle →
+          </a>
+        </div>
+      </div>
+    </article><article class="card" style="padding: 0; overflow: hidden; border-radius: var(--radius-md);" data-type="Van">
+      <div style="height: 140px; background: #E2E8F0; display: flex; align-items: center; justify-content: center; position: relative;">
+        <span style="font-family: var(--font-condensed); font-size: 32px; font-weight: 700; color: var(--navy-600); opacity: 0.5;">Toyota HiAce</span>
+        <span class="badge badge-info" style="position: absolute; top: 12px; right: 12px;">On trip</span>
+      </div>
+      <div style="padding: 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--navy-800);">Toyota HiAce (2022)</h3>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-weight: 700;">V-114</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: var(--text-muted);">
+          <div><strong>Type:</strong> Van</div>
+          <div><strong>Seats:</strong> 9 pax</div>
+          <div><strong>Fuel:</strong> Diesel</div>
+          <div><strong>Trans:</strong> Manual</div>
+          <div style="grid-column: span 2;"><strong>Nominal:</strong> <span style="font-family:var(--font-mono);">9.8 L/100 km</span></div>
+        </div>
+        <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border);">
+          <a href="booking-new.html" class="btn btn-secondary btn-sm" style="width: 100%; font-weight: 700; text-align:center; box-sizing:border-box;">
+            Book this vehicle →
+          </a>
+        </div>
+      </div>
+    </article><article class="card" style="padding: 0; overflow: hidden; border-radius: var(--radius-md);" data-type="Sedan">
+      <div style="height: 140px; background: #E2E8F0; display: flex; align-items: center; justify-content: center; position: relative;">
+        <span style="font-family: var(--font-condensed); font-size: 32px; font-weight: 700; color: var(--navy-600); opacity: 0.5;">Hyundai Elantra</span>
+        <span class="badge badge-success" style="position: absolute; top: 12px; right: 12px;">Available</span>
+      </div>
+      <div style="padding: 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--navy-800);">Hyundai Elantra (2024)</h3>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-weight: 700;">S-11</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: var(--text-muted);">
+          <div><strong>Type:</strong> Sedan</div>
+          <div><strong>Seats:</strong> 4 pax</div>
+          <div><strong>Fuel:</strong> Petrol 92</div>
+          <div><strong>Trans:</strong> Automatic</div>
+          <div style="grid-column: span 2;"><strong>Nominal:</strong> <span style="font-family:var(--font-mono);">7.1 L/100 km</span></div>
+        </div>
+        <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border);">
+          <a href="booking-new.html" class="btn btn-secondary btn-sm" style="width: 100%; font-weight: 700; text-align:center; box-sizing:border-box;">
+            Book this vehicle →
+          </a>
+        </div>
+      </div>
+    </article><article class="card" style="padding: 0; overflow: hidden; border-radius: var(--radius-md);" data-type="Sedan">
+      <div style="height: 140px; background: #E2E8F0; display: flex; align-items: center; justify-content: center; position: relative;">
+        <span style="font-family: var(--font-condensed); font-size: 32px; font-weight: 700; color: var(--navy-600); opacity: 0.5;">Toyota Corolla</span>
+        <span class="badge badge-info" style="position: absolute; top: 12px; right: 12px;">On trip</span>
+      </div>
+      <div style="padding: 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--navy-800);">Toyota Corolla (2023)</h3>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-weight: 700;">V-205</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: var(--text-muted);">
+          <div><strong>Type:</strong> Sedan</div>
+          <div><strong>Seats:</strong> 4 pax</div>
+          <div><strong>Fuel:</strong> Petrol 95</div>
+          <div><strong>Trans:</strong> Automatic</div>
+          <div style="grid-column: span 2;"><strong>Nominal:</strong> <span style="font-family:var(--font-mono);">6.8 L/100 km</span></div>
+        </div>
+        <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border);">
+          <a href="booking-new.html" class="btn btn-secondary btn-sm" style="width: 100%; font-weight: 700; text-align:center; box-sizing:border-box;">
+            Book this vehicle →
+          </a>
+        </div>
+      </div>
+    </article><article class="card" style="padding: 0; overflow: hidden; border-radius: var(--radius-md);" data-type="Sedan">
+      <div style="height: 140px; background: #E2E8F0; display: flex; align-items: center; justify-content: center; position: relative;">
+        <span style="font-family: var(--font-condensed); font-size: 32px; font-weight: 700; color: var(--navy-600); opacity: 0.5;">Hyundai Accent</span>
+        <span class="badge badge-success" style="position: absolute; top: 12px; right: 12px;">Available</span>
+      </div>
+      <div style="padding: 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--navy-800);">Hyundai Accent (2022)</h3>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-weight: 700;">C-04</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: var(--text-muted);">
+          <div><strong>Type:</strong> Sedan</div>
+          <div><strong>Seats:</strong> 4 pax</div>
+          <div><strong>Fuel:</strong> CNG</div>
+          <div><strong>Trans:</strong> Manual</div>
+          <div style="grid-column: span 2;"><strong>Nominal:</strong> <span style="font-family:var(--font-mono);">7.4 m³/100 km</span></div>
+        </div>
+        <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border);">
+          <a href="booking-new.html" class="btn btn-secondary btn-sm" style="width: 100%; font-weight: 700; text-align:center; box-sizing:border-box;">
+            Book this vehicle →
+          </a>
+        </div>
+      </div>
+    </article><article class="card" style="padding: 0; overflow: hidden; border-radius: var(--radius-md);" data-type="Bus">
+      <div style="height: 140px; background: #E2E8F0; display: flex; align-items: center; justify-content: center; position: relative;">
+        <span style="font-family: var(--font-condensed); font-size: 32px; font-weight: 700; color: var(--navy-600); opacity: 0.5;">MCV 500 Coach</span>
+        <span class="badge badge-success" style="position: absolute; top: 12px; right: 12px;">Available</span>
+      </div>
+      <div style="padding: 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--navy-800);">MCV 500 Coach (2021)</h3>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-weight: 700;">B-07</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: var(--text-muted);">
+          <div><strong>Type:</strong> Bus</div>
+          <div><strong>Seats:</strong> 45 pax</div>
+          <div><strong>Fuel:</strong> Diesel</div>
+          <div><strong>Trans:</strong> Manual</div>
+          <div style="grid-column: span 2;"><strong>Nominal:</strong> <span style="font-family:var(--font-mono);">27.5 L/100 km</span></div>
+        </div>
+        <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border);">
+          <a href="booking-new.html" class="btn btn-secondary btn-sm" style="width: 100%; font-weight: 700; text-align:center; box-sizing:border-box;">
+            Book this vehicle →
+          </a>
+        </div>
+      </div>
+    </article><article class="card" style="padding: 0; overflow: hidden; border-radius: var(--radius-md);" data-type="Truck">
+      <div style="height: 140px; background: #E2E8F0; display: flex; align-items: center; justify-content: center; position: relative;">
+        <span style="font-family: var(--font-condensed); font-size: 32px; font-weight: 700; color: var(--navy-600); opacity: 0.5;">Isuzu NPR Box Truck</span>
+        <span class="badge badge-info" style="position: absolute; top: 12px; right: 12px;">On trip</span>
+      </div>
+      <div style="padding: 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--navy-800);">Isuzu NPR Box Truck (2021)</h3>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-weight: 700;">T-02</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: var(--text-muted);">
+          <div><strong>Type:</strong> Truck</div>
+          <div><strong>Seats:</strong> 3 pax</div>
+          <div><strong>Fuel:</strong> Diesel</div>
+          <div><strong>Trans:</strong> Manual</div>
+          <div style="grid-column: span 2;"><strong>Nominal:</strong> <span style="font-family:var(--font-mono);">16.5 L/100 km</span></div>
+        </div>
+        <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border);">
+          <a href="booking-new.html" class="btn btn-secondary btn-sm" style="width: 100%; font-weight: 700; text-align:center; box-sizing:border-box;">
+            Book this vehicle →
+          </a>
+        </div>
+      </div>
+    </article><article class="card" style="padding: 0; overflow: hidden; border-radius: var(--radius-md);" data-type="Van">
+      <div style="height: 140px; background: #E2E8F0; display: flex; align-items: center; justify-content: center; position: relative;">
+        <span style="font-family: var(--font-condensed); font-size: 32px; font-weight: 700; color: var(--navy-600); opacity: 0.5;">Nissan Urvan</span>
+        <span class="badge badge-warning" style="position: absolute; top: 12px; right: 12px;">Maintenance</span>
+      </div>
+      <div style="padding: 18px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--navy-800);">Nissan Urvan (2019)</h3>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-weight: 700;">V-108</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: var(--text-muted);">
+          <div><strong>Type:</strong> Van</div>
+          <div><strong>Seats:</strong> 12 pax</div>
+          <div><strong>Fuel:</strong> Diesel</div>
+          <div><strong>Trans:</strong> Manual</div>
+          <div style="grid-column: span 2;"><strong>Nominal:</strong> <span style="font-family:var(--font-mono);">10.4 L/100 km</span></div>
+        </div>
+        <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border);">
+          <a href="booking-new.html" class="btn btn-secondary btn-sm" style="width: 100%; font-weight: 700; text-align:center; box-sizing:border-box;">
+            Book this vehicle →
+          </a>
+        </div>
+      </div>
+    </article>
+</div>
+    </main>
+  </div>
+
+  <!-- Master Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-col" style="flex: 1 1 280px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="logo-badge" style="width: 36px; height: 36px; font-size: 11px; font-weight:900; background:var(--cira-gold); color:var(--cira-burgundy);">CIRA</div>
+            <div class="logo-text">
+              <span class="univ-name" style="color: #FFFFFF; font-size: 17px; font-weight:800;">CIRA EDUCATION</span>
+              <span class="portal-title" style="color: var(--cira-gold); font-size: 10px;">Fleet &amp; Logistics Directorate</span>
+            </div>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 13px; color: #DCE4EF; line-height: 1.6;">
+            Enterprise fleet logistics, vehicle booking, live GPS tracking and algorithmic fuel chargeback across CIRA Education universities and institutions.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Portal Services</h4>
+          <a href="booking-new.html" class="footer-link">Book a Vehicle</a>
+          <a href="vehicles.html" class="footer-link">Vehicle Catalog</a>
+          <a href="booking-track.html" class="footer-link">Track Active Trip</a>
+          <a href="bookings.html" class="footer-link">My Bookings</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Fleet Operations Center</h4>
+          <span>CIRA Education HQ · Central Logistics Operations</span>
+          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
+          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
+          <span>Email: fleet.operations@cira.com.eg</span>
+          <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 CIRA Education (Cairo for Investment and Real Estate Development S.A.E.)</span>
+        <div style="display: flex; gap: 20px;">
+          <a href="policies.html" class="footer-link">Policies &amp; Rules</a>
+          <a href="help.html" class="footer-link">Fleet Help Desk</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!Auth.requireAuth(["Requester"])) return;
+      Auth.renderAppShell('catalog');
+      
+function filterCatalog(type, btn) {
+  document.querySelectorAll('.catalog-pill').forEach(b => {
+    b.className = 'btn btn-sm btn-secondary catalog-pill';
+  });
+  btn.className = 'btn btn-sm btn-primary catalog-pill';
+  document.querySelectorAll('#catalog-grid article').forEach(card => {
+    if (type === 'All' || card.getAttribute('data-type') === type) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+    });
+  </script>
+</body>
+</html>

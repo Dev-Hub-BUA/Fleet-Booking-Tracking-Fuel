@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Schedule & Gantt Timeline — CIRA Education Fleet Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/auth.js"></script>
+</head>
+<body>
+
+  <!-- Master Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="home.html" class="logo-btn" style="text-decoration:none;">
+        <span class="logo-badge" style="background:var(--cira-burgundy); color:var(--cira-gold); font-size:12px; font-weight:900; letter-spacing:0.06em;">CIRA</span>
+        <span class="logo-text">
+          <span class="univ-name">CIRA EDUCATION</span>
+          <span class="portal-title">Fleet &amp; Logistics Directorate</span>
+        </span>
+      </a>
+
+      <!-- Authenticated Controls -->
+      <div class="header-actions">
+        <div class="search-wrapper">
+          <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          </span>
+          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
+        </div>
+
+        <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <span class="badge-counter">3</span>
+        </a>
+
+        <!-- User Dropdown Menu -->
+        <div class="user-menu-wrapper">
+          <button type="button" class="user-btn">
+            <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
+            <span class="user-info">
+              <span class="user-name">Loading...</span>
+              <span class="user-role-badge">Authenticating</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="dropdown-menu" id="user-dropdown-menu" role="menu"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-container">
+    <aside class="sidebar-nav" aria-label="Sidebar Navigation">
+      <div>
+        <span class="nav-section-title">Navigation</span>
+        <div class="nav-links"></div>
+      </div>
+    </aside>
+
+    <main class="main-content" role="main">
+      <div class="page-header">
+  <div class="page-title-group">
+    <span class="page-pretitle">Daily Operations Schedule</span>
+    <h1 class="page-title">Vehicle Timeline &amp; Gantt Schedule</h1>
+    <span class="page-subtitle">Track trips, cleaning buffers, maintenance lockouts, and clash detection</span>
+  </div>
+  <div style="display: flex; gap: 8px;">
+    <a href="dispatch-queue.html" class="btn btn-secondary btn-sm">Approval Queue</a>
+    <a href="dispatch-map.html" class="btn btn-primary btn-sm">Live Map</a>
+  </div>
+</div>
+
+<div class="timeline-card" style="margin-top: 14px;">
+  <div class="timeline-header-hours">
+    <div style="text-align: left; padding-left: 8px;">Vehicle Asset</div>
+    <div>06:00</div><div>07:00</div><div>08:00</div><div>09:00</div><div>10:00</div><div>11:00</div>
+    <div>12:00</div><div>13:00</div><div>14:00</div><div>15:00</div><div>16:00</div><div>17:00</div><div>18:00</div>
+  </div>
+  <div style="display: flex; flex-direction: column;">
+    <div class="timeline-row">
+      <div class="timeline-veh-label">
+        <span class="timeline-veh-code">V-114</span>
+        <span class="timeline-veh-sub">Toyota HiAce (9-Seat Van)</span>
+      </div>
+      <div class="timeline-track">
+        <div class="timeline-block block-trip" style="left: 0.0%; width: 20.833333333333336%;" title="BK-2041 Airport Run (06:00–08:30 Trip)" onclick="alert('BK-2041 Airport Run\n06:00–08:30 Trip');">06:00–08:30 Trip</div><div class="timeline-block block-buffer" style="left: 20.833333333333336%; width: 6.25%;" title="Cleaning & Fuel Buffer (08:30–09:15 Buffer)" onclick="alert('Cleaning & Fuel Buffer\n08:30–09:15 Buffer');">08:30–09:15 Buffer</div><div class="timeline-block block-clash" style="left: 20.833333333333336%; width: 6.25%;" title="BK-2047 Clash (Overlap 45m) (CLASH 45m)" onclick="alert('BK-2047 Clash (Overlap 45m)\nCLASH 45m');">CLASH 45m</div><div class="timeline-block block-trip" style="left: 33.33333333333333%; width: 33.33333333333333%;" title="BK-2048 Downtown Transit (10:00–14:00 Trip)" onclick="alert('BK-2048 Downtown Transit\n10:00–14:00 Trip');">10:00–14:00 Trip</div><div class="timeline-block block-buffer" style="left: 66.66666666666666%; width: 6.25%;" title="Return Buffer (Buffer)" onclick="alert('Return Buffer\nBuffer');">Buffer</div>
+      </div>
+    </div><div class="timeline-row">
+      <div class="timeline-veh-label">
+        <span class="timeline-veh-code">V-122</span>
+        <span class="timeline-veh-sub">Hyundai H-1 (9-Seat Van)</span>
+      </div>
+      <div class="timeline-track">
+        <div class="timeline-block block-buffer" style="left: 14.583333333333334%; width: 6.25%;" title="Pre-Trip Inspection Buffer (07:45–08:30 Prep)" onclick="alert('Pre-Trip Inspection Buffer\n07:45–08:30 Prep');">07:45–08:30 Prep</div><div class="timeline-block block-trip" style="left: 20.833333333333336%; width: 45.83333333333333%;" title="BK-2047 Pharmacy Run (08:30–14:00 Active)" onclick="alert('BK-2047 Pharmacy Run\n08:30–14:00 Active');">08:30–14:00 Active</div><div class="timeline-block block-buffer" style="left: 66.66666666666666%; width: 8.333333333333332%;" title="Post-Trip Buffer (14:00–15:00 Buffer)" onclick="alert('Post-Trip Buffer\n14:00–15:00 Buffer');">14:00–15:00 Buffer</div>
+      </div>
+    </div><div class="timeline-row">
+      <div class="timeline-veh-label">
+        <span class="timeline-veh-code">V-130</span>
+        <span class="timeline-veh-sub">Toyota HiAce (12-Seat Van)</span>
+      </div>
+      <div class="timeline-track">
+        <div class="timeline-block block-trip" style="left: 8.333333333333332%; width: 16.666666666666664%;" title="Staff Shuttle Routine (07:00–09:00 Shuttle)" onclick="alert('Staff Shuttle Routine\n07:00–09:00 Shuttle');">07:00–09:00 Shuttle</div><div class="timeline-block block-idle" style="left: 25.0%; width: 50.0%;" title="Available at Depot (Standby / Free)" onclick="alert('Available at Depot\nStandby / Free');">Standby / Free</div>
+      </div>
+    </div><div class="timeline-row">
+      <div class="timeline-veh-label">
+        <span class="timeline-veh-code">S-11</span>
+        <span class="timeline-veh-sub">Hyundai Elantra (Executive Sedan)</span>
+      </div>
+      <div class="timeline-track">
+        <div class="timeline-block block-trip" style="left: 29.166666666666668%; width: 33.33333333333333%;" title="BK-2050 Dean Travel (09:30–13:30 Trip)" onclick="alert('BK-2050 Dean Travel\n09:30–13:30 Trip');">09:30–13:30 Trip</div><div class="timeline-block block-buffer" style="left: 62.5%; width: 6.25%;" title="Return Buffer (Buffer)" onclick="alert('Return Buffer\nBuffer');">Buffer</div>
+      </div>
+    </div><div class="timeline-row">
+      <div class="timeline-veh-label">
+        <span class="timeline-veh-code">V-205</span>
+        <span class="timeline-veh-sub">Toyota Corolla (Sedan)</span>
+      </div>
+      <div class="timeline-track">
+        <div class="timeline-block block-trip" style="left: -8.333333333333332%; width: 25.0%;" title="BK-2049 Airport Guest Reception (05:00–08:00 Trip)" onclick="alert('BK-2049 Airport Guest Reception\n05:00–08:00 Trip');">05:00–08:00 Trip</div><div class="timeline-block block-buffer" style="left: 16.666666666666664%; width: 6.25%;" title="Buffer (Buffer)" onclick="alert('Buffer\nBuffer');">Buffer</div><div class="timeline-block block-trip" style="left: 41.66666666666667%; width: 41.66666666666667%;" title="University Board Transit (11:00–16:00 Trip)" onclick="alert('University Board Transit\n11:00–16:00 Trip');">11:00–16:00 Trip</div>
+      </div>
+    </div><div class="timeline-row">
+      <div class="timeline-veh-label">
+        <span class="timeline-veh-code">C-04</span>
+        <span class="timeline-veh-sub">Hyundai Accent (CNG Eco Sedan)</span>
+      </div>
+      <div class="timeline-track">
+        <div class="timeline-block block-trip" style="left: 16.666666666666664%; width: 25.0%;" title="Inter-Campus Mail Run (08:00–11:00 Mail Run)" onclick="alert('Inter-Campus Mail Run\n08:00–11:00 Mail Run');">08:00–11:00 Mail Run</div><div class="timeline-block block-idle" style="left: 41.66666666666667%; width: 50.0%;" title="Standby on Campus (Available)" onclick="alert('Standby on Campus\nAvailable');">Available</div>
+      </div>
+    </div><div class="timeline-row">
+      <div class="timeline-veh-label">
+        <span class="timeline-veh-code">B-07</span>
+        <span class="timeline-veh-sub">MCV 500 (45-Seat Bus)</span>
+      </div>
+      <div class="timeline-track">
+        <div class="timeline-block block-trip" style="left: 4.166666666666666%; width: 16.666666666666664%;" title="Morning Faculty Route #4 (06:30–08:30 Route)" onclick="alert('Morning Faculty Route #4\n06:30–08:30 Route');">06:30–08:30 Route</div><div class="timeline-block block-idle" style="left: 20.833333333333336%; width: 58.333333333333336%;" title="Bus Depot Standby (Standby)" onclick="alert('Bus Depot Standby\nStandby');">Standby</div><div class="timeline-block block-trip" style="left: 79.16666666666666%; width: 16.666666666666664%;" title="Evening Return Route #4 (15:30–17:30 Route)" onclick="alert('Evening Return Route #4\n15:30–17:30 Route');">15:30–17:30 Route</div>
+      </div>
+    </div><div class="timeline-row">
+      <div class="timeline-veh-label">
+        <span class="timeline-veh-code">T-02</span>
+        <span class="timeline-veh-sub">Isuzu NPR Box Truck (4.5t Cargo)</span>
+      </div>
+      <div class="timeline-track">
+        <div class="timeline-block block-trip" style="left: 16.666666666666664%; width: 33.33333333333333%;" title="Lab Chemical Supplies Transfer (08:00–12:00 Cargo)" onclick="alert('Lab Chemical Supplies Transfer\n08:00–12:00 Cargo');">08:00–12:00 Cargo</div><div class="timeline-block block-buffer" style="left: 50.0%; width: 8.333333333333332%;" title="Unloading & Wash (Buffer)" onclick="alert('Unloading & Wash\nBuffer');">Buffer</div>
+      </div>
+    </div><div class="timeline-row">
+      <div class="timeline-veh-label">
+        <span class="timeline-veh-code">V-108</span>
+        <span class="timeline-veh-sub">Nissan Urvan (Van)</span>
+      </div>
+      <div class="timeline-track">
+        <div class="timeline-block block-lockout" style="left: 0.0%; width: 100.0%;" title="Scheduled Preventive Maintenance (Brakes & Clutch) (MAINTENANCE LOCKOUT)" onclick="alert('Scheduled Preventive Maintenance (Brakes & Clutch)\nMAINTENANCE LOCKOUT');">MAINTENANCE LOCKOUT</div>
+      </div>
+    </div>
+  </div>
+</div>
+    </main>
+  </div>
+
+  <!-- Master Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-col" style="flex: 1 1 280px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="logo-badge" style="width: 36px; height: 36px; font-size: 11px; font-weight:900; background:var(--cira-gold); color:var(--cira-burgundy);">CIRA</div>
+            <div class="logo-text">
+              <span class="univ-name" style="color: #FFFFFF; font-size: 17px; font-weight:800;">CIRA EDUCATION</span>
+              <span class="portal-title" style="color: var(--cira-gold); font-size: 10px;">Fleet &amp; Logistics Directorate</span>
+            </div>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 13px; color: #DCE4EF; line-height: 1.6;">
+            Enterprise fleet logistics, vehicle booking, live GPS tracking and algorithmic fuel chargeback across CIRA Education universities and institutions.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Portal Services</h4>
+          <a href="booking-new.html" class="footer-link">Book a Vehicle</a>
+          <a href="vehicles.html" class="footer-link">Vehicle Catalog</a>
+          <a href="booking-track.html" class="footer-link">Track Active Trip</a>
+          <a href="bookings.html" class="footer-link">My Bookings</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Fleet Operations Center</h4>
+          <span>CIRA Education HQ · Central Logistics Operations</span>
+          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
+          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
+          <span>Email: fleet.operations@cira.com.eg</span>
+          <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 CIRA Education (Cairo for Investment and Real Estate Development S.A.E.)</span>
+        <div style="display: flex; gap: 20px;">
+          <a href="policies.html" class="footer-link">Policies &amp; Rules</a>
+          <a href="help.html" class="footer-link">Fleet Help Desk</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!Auth.requireAuth(["Dispatcher"])) return;
+      Auth.renderAppShell('timeline');
+      
+    });
+  </script>
+</body>
+</html>

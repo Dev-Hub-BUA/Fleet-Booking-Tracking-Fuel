@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Log & Fuel Reconciliation Bureau — CIRA Education Fleet Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23703845%22/><text y=%2266%22 x=%2250%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2232%22 fill=%22%23CE9F51%22>CIRA</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/auth.js"></script>
+</head>
+<body>
+
+  <!-- Master Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="home.html" class="logo-btn" style="text-decoration:none;">
+        <span class="logo-badge" style="background:var(--cira-burgundy); color:var(--cira-gold); font-size:12px; font-weight:900; letter-spacing:0.06em;">CIRA</span>
+        <span class="logo-text">
+          <span class="univ-name">CIRA EDUCATION</span>
+          <span class="portal-title">Fleet &amp; Logistics Directorate</span>
+        </span>
+      </a>
+
+      <!-- Authenticated Controls -->
+      <div class="header-actions">
+        <div class="search-wrapper">
+          <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          </span>
+          <input type="search" class="search-input" placeholder="Search bookings, vehicles, drivers…" aria-label="Search fleet records">
+        </div>
+
+        <a href="notifications.html" class="btn-icon" title="Notifications" aria-label="Notifications" style="text-decoration:none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <span class="badge-counter">3</span>
+        </a>
+
+        <!-- User Dropdown Menu -->
+        <div class="user-menu-wrapper">
+          <button type="button" class="user-btn">
+            <span class="user-avatar" style="background:var(--cira-burgundy); color:var(--cira-gold);">SM</span>
+            <span class="user-info">
+              <span class="user-name">Loading...</span>
+              <span class="user-role-badge">Authenticating</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="dropdown-menu" id="user-dropdown-menu" role="menu"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-container">
+    <aside class="sidebar-nav" aria-label="Sidebar Navigation">
+      <div>
+        <span class="nav-section-title">Navigation</span>
+        <div class="nav-links"></div>
+      </div>
+    </aside>
+
+    <main class="main-content" role="main">
+      <div class="page-header">
+  <div class="page-title-group">
+    <span class="page-pretitle">Internal Audit Bureau &amp; Compliance</span>
+    <h1 class="page-title">Audit Log &amp; Fuel Reconciliation</h1>
+    <span class="page-subtitle">Cryptographically stamped immutable change ledger and automated chargeback verification</span>
+  </div>
+  <button class="btn btn-secondary" onclick="alert('Exporting signed audit package for University Comptroller.');" style="display:flex; align-items:center; gap:8px;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span>Export Audit Package</span>
+  </button>
+</div>
+
+<div class="card" style="margin-bottom: 24px;">
+  <h2 class="card-title">1. Trip Fuel &amp; Mileage Reconciliation Ledger</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Trip</th>
+          <th>Department</th>
+          <th>Route</th>
+          <th style="text-align:right;">Est Fuel</th>
+          <th style="text-align:right;">Act Fuel</th>
+          <th style="text-align:right;">Delta %</th>
+          <th>Audit Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">BK-2045</td>
+      <td>President’s Office</td>
+      <td><strong>Campus → Cairo Airport T3</strong></td>
+      <td style="font-family:var(--font-mono); text-align:right;">7.2 L</td>
+      <td style="font-family:var(--font-mono); text-align:right;">7 L</td>
+      <td style="font-family:var(--font-mono); text-align:right; font-weight:700; color:var(--success);">-2.8%</td>
+      <td><span class="badge badge-success">Reconciled</span></td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">BK-2040</td>
+      <td>Faculty of Science</td>
+      <td><strong>Campus → Ain Sokhna Site</strong></td>
+      <td style="font-family:var(--font-mono); text-align:right;">68 L</td>
+      <td style="font-family:var(--font-mono); text-align:right;">71.5 L</td>
+      <td style="font-family:var(--font-mono); text-align:right; font-weight:700; color:var(--danger);">5.1%</td>
+      <td><span class="badge badge-warning">Flagged (Anomaly)</span></td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">BK-2038</td>
+      <td>University Admin</td>
+      <td><strong>Campus → Ministry of Higher Ed</strong></td>
+      <td style="font-family:var(--font-mono); text-align:right;">8.4 L</td>
+      <td style="font-family:var(--font-mono); text-align:right;">8.1 L</td>
+      <td style="font-family:var(--font-mono); text-align:right; font-weight:700; color:var(--success);">-3.6%</td>
+      <td><span class="badge badge-success">Reconciled</span></td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">BK-2022</td>
+      <td>Engineering Projects</td>
+      <td><strong>Depot → New Administrative Capital</strong></td>
+      <td style="font-family:var(--font-mono); text-align:right;">24.5 L</td>
+      <td style="font-family:var(--font-mono); text-align:right;">24 L</td>
+      <td style="font-family:var(--font-mono); text-align:right; font-weight:700; color:var(--success);">-2%</td>
+      <td><span class="badge badge-success">Reconciled</span></td>
+    </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="card-title">2. Immutable System Action Log (WORM Hash Chain)</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Event ID</th>
+          <th>Timestamp</th>
+          <th>Entity</th>
+          <th>Actor</th>
+          <th>Action</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8812</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">13 Oct 2026 · 08:31:04</td>
+      <td style="font-family:var(--font-mono);">BK-2047 · V-122</td>
+      <td><strong>System (GPS Geo-Trigger)</strong></td>
+      <td><span class="badge badge-info">TRIP_ACTIVATED</span></td>
+      <td style="font-size:13px; color:var(--text-muted);">Vehicle departed campus perimeter. Real-time telemetry streaming started.</td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8811</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">13 Oct 2026 · 08:20:19</td>
+      <td style="font-family:var(--font-mono);">BK-2047 · V-122</td>
+      <td><strong>Driver Ahmed Hassan (D-101)</strong></td>
+      <td><span class="badge badge-info">ASSIGNMENT_ACCEPTED</span></td>
+      <td style="font-size:13px; color:var(--text-muted);">Pre-trip checklist validated. Duty hour window confirmed 6.5h / 8h.</td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8810</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">12 Oct 2026 · 14:20:44</td>
+      <td style="font-family:var(--font-mono);">BK-2047 · V-114 → V-122</td>
+      <td><strong>Tarek El-Sayed (DS-202)</strong></td>
+      <td><span class="badge badge-info">VEHICLE_SUBSTITUTION</span></td>
+      <td style="font-size:13px; color:var(--text-muted);">Automated conflict detector identified 45-min buffer overlap on V-114. Swapped to V-122.</td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8809</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">12 Oct 2026 · 14:20:30</td>
+      <td style="font-family:var(--font-mono);">BK-2047</td>
+      <td><strong>Tarek El-Sayed (DS-202)</strong></td>
+      <td><span class="badge badge-info">REQUEST_APPROVED</span></td>
+      <td style="font-size:13px; color:var(--text-muted);">Booking approved for Faculty of Pharmacy (CC-410). Pre-authorization hold 350.00 EGP logged.</td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8808</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">12 Oct 2026 · 11:40:12</td>
+      <td style="font-family:var(--font-mono);">BK-2047</td>
+      <td><strong>Dr. Sarah Mansour (RQ-101)</strong></td>
+      <td><span class="badge badge-info">BOOKING_SUBMITTED</span></td>
+      <td style="font-size:13px; color:var(--text-muted);">Initial request submitted via web portal: 61.4 km, estimated fuel 14.1 L Diesel.</td>
+    </tr><tr>
+      <td style="font-family:var(--font-mono); font-weight:700;">LOG-8807</td>
+      <td style="font-family:var(--font-mono); font-size:13px;">12 Oct 2026 · 09:15:00</td>
+      <td style="font-family:var(--font-mono);">Price Book v3</td>
+      <td><strong>Eng. Mahmoud Fawzy (FA-404)</strong></td>
+      <td><span class="badge badge-info">PRICE_BOOK_AUDIT</span></td>
+      <td style="font-size:13px; color:var(--text-muted);">Quarterly fuel prices cross-checked against official Egyptian Petroleum pricing gazette.</td>
+    </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+    </main>
+  </div>
+
+  <!-- Master Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-col" style="flex: 1 1 280px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="logo-badge" style="width: 36px; height: 36px; font-size: 11px; font-weight:900; background:var(--cira-gold); color:var(--cira-burgundy);">CIRA</div>
+            <div class="logo-text">
+              <span class="univ-name" style="color: #FFFFFF; font-size: 17px; font-weight:800;">CIRA EDUCATION</span>
+              <span class="portal-title" style="color: var(--cira-gold); font-size: 10px;">Fleet &amp; Logistics Directorate</span>
+            </div>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 13px; color: #DCE4EF; line-height: 1.6;">
+            Enterprise fleet logistics, vehicle booking, live GPS tracking and algorithmic fuel chargeback across CIRA Education universities and institutions.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Portal Services</h4>
+          <a href="booking-new.html" class="footer-link">Book a Vehicle</a>
+          <a href="vehicles.html" class="footer-link">Vehicle Catalog</a>
+          <a href="booking-track.html" class="footer-link">Track Active Trip</a>
+          <a href="bookings.html" class="footer-link">My Bookings</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Fleet Operations Center</h4>
+          <span>CIRA Education HQ · Central Logistics Operations</span>
+          <span>Operations Desk: <strong>Ext. 4108 / 4109</strong></span>
+          <span>Emergency Line: <strong>+20 10 2233 4455</strong></span>
+          <span>Email: fleet.operations@cira.com.eg</span>
+          <span style="color: var(--cira-gold); font-weight: 600;">24/7 Dispatch Availability</span>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 CIRA Education (Cairo for Investment and Real Estate Development S.A.E.)</span>
+        <div style="display: flex; gap: 20px;">
+          <a href="policies.html" class="footer-link">Policies &amp; Rules</a>
+          <a href="help.html" class="footer-link">Fleet Help Desk</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!Auth.requireAuth(["Auditor"])) return;
+      Auth.renderAppShell('audit');
+      
+    });
+  </script>
+</body>
+</html>
